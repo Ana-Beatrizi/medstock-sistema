@@ -35,7 +35,14 @@ class Cliente(Crudmedstock):
         ]
         return [erro for erro in erros if erro]
 #===========================================================
-
+    @classmethod
+    def deletar_cliente(cls, id):
+        cliente = cls.seleciona_por_id(id)
+        if not cliente:
+            raise ValueError("Cliente não encontrado.")
+        '''if cls.has_related_records(id): #! atencao
+            raise ValueError("Não é possível excluir o produto porque ele possui pedidos ou movimentações vinculadas.")'''
+        cls.delete(id)
 
 # FINALIZAR
 

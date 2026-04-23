@@ -1,38 +1,52 @@
-'''from core.crud_base import CrudBase
-from core.database import Database
-from core.validator import Validator
+from core.crud_base import Crudmedstock
+from core.database import conectar_banco
+from core.validador import Validador
 
-class Produto(CrudBase):
+class Produto(Crudmedstock):
     table = "produto"
     fields = [
         "nome",
         "quantidade_estoque",
         "categoria",
+        "estoque_minimo",
         "preco_custo",
         "preco_venda",
     ]
 
-    def __init__(self, nome, quantidade_estoque, categoria, preco_custo,
+    def __init__(self, nome, quantidade_estoque, categoria, estoque_minimo, preco_custo,
                  preco_venda,):
         self.nome = nome
         self.quantidade_estoque = quantidade_estoque
         self.categoria = categoria
+        self.estoque_minimo = estoque_minimo
         self.preco_custo = preco_custo
         self.preco_venda = preco_venda
 
 
     def validate(self):
         erros = [
-            Validator.required(self.nome, "nome"),
-            Validator.non_negative(self.quantidade, "quantidade"),
-            Validator.non_negative(self.estoque_minimo, "estoque mínimo"),
-            Validator.non_negative(self.preco_custo, "preço de custo"),
-            Validator.non_negative(self.preco_venda, "preço de venda")
+            Validador.obrigatorio(self.nome, "nome"),
+            Validador.nao_negativo(self.quantidade_estoque, "quantidade_estoque"),
+            Validador.nao_negativo(self.preco_custo, "preço de custo"),
+            Validador.nao_negativo(self.preco_venda, "preço de venda"),
+            Validador.nao_negativo(self.estoque_minimo, "estoque_minimo"),
+            Validador.obrigatorio(self.estoque_minimo, "estoque_minimo"),
         ]
         return [erro for erro in erros if erro]
 
     @classmethod
-    def low_stock(cls):
+    def deletar_produto(cls, id):
+        produto = cls.seleciona_por_id(id)
+        if not produto:
+            raise ValueError("Produto não encontrado.")
+        '''if cls.has_related_records(id): #! atencao
+            raise ValueError("Não é possível excluir o produto porque ele possui pedidos ou movimentações vinculadas.")'''
+        cls.delete(id)
+'''
+#! =================
+#! err
+    @classmethod
+    def estoque_baixo(cls):
         conexao = Database.connect()
         cursor = conexao.cursor(dictionary=True)
         try:
@@ -79,13 +93,4 @@ class Produto(CrudBase):
         finally:
             cursor.close()
             conexao.close()
-
-    @classmethod
-    def safe_delete(cls, id):
-        produto = cls.find_by_id(id)
-        if not produto:
-            raise ValueError("Produto não encontrado.")
-        if cls.has_related_records(id):
-            raise ValueError("Não é possível excluir o produto porque ele possui pedidos ou movimentações vinculadas.")
-        cls.delete(id)
 '''

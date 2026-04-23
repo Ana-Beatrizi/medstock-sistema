@@ -127,15 +127,8 @@ justify-content: center;
 #requisitos-minimos{
     font-family: 'Inter', sans-serif;
     font-size: 13px;
-    color: #ff6f6f;
-    font-weight: 400;
 }
 
-#requisitos-minimos p{
-    margin-top: 0;
-    margin-bottom: 0;
-
-}
 
 #grupo1{
     margin-bottom: 0px;

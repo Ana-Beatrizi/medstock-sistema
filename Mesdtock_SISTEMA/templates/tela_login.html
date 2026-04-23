@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +16,7 @@
     <!-- Fonte moderna -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div class="container d-flex align-items-center justify-content-center login container">
         <div class="login-card text-center">
@@ -29,7 +31,8 @@
                         <span class="input-group-text bg-dark border-secondary">
                             <i class="bi bi-envelope text-white"></i>
                         </span>
-                        <input type="email" name="email" id="email" class="form-control" placeholder="Digite seu email" required>
+                        <input type="email" name="email" id="email" class="form-control" placeholder="Digite seu email"
+                            required>
                     </div>
                 </div>
 
@@ -39,26 +42,29 @@
                         <span class="input-group-text bg-dark border-secondary">
                             <i class="bi bi-lock text-white"></i>
                         </span>
-                        <input type="password" name="senha" id="password" class="form-control" placeholder="Digite sua senha" required>
+                        <input type="password" name="senha" id="password" class="form-control"
+                            placeholder="Digite sua senha" required>
                     </div>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" value="" id="checkDefault">
                     <label class="form-check-label" for="checkDefault">
-                      Lembre de Mim
+                        Lembre de Mim
                     </label>
                     <p><a class="link-offset-1" href="#">Esqueci a Senha</a></p>
-                  </div>
+                </div>
                 <button type="submit" class="btn btn-login w-100 text-white mt-2">Entrar</button>
             </form>
 
-            {% with mensagem = get_flashed_messages() %}
+            {% with mensagem = get_flashed_messages(with_categories = true) %}
             {% if mensagem %}
-                <div class="alert alert-danger" id="alerta-erro">
-                    {{ mensagem }}
-                </div>
+            {% for categoria, msg in mensagem%}
+            <div class="alert alert-{{ categoria }} mt-2" id="alerta-erro">
+                {{ msg }}
+            </div>
+            {% endfor %}
             {% endif %}
-        {% endwith %}
+            {% endwith %}
 
             <div class="mt-4 text-dark" style="font-size: 13px;">
                 &copy; 2026 MEDSTOCK - Sistema de Estoque
@@ -66,4 +72,5 @@
         </div>
     </div>
 </body>
+
 </html>

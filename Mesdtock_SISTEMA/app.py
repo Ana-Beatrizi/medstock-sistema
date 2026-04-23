@@ -1,9 +1,25 @@
 from flask import Flask, jsonify, request, url_for, render_template, redirect, flash, jsonify
 from models.cliente import Cliente
+from models.produto import Produto
 
 
 app = Flask(__name__)
 app.secret_key = "Medstock_programa_de_estoque_123456"
+
+# TRANSFORMA DADOS ============
+def to_int(value, default=0):
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def to_float(value, default=0.0):
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+# ===============================
 
 # TELA DE CADASTRO ===============
 @app.route("/")
@@ -23,6 +39,14 @@ def tela_home():
     return render_template("tela_home.html")
 #==============================================
 
+# TELA CADASTRO PRODUTO==============
+@app.route("/cadastro/produto")
+def tela_cadastro_produto():
+    return render_template("tela_cadastro_produto.html")
+#==============================================
+
+
+# -------------------------------------- CLIENTE ------------------------------------------
 # GET FORM TELA DE CADASTRO ===============
 def get_cliente_form_cadastro():
     return {
@@ -41,17 +65,61 @@ def salvar_cliente():
     erros = cliente.validate()
 
     if erros:
-            flash(erros[0], "erro")
+            flash(erros[0], "danger")
             return render_template("tela_cadastro.html", cliente=dados)
 
     try:
         cliente.insert()
-        flash("Cliente cadastrado com sucesso.", "sucesso")
+        flash("Cliente cadastrado com sucesso.", "success")
         return redirect(url_for("tela_login"))
     except Exception as e:
-        flash(f"Erro ao cadastrar Cliente: {e}", "erro")
+        # Verifica se o erro é de entrada duplicada (código 1062 do MySQL)
+        if "1062" in str(e):
+            flash("E-mail ou CPF já cadastrado no sistema.", "danger")
+        else:
+            flash(f"Erro ao cadastrar Cliente: {e}", "danger")
         return render_template("tela_cadastro.html", cliente=dados)
 #==============================================
+
+# POST ATUALIZAR CLIENTE ======================
+@app.route("/cliente/atualizar/<int:id>", methods=["POST"])
+def atualizar_cliente(id):
+    dados = get_cliente_form_cadastro()
+    cliente = Cliente(**dados)
+    erros = cliente.validate()
+
+    if erros:
+        for erro in erros:
+            flash(erro[0], "erro")
+        dados["id"] = id
+        return render_template("tela_cadastro.html", cliente=dados) #! erro tela indefinida
+
+    try:
+        if not Cliente.seleciona_por_id(id):
+            flash("Cliente não encontrado.", "danger")
+            return redirect(url_for("tela_login")) #!
+
+        cliente.atualizar(id)
+        flash("Cliente atualizado com sucesso.", "success")
+        return redirect(url_for("tela_login")) #!
+    except Exception as e:
+        dados["id"] = id
+        flash(f"Erro ao atualizar cliente: {e}", "danger")
+        return render_template("tela_cadastro.html", cliente=dados)
+# =========================================
+
+# DELETAR CLIENTE ==================
+@app.route("/cliente/excluir/<int:id>")
+def excluir_cliente(id):
+    try:
+        Cliente.deletar_cliente(id)
+        flash("Cliente excluído com sucesso.", "success")
+    except ValueError as e:
+        flash(str(e), "danger")
+    except Exception as e:
+        flash(f"Erro ao excluir cliente: {e}", "danger")
+    return redirect(url_for("tela_login")) #!
+# ====================================
 
 # Faz LOGIN ===============
 @app.route("/cliente/login", methods=['POST'])
@@ -59,47 +127,179 @@ def fazer_login():
     email = request.form.get("email")
     senha = request.form.get("senha")
 
+    print('email e senha',email)
+
     usuario = Cliente.seleciona_por_email(email)
 
     if usuario["senha"] == senha:
-        flash("Login realizado com sucesso!")
+        flash("Login realizado com sucesso!", "success")
         return redirect(url_for("tela_home"))
     else:
-        flash("Email ou senha inválidos!")
+        flash("Email ou senha inválidos!", "danger")
         return render_template("tela_login.html")
 
+# -------------------------------------- CLIENTE FIM ------------------------------------------
 
-#==============================================
+#! -------------------------------------- PRODUTO ------------------------------------------
+# GET FORM TELA CADASTRO DE PRODUTO ===========
+def get_produto_form_cadastro():
+    return {
+        "nome": request.form.get("nome", "").strip(),
+        "quantidade_estoque": to_int(request.form.get("quantidade_estoque")),
+        "categoria": request.form.get("categoria", "").strip(),
+        "estoque_minimo": to_int(request.form.get("estoque_minimo")),
+        "preco_custo": to_float(request.form.get("preco_custo")),
+        "preco_venda": to_float(request.form.get("preco_venda")),
+        
+    }
+# ===============================
+
+# POST SALVAR PRODUTO =======================
+@app.route("/produto/salvar", methods=["POST"])
+def salvar_produto():
+    dados = get_produto_form_cadastro()
+    produto = Produto(**dados)
+    erros = produto.validate()
+
+    if erros:
+        for erro in erros:
+            flash(erro[0], "danger")
+        return render_template("formulario_produto.html", produto=dados) #! erro
+
+    try:
+        produto.insert()
+        flash("Produto cadastrado com sucesso.", "success")
+        return redirect(url_for("tela_home"))
+    except Exception as e:
+        # Verifica se o erro é de entrada duplicada (código 1062 do MySQL)
+        if "1062" in str(e):
+            flash("Produto já cadastrado.", "danger")
+        else:
+            flash(f"Erro ao cadastrar produto: {e}", "danger") #! erro
+        return render_template("tela_cadastro.html", produto=dados)
+# ================================================
+
+# POST ATUALIZAR PRODUTO ======================
+@app.route("/produto/atualizar/<int:id>", methods=["POST"])
+def atualizar_produto(id):
+    dados = get_produto_form_cadastro()
+    produto = Produto(**dados)
+    erros = produto.validate()
+
+    if erros:
+        for erro in erros:
+            flash(erro[0], "erro")
+        dados["id"] = id
+        return render_template("tela_cadastro.html", produto=dados) #! erro
+
+    try:
+        if not Produto.seleciona_por_id(id):
+            flash("Produto não encontrado.", "erro")
+            return redirect(url_for("produtos"))
+
+        produto.atualizar(id)
+        flash("Produto atualizado com sucesso.", "success")
+        return redirect(url_for("produtos"))
+    except Exception as e:
+        dados["id"] = id
+        flash(f"Erro ao atualizar produto: {e}", "danger")
+        return render_template("tela_cadastro.html", produto=dados)
+# =========================================
+
+# PUT EDITAR PRODUTO ==================
+@app.route("/produto/editar/<int:id>")
+def editar_produto(id):
+    produto = Produto.seleciona_por_id(id)
+    if not produto:
+        flash("Produto não encontrado.", "danger")
+        return redirect(url_for("produtos"))
+    return render_template("formulario_produto.html", produto=produto) #! erro
+# ==============================
+
+# DELETAR PRODUTO ==================
+@app.route("/produto/excluir/<int:id>")
+def excluir_produto(id):
+    try:
+        Produto.deletar_produto(id)
+        flash("Produto excluído com sucesso.", "success")
+    except ValueError as e:
+        flash(str(e), "danger")
+    except Exception as e:
+        flash(f"Erro ao excluir produto: {e}", "danger")
+    return redirect(url_for("tela_login")) #!
+# ====================================
+# -------------------------------------- PRODUTO FIM ------------------------------------------
+
+#! -------------------------------------- PEDIDOS ------------------------------------------
+@app.route("/pedido/novo/<tipo>/<int:id>")
+def novo_pedido(tipo, id):
+    produto = Produto.seleciona_por_id(id)
+    tipo = tipo.upper()
+
+    if not produto:
+        flash("Produto não encontrado.", "danger")
+        return redirect(url_for("produtos"))
+
+    if tipo not in ["ENTRADA", "SAIDA"]:
+        flash("Tipo de pedido inválido.", "erro")
+        return redirect(url_for("produtos"))
+
+    return render_template("formulario_pedido.html", produto=produto, tipo=tipo, pedido=None)
+
+
+@app.route("/pedido/salvar", methods=["POST"])
+def salvar_pedido():
+    dados = get_pedido_form()
+    produto = Produto.find_by_id(dados["produto_id"])
+    pedido = PedidoMovimentacao(**dados)
+    erros = pedido.validate()
+
+    if not produto:
+        flash("Produto não encontrado.", "erro")
+        return redirect(url_for("produtos"))
+
+    if erros:
+        for erro in erros:
+            flash(erro, "erro")
+        return render_template("formulario_pedido.html", produto=produto, tipo=dados["tipo"], pedido=dados)
+
+    try:
+        pedido.insert()
+        flash("Pedido criado com sucesso.", "sucesso")
+        return redirect(url_for("pedidos"))
+    except Exception as e:
+        flash(f"Erro ao criar pedido: {e}", "erro")
+        return render_template("formulario_pedido.html", produto=produto, tipo=dados["tipo"], pedido=dados)
+
+
+@app.route("/pedido/processar/<int:id>")
+def processar_pedido(id):
+    try:
+        mensagem = PedidoMovimentacao.processar(id)
+        flash(mensagem, "sucesso")
+    except ValueError as e:
+        flash(str(e), "erro")
+    except Exception as e:
+        flash(f"Erro ao processar pedido: {e}", "erro")
+    return redirect(url_for("pedidos"))
+
+
+@app.route("/pedido/cancelar/<int:id>")
+def cancelar_pedido(id):
+    try:
+        mensagem = PedidoMovimentacao.cancelar(id)
+        flash(mensagem, "sucesso")
+    except ValueError as e:
+        flash(str(e), "erro")
+    except Exception as e:
+        flash(f"Erro ao cancelar pedido: {e}", "erro")
+    return redirect(url_for("pedidos"))
+
 
 '''usuarios = []
 perfil = ["cliente", "fornercedor"]
 
-@app.route("/usuarios", methods=["POST"])
-def criar_usuario():
-    dados = request.json
-    resposta = insert_cliente(dados)
 
-    res_nome = validar_nome(dados["nome"])
-    res_email = valida_externa_email(dados["email"])
-    res_senha = validar_senha(dados["senha"])
-    res = validar_cpf(dados["cpf"])
-
-    posta = valida_externa_cpf(res)
-    return jsonify(resposta), 201 if resposta.get('status') == 'sucesso' else 400
-    return jsonify({
-                        "cpf": posta,
-                         "nome" : res_nome,
-                         "email": res_email,
-                         "senha": res_senha})
-
-    return jsonify({"valida": False})
-
-# ======================GET============================
-
-@app.route("/usuarios/<int:idcliente>", methods=["GET"])
-def buscar_usuario(idcliente):
-    resposta = read_cliente(idcliente)
-    return jsonify(resposta)
 
 # ======================PUT============================
 @app.route("/usuarios/atualizar/<int:idcliente>", methods=["PUT"])
@@ -117,40 +317,6 @@ def deletar_usuario(idcliente):
     resposta = delete_cliente(idcliente)
     return jsonify(resposta)
 
-
-#? =========================PRODUTOS==========================
-produtos = []
-@app.route("/produtos", methods=["POST"])
-def adicionar_produto():
-    novo_produto = request.get_json()
-    produtos.append(novo_produto)
-    return jsonify({"mensagem": "Produto adicionado com sucesso"}), 201
-
-@app.route("/produtos", methods=["GET"])
-def listar_produtos():
-    return jsonify(produtos)
-
-@app.route("/produtos/<int:indice>", methods=["GET"])
-def buscar_produto(indice):
-    if indice < len(produtos):
-        return jsonify(produtos[indice])
-    return jsonify({"erro": "Produto não encontrado"}), 404
-
-@app.route("/produtos/<int:indice>", methods=["PUT"])
-def atualizar_produto(indice):
-    if indice < len(produtos):
-        dados = request.get_json()
-        produtos[indice].update(dados)
-        return jsonify({"mensagem": "Produto atualizado com sucesso!"})
-    return jsonify({"erro": "Produto não encontrado"}), 404
-
-@app.route("/produtos/<int:indice>", methods=["DELETE"])
-def deletar_produto(indice):
-    if indice < len(produtos):
-        produtos.pop(indice)
-        return jsonify({"mensagem": "Produto removido com sucesso!"})
-    return jsonify({"erro": "Produto não encontrado"}), 404
-# =========================PRODUTOS FIM==========================
 
 
 # Fornecedores

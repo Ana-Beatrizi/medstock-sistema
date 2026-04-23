@@ -21,7 +21,7 @@
 
 
     <div class="container d-flex align-items-center justify-content-center cadastro container">
-        
+
 
         <div class="pb-3 cadastro-card text-center">
             <!--Logo-->
@@ -39,8 +39,8 @@
                         <span class="input-group-text bg-dark border-secondary">
                             <i class="bi bi-person text-white"></i>
                         </span>
-                        <input value="{{ cliente.nome if cliente else '' }}" type="text" name="nome" id="nome" class="form-control" placeholder="Digite seu nome"
-                            required>
+                        <input value="{{ cliente.nome if cliente else '' }}" type="text" name="nome" id="nome"
+                            class="form-control" placeholder="Digite seu nome" required>
                     </div>
                 </div>
 
@@ -56,50 +56,58 @@
                 </div>
 
 
-            <div id="separador">
-                <div class=" text-start" id="grupo1">
-                    <label class="mb-1 form-label text-dark">CPF</label>
-                    <div class="input-group" >
-                        <span class="input-group-text bg-dark border-secondary">
-                            <i class="bi bi-key text-white"></i>
-                        </span>
-                        <input type="text" name="cpf" id="cpf" class="form-control" placeholder="Digite seu CPF" required>
+                <div id="separador">
+                    <div class=" text-start" id="grupo1">
+                        <label class="mb-1 form-label text-dark">CPF</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-secondary">
+                                <i class="bi bi-key text-white"></i>
+                            </span>
+                            <input type="text" name="cpf" id="cpf" class="form-control" placeholder="Digite seu CPF"
+                                required>
+                        </div>
+                    </div>
+
+                    <div class="text-start" id="grupo2">
+                        <label class="mb-1 form-label text-dark">Senha</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-secondary">
+                                <i class="bi bi-lock text-white"></i>
+                            </span>
+                            <input type="password" name="senha" id="password" class="form-control"
+                                placeholder="Digite sua senha" required>
+
+                                {% with messages = get_flashed_messages() %}
+                                {% if messages %}
+                                    <div id="requisitos-minimos" style="color: red; margin-top: 5px;">
+                                        <p class="mb-0">A senha deve conter no mínimo: </p>
+                                        <p class="mb-0">• 1 letra maiúscula e minúscula</p>
+                                        <p class="mb-0">• 8 caracteres</p>
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
                     </div>
                 </div>
 
-                <div class="text-start" id="grupo2">
-                    <label class="mb-1 form-label text-dark">Senha</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-dark border-secondary">
-                            <i class="bi bi-lock text-white"></i>
-                        </span>
-                        <input type="password" name="senha" id="password" class="form-control"
-                            placeholder="Digite sua senha" required>
-                            <div id="requisitos-minimos">
-                            <p>A senha deve conter no mínimo: </p>
-                            <p>• 1 letra maiúscula e minúscula</p>
-                            <p>• 8 caracteres</p>
-                            </div>
-                    </div>
-                </div>
-            </div>
 
 
-                
-                <button type="submit" class="btn btn-cadastro w-100 text-white mt-2">Cadastrar</button>
+                <button type="submit" class="btn btn-cadastro w-100 text-white mt-3">Cadastrar</button>
             </form>
 
-            {% with mensagem = get_flashed_messages() %}
+            {% with mensagem = get_flashed_messages(with_categories = true) %}
             {% if mensagem %}
-                <div class="alert alert-danger" id="alerta-erro">
-                    {{ mensagem }}
-                </div>
+            {% for categoria, msg in mensagem%}
+            <div class="alert alert-{{ categoria }}" id="alerta-erro">
+                {{ msg }}
+            </div>
+            {% endfor %}
             {% endif %}
-        {% endwith %}
+            {% endwith %}
 
-        <p id="faz_login2">Já tem cadastro?</p>
-        <a href="{{ url_for('tela_login')}}" id="faz_login1">
-            <button class="" id="faz_login">Fazer Login</button>
+            <p id="faz_login2">Já tem cadastro?</p>
+            <a href="{{ url_for('tela_login')}}" id="faz_login1">
+                <button class="" id="faz_login">Fazer Login</button>
             </a>
 
             <div class="mt-4 text-dark" style="font-size: 13px;">
