@@ -16,6 +16,21 @@ CREATE TABLE IF NOT EXISTS cliente (
   UNIQUE (cpf)
 ) ENGINE = InnoDB;
 
+-- ================= CLIENTE CADASTRADOS =================
+CREATE TABLE IF NOT EXISTS clientes_cadastro (
+ id INT NOT NULL AUTO_INCREMENT,
+ nome VARCHAR(100) NOT NULL,
+ cpf CHAR(11) UNIQUE,
+ telefone VARCHAR(20),
+ endereco VARCHAR(150),
+ numero VARCHAR(20),
+ bairro VARCHAR(50),
+ cidade VARCHAR(50),
+ estado CHAR(2),
+ cep CHAR(8),
+ PRIMARY KEY (id)
+) ENGINE=InnoDB;
+
 -- ================= PRODUTO =================
 CREATE TABLE IF NOT EXISTS produto (
   id INT NOT NULL AUTO_INCREMENT,
@@ -50,20 +65,29 @@ CREATE TABLE IF NOT EXISTS movimentacao (
 ) ENGINE = InnoDB;
 
 -- ================= PEDIDO CLIENTE =================
-CREATE TABLE IF NOT EXISTS pedido_cliente (
+CREATE TABLE IF NOT EXISTS saida (
   id INT NOT NULL AUTO_INCREMENT,
   data_pedido DATETIME NOT NULL,
+  tipo VARCHAR(10) NOT NULL,
+quantidade INT NOT NULL,
   valor_total DECIMAL(10,2) NOT NULL,
+  observacao VARCHAR(255),
+data_processamento DATETIME NULL,
   cliente_id INT NOT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (cliente_id) REFERENCES cliente (id)
 ) ENGINE = InnoDB;
 
+
 -- ================= PEDIDO FORNECEDOR =================
-CREATE TABLE IF NOT EXISTS pedido_fornecedor (
+CREATE TABLE IF NOT EXISTS entrada (
   id INT NOT NULL AUTO_INCREMENT,
-  valor_total DECIMAL(10,2) NULL,
   data_pedido DATETIME NULL,
+  tipo VARCHAR(10) NOT NULL,
+quantidade INT NOT NULL,
+  valor_total DECIMAL(10,2) NOT NULL,
+  observacao VARCHAR(255),
+   data_processamento DATETIME NULL,
   fornecedor_id INT NOT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (fornecedor_id) REFERENCES fornecedor (id)

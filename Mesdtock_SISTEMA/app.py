@@ -42,7 +42,25 @@ def tela_home():
 # TELA CADASTRO PRODUTO==============
 @app.route("/cadastro/produto")
 def tela_cadastro_produto():
-    return render_template("tela_cadastro_produto.html")
+    return render_template("tela_cadastro_produto.html", produto = None)
+#==============================================
+
+# TELA PRODUTO==============
+@app.route("/produto")
+def tela_produtos():
+    return render_template("tela_produtos.html", produtos = Produto.seleciona_tudo(order_by="nome"))
+#==============================================
+
+# TELA PEDIDOS==============
+@app.route("/pedido")
+def tela_pedidos():
+    return render_template("tela_pedidos.html")
+#==============================================
+
+# TELA CADASTRO PEDIDOS==============
+@app.route("/cadastro/pedido")
+def tela_cadastro_pedidos():
+    return render_template("tela_cadastro_pedidos.html", pedidos=PedidoMovimentacao.find_all_with_product())
 #==============================================
 
 
@@ -97,11 +115,11 @@ def atualizar_cliente(id):
     try:
         if not Cliente.seleciona_por_id(id):
             flash("Cliente não encontrado.", "danger")
-            return redirect(url_for("tela_login")) #!
+            return redirect(url_for("tela_login"))
 
         cliente.atualizar(id)
         flash("Cliente atualizado com sucesso.", "success")
-        return redirect(url_for("tela_login")) #!
+        return redirect(url_for("tela_login"))
     except Exception as e:
         dados["id"] = id
         flash(f"Erro ao atualizar cliente: {e}", "danger")
@@ -140,6 +158,9 @@ def fazer_login():
 
 # -------------------------------------- CLIENTE FIM ------------------------------------------
 
+# -------------------------------------- CADASTRAR CLIENTES ------------------------------------------
+# GET FORM CADASTRO DE CLIENTES===============
+
 #! -------------------------------------- PRODUTO ------------------------------------------
 # GET FORM TELA CADASTRO DE PRODUTO ===========
 def get_produto_form_cadastro():
@@ -169,14 +190,14 @@ def salvar_produto():
     try:
         produto.insert()
         flash("Produto cadastrado com sucesso.", "success")
-        return redirect(url_for("tela_home"))
+        return redirect(url_for("tela_produtos"))
     except Exception as e:
         # Verifica se o erro é de entrada duplicada (código 1062 do MySQL)
         if "1062" in str(e):
             flash("Produto já cadastrado.", "danger")
         else:
             flash(f"Erro ao cadastrar produto: {e}", "danger") #! erro
-        return render_template("tela_cadastro.html", produto=dados)
+        return render_template("tela_cadastro_produto.html", produto=dados)
 # ================================================
 
 # POST ATUALIZAR PRODUTO ======================
@@ -190,20 +211,20 @@ def atualizar_produto(id):
         for erro in erros:
             flash(erro[0], "erro")
         dados["id"] = id
-        return render_template("tela_cadastro.html", produto=dados) #! erro
+        return render_template("tela_produtos.html", produto=dados) 
 
     try:
         if not Produto.seleciona_por_id(id):
             flash("Produto não encontrado.", "erro")
-            return redirect(url_for("produtos"))
+            return redirect(url_for("tela_produtos"))
 
         produto.atualizar(id)
         flash("Produto atualizado com sucesso.", "success")
-        return redirect(url_for("produtos"))
+        return redirect(url_for("tela_produtos"))
     except Exception as e:
         dados["id"] = id
         flash(f"Erro ao atualizar produto: {e}", "danger")
-        return render_template("tela_cadastro.html", produto=dados)
+        return render_template("tela_cadastro_produto.html", produto=dados)
 # =========================================
 
 # PUT EDITAR PRODUTO ==================
@@ -212,8 +233,8 @@ def editar_produto(id):
     produto = Produto.seleciona_por_id(id)
     if not produto:
         flash("Produto não encontrado.", "danger")
-        return redirect(url_for("produtos"))
-    return render_template("formulario_produto.html", produto=produto) #! erro
+        return redirect(url_for("tela_produtos"))
+    return render_template("tela_cadastro_produto.html", produto=produto) #! erro
 # ==============================
 
 # DELETAR PRODUTO ==================
@@ -226,7 +247,7 @@ def excluir_produto(id):
         flash(str(e), "danger")
     except Exception as e:
         flash(f"Erro ao excluir produto: {e}", "danger")
-    return redirect(url_for("tela_login")) #!
+    return redirect(url_for("tela_produtos"))   
 # ====================================
 # -------------------------------------- PRODUTO FIM ------------------------------------------
 
@@ -238,13 +259,13 @@ def novo_pedido(tipo, id):
 
     if not produto:
         flash("Produto não encontrado.", "danger")
-        return redirect(url_for("produtos"))
+        return redirect(url_for("tela_produtos"))
 
     if tipo not in ["ENTRADA", "SAIDA"]:
         flash("Tipo de pedido inválido.", "erro")
-        return redirect(url_for("produtos"))
+        return redirect(url_for("tela_produtos"))
 
-    return render_template("formulario_pedido.html", produto=produto, tipo=tipo, pedido=None)
+    return render_template("tela_cadastro_pedidos.html", produto=produto, tipo=tipo, pedido=None)
 
 
 @app.route("/pedido/salvar", methods=["POST"])
@@ -298,25 +319,6 @@ def cancelar_pedido(id):
 
 '''usuarios = []
 perfil = ["cliente", "fornercedor"]
-
-
-
-# ======================PUT============================
-@app.route("/usuarios/atualizar/<int:idcliente>", methods=["PUT"])
-def atualizar_usuario(idcliente):
-    dados = request.json
-    dados['idcliente'] = idcliente
-    resposta = update_cliente(dados)
-    return jsonify(resposta), 200 if resposta.get('status') == 'sucesso' else 400
-
-
-# =========================DELETE==========================
-
-@app.route("/usuarios/delete/<int:idcliente>", methods=["DELETE"])
-def deletar_usuario(idcliente):
-    resposta = delete_cliente(idcliente)
-    return jsonify(resposta)
-
 
 
 # Fornecedores
