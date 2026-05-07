@@ -1,11 +1,14 @@
 from core.database import conectar_banco
 
+# = Feito pela -- Ana Beatriz //
+
 # CLASSE CRUD ==============================
 
 class Crudmedstock:
     table = ""
     fields = []
 
+# SELECIONA TUDO NO BANCO E ORDENA
     @classmethod
     def seleciona_tudo(cls, order_by="id"):
         conexao = conectar_banco.connect()
@@ -18,6 +21,7 @@ class Crudmedstock:
             cursor.close()
             conexao.close()
 
+# SELECIONA TUDO NO BANCO PELO ID
     @classmethod
     def seleciona_por_id(cls, id):
         conexao = conectar_banco.connect()
@@ -30,6 +34,8 @@ class Crudmedstock:
             cursor.close()
             conexao.close()
 
+
+# SELECIONA TUDO POR EMAIL
     @classmethod
     def seleciona_por_email(cls, email):
         conexao = conectar_banco.connect()
@@ -42,6 +48,8 @@ class Crudmedstock:
             cursor.close()
             conexao.close()
 
+
+# DELETA SELECIONANDO POR ID
     @classmethod
     def delete(cls, id):
         conexao = conectar_banco.connect()
@@ -58,6 +66,8 @@ class Crudmedstock:
             cursor.close()
             conexao.close()
 
+
+# GRAVA NO BANCO
     def insert(self):
         conexao = conectar_banco.connect()
         cursor = conexao.cursor()
@@ -76,6 +86,8 @@ class Crudmedstock:
             cursor.close()
             conexao.close()
 
+
+# ATUALIZA OS DADOS DO BANCO
     def atualizar(self, id):
         conexao = conectar_banco.connect()
         cursor = conexao.cursor()

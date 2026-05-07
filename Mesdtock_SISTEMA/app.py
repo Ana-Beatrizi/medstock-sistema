@@ -1,19 +1,23 @@
 from flask import Flask, jsonify, request, url_for, render_template, redirect, flash, jsonify
 from models.cliente import Cliente
 from models.produto import Produto
+from models.entrada import PedidoEntrada
 
 
 app = Flask(__name__)
 app.secret_key = "Medstock_programa_de_estoque_123456"
 
+#! = Feito pela -- Ana Beatriz //
+
 # TRANSFORMA DADOS ============
+# inteiro
 def to_int(value, default=0):
     try:
         return int(value)
     except (TypeError, ValueError):
         return default
 
-
+# decimal
 def to_float(value, default=0.0):
     try:
         return float(value)
@@ -21,6 +25,7 @@ def to_float(value, default=0.0):
         return default
 # ===============================
 
+# ======================= ROTAS =====================
 # TELA DE CADASTRO ===============
 @app.route("/")
 def index():
@@ -51,16 +56,22 @@ def tela_produtos():
     return render_template("tela_produtos.html", produtos = Produto.seleciona_tudo(order_by="nome"))
 #==============================================
 
-# TELA PEDIDOS==============
-@app.route("/pedido")
-def tela_pedidos():
-    return render_template("tela_pedidos.html")
+# TELA ENTRADA==============
+@app.route("/pedido/entrada")
+def tela_entrada():
+    return render_template("tela_entrada.html", entrada=PedidoEntrada.encontra_tudo_com_produto())
+#==============================================
+
+# TELA SAIDA==============
+@app.route("/pedido/saida")
+def tela_saida():
+    return render_template("tela_saida.html")
 #==============================================
 
 # TELA CADASTRO PEDIDOS==============
 @app.route("/cadastro/pedido")
 def tela_cadastro_pedidos():
-    return render_template("tela_cadastro_pedidos.html", pedidos=PedidoMovimentacao.find_all_with_product())
+    return render_template("tela_cadastro_pedidos.html", pedidos=PedidoEntrada.encontra_tudo_com_produto())
 #==============================================
 
 
@@ -110,7 +121,7 @@ def atualizar_cliente(id):
         for erro in erros:
             flash(erro[0], "erro")
         dados["id"] = id
-        return render_template("tela_cadastro.html", cliente=dados) #! erro tela indefinida
+        return render_template("tela_cadastro.html", cliente=dados)
 
     try:
         if not Cliente.seleciona_por_id(id):
@@ -139,7 +150,7 @@ def excluir_cliente(id):
     return redirect(url_for("tela_login")) #!
 # ====================================
 
-# Faz LOGIN ===============
+# Faz LOGIN CLIENTE ===============
 @app.route("/cliente/login", methods=['POST'])
 def fazer_login():
     email = request.form.get("email")
@@ -170,10 +181,20 @@ def get_produto_form_cadastro():
         "categoria": request.form.get("categoria", "").strip(),
         "estoque_minimo": to_int(request.form.get("estoque_minimo")),
         "preco_custo": to_float(request.form.get("preco_custo")),
-        "preco_venda": to_float(request.form.get("preco_venda")),
-        
+        "preco_venda": to_float(request.form.get("preco_venda")),   
     }
 # ===============================
+
+# GET FORM TELA CADASTRO DE PEDIDOS ===========
+def get_pedido_form():
+    return {
+        "produto_id": request.form.get("produto_id"),
+        "data_pedido": request.form.get("data_pedido"),
+        "valor_total": request.form.get("valor_total"),
+        "observacao": request.form.get("observacao", "").strip(),
+        "data_processamento": request.form.get("data_processamento"),
+        "fornecedor_id": request.form.get("fornecedor_id")
+    }
 
 # POST SALVAR PRODUTO =======================
 @app.route("/produto/salvar", methods=["POST"])
@@ -260,7 +281,7 @@ def novo_pedido(tipo, id):
     if not produto:
         flash("Produto não encontrado.", "danger")
         return redirect(url_for("tela_produtos"))
-
+    
     if tipo not in ["ENTRADA", "SAIDA"]:
         flash("Tipo de pedido inválido.", "erro")
         return redirect(url_for("tela_produtos"))
@@ -268,29 +289,29 @@ def novo_pedido(tipo, id):
     return render_template("tela_cadastro_pedidos.html", produto=produto, tipo=tipo, pedido=None)
 
 
-@app.route("/pedido/salvar", methods=["POST"])
+@app.route("/pedido/salvar/<int:produto_id>", methods=["POST"])
 def salvar_pedido():
     dados = get_pedido_form()
-    produto = Produto.find_by_id(dados["produto_id"])
-    pedido = PedidoMovimentacao(**dados)
-    erros = pedido.validate()
+    produto = Produto.seleciona_por_id(dados["produto_id"])
+    entrada = PedidoEntrada(**dados)
+    erros = entrada.validate()
 
     if not produto:
         flash("Produto não encontrado.", "erro")
-        return redirect(url_for("produtos"))
+        return redirect(url_for("tela_produtos"))
 
     if erros:
         for erro in erros:
             flash(erro, "erro")
-        return render_template("formulario_pedido.html", produto=produto, tipo=dados["tipo"], pedido=dados)
-
+        return render_template("tela_cadastro_pedidos.html", pedido=dados)
+    
     try:
-        pedido.insert()
-        flash("Pedido criado com sucesso.", "sucesso")
-        return redirect(url_for("pedidos"))
+        entrada.insert()
+        flash("Pedido criado com sucesso.", "success")
+        return redirect(url_for("tela_entrada"))
     except Exception as e:
-        flash(f"Erro ao criar pedido: {e}", "erro")
-        return render_template("formulario_pedido.html", produto=produto, tipo=dados["tipo"], pedido=dados)
+        flash(f"Erro ao criar pedido: {e}", "danger")
+        return render_template("tela_cadastro_pedidos.html", produto=produto, tipo=dados["tipo"], pedido=dados)
 
 
 @app.route("/pedido/processar/<int:id>")

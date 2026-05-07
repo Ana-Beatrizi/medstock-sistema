@@ -3,55 +3,49 @@ from core.crud_base import Crudmedstock
 from core.database import conectar_banco
 from core.validador import Validador
 from models.produto import Produto
-from models.movimentacao import Movimentacao #! err
 
+#from models.movimentacao import Movimentacao #! err
 
-class PedidoMovimentacao(Crudmedstock):
+# = Feito pela -- Ana Beatriz //
+
+#============================ CLASSE PEDIDO ENTRADA =========================
+class PedidoEntrada(Crudmedstock):
     table = "entrada"
     fields = [
-        "id",
-        "tipo",
-        "quantidade",
+        "data_pedido",
+        "valor_total",
         "observacao",
-        "data_processamento"
+        "data_processamento",
+        "fornecedor_id"
     ]
 
-    def __init__(self, produto_id, tipo, quantidade, status="PENDENTE",
-                 observacao="", data_pedido=None, data_processamento=None):
-        self.produto_id = produto_id
-        self.tipo = tipo
-        self.quantidade = quantidade
-        self.status = status
-        self.observacao = observacao
+    def __init__(self, data_pedido, valor_total, fornecedor_id, observacao="", data_processamento=None):
         self.data_pedido = data_pedido or datetime.now()
+        self.valor_total = valor_total
+        self.fornecedor_id = fornecedor_id
+        self.observacao = observacao
         self.data_processamento = data_processamento
 
+#============================ VALIDAÇÃO =========================
     def validate(self):
         erros = []
 
-        erro_produto = Validator.positive(self.produto_id, "produto")
-        if erro_produto:
-            erros.append(erro_produto)
-
-        erro_qtd = Validator.positive(self.quantidade, "quantidade")
-        if erro_qtd:
-            erros.append(erro_qtd)
-
-        if self.tipo not in ["ENTRADA", "SAIDA"]:
-            erros.append("O tipo deve ser ENTRADA ou SAIDA.")
+        erro_fornecedor = Validador.positivo(self.fornecedor_id, "fornecedor")
+        if erro_fornecedor:
+            erros.append(erro_fornecedor)
 
         return erros
 
     @classmethod
-    def find_all_with_product(cls):
-        conexao = Database.connect()
+    def encontra_tudo_com_produto(cls):
+        conexao = conectar_banco.connect()
         cursor = conexao.cursor(dictionary=True)
         try:
             sql = """
-            SELECT pm.*, p.nome AS produto
-            FROM pedido_movimentacao pm
-            INNER JOIN produto p ON pm.produto_id = p.id
-            ORDER BY pm.data_pedido DESC
+            SELECT en.*, p.nome AS produto
+            FROM entrada en
+            INNER JOIN produto p ON en.produto_id = p.id
+            ORDER BY en.data_pedido DESC
             """
             cursor.execute(sql)
             return cursor.fetchall()

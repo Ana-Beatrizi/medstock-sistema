@@ -34,13 +34,15 @@ CREATE TABLE IF NOT EXISTS clientes_cadastro (
 -- ================= PRODUTO =================
 CREATE TABLE IF NOT EXISTS produto (
   id INT NOT NULL AUTO_INCREMENT,
+  fornecedor_id INT NOT NULL,
   nome VARCHAR(100) NOT NULL,
-  quantidade_estoque INT NOT NULL,
+  quantidade_estoque INT NOT NULL DEFAULT 0,
   categoria VARCHAR(100) NOT NULL,
-  estoque_minimo INT NOT NULL,
+  estoque_minimo INT NOT NULL DEFAULT 0,
   preco_custo DECIMAL(10,2) NOT NULL DEFAULT 0,
   preco_venda DECIMAL(10,2) NOT NULL DEFAULT 0,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT fk_produto_fornecedor FOREIGN KEY (fornecedor_id) REFERENCES fornecedor (id)
 ) ENGINE = InnoDB;
 
 
@@ -83,11 +85,9 @@ data_processamento DATETIME NULL,
 CREATE TABLE IF NOT EXISTS entrada (
   id INT NOT NULL AUTO_INCREMENT,
   data_pedido DATETIME NULL,
-  tipo VARCHAR(10) NOT NULL,
-quantidade INT NOT NULL,
   valor_total DECIMAL(10,2) NOT NULL,
   observacao VARCHAR(255),
-   data_processamento DATETIME NULL,
+  data_processamento DATETIME NULL,
   fornecedor_id INT NOT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (fornecedor_id) REFERENCES fornecedor (id)
@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS item_pedido_cliente (
   id INT NOT NULL AUTO_INCREMENT,
   quantidade INT NULL,
   valor_unitario DECIMAL(10,2) NULL,
-  pedido_cliente_id INT NOT NULL,
+  entrada_id INT NOT NULL,
   movimentacao_id INT NOT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (pedido_cliente_id) REFERENCES pedido_cliente (id),
@@ -110,11 +110,11 @@ CREATE TABLE IF NOT EXISTS item_pedido_fornecedor (
   id INT NOT NULL AUTO_INCREMENT,
   quantidade INT NULL,
   valor_unitario DECIMAL(10,2) NULL,
-  pedido_fornecedor_id INT NOT NULL,
-  movimentacao_id INT NOT NULL,
+  entrada_id INT NOT NULL,
+  produto_id INT NOT NULL,
   PRIMARY KEY (id),
-  FOREIGN KEY (pedido_fornecedor_id) REFERENCES pedido_fornecedor (id),
-  FOREIGN KEY (movimentacao_id) REFERENCES movimentacao (id)
+  FOREIGN KEY (entrada_id) REFERENCES entrada (id),
+  FOREIGN KEY (produto_id) REFERENCES produto (id)
 ) ENGINE = InnoDB;
 
 
@@ -122,6 +122,8 @@ SHOW WARNINGS;
 
 select * from cliente;
 select * from produto;
+select * from entrada;
+select * from item_pedido_fornecedor;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

@@ -1,7 +1,10 @@
 import requests
 import urllib.parse
+
+# = Feito pela -- Ana Beatriz //
+
     #==================== CLASSE - VALIDAÇÃO poo=========================
-# feito por Ana Beatriz
+
 class Validador:
 
     #NÃO DEVE SER VAZIO=========================

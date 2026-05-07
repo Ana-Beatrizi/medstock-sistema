@@ -6,17 +6,18 @@
     <title>Document</title>
 </head>
 <body>
-    <h2>Novo Pedido de {{ tipo }}</h2>
+    <h1>Novo Pedido de {{ tipo }}</h1>
 
 <p><strong>Produto:</strong> {{ produto.nome }}</p>
-<p><strong>Quantidade atual:</strong> {{ produto.quantidade }}</p>
+<p><strong>Quantidade atual:</strong> {{ produto.quantidade_estoque }}</p>
 
-<form action="{{ url_for('salvar_pedido') }}" method="POST">
+<form action="{{ url_for('salvar_pedido, produto_id=produto.id') }}" method="POST">
     <input type="hidden" name="produto_id" value="{{ produto.id }}">
-    <input type="hidden" name="tipo" value="{{ tipo }}">
+    <input type="hidden" name="fornecedor_id" value="{{ produto.fornecedor_id }}">
+   <!-- <input type="hidden" name="tipo" value="{{ tipo }}"> -->
 
     <label>Quantidade:</label>
-    <input type="number" name="quantidade" value="{{ pedido.quantidade if pedido else '' }}" required>
+    <input type="number" name="quantidade" value="{{ pedido.quantidade_estoque if pedido else '' }}" required>
 
     <label>Observação:</label>
     <input type="text" name="observacao" value="{{ pedido.observacao if pedido else '' }}">

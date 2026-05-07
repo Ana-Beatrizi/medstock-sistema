@@ -1,21 +1,92 @@
-h1 {
-    font-size: 70px;
-    font-weight: 900;
-    text-align: center;
-    text-transform: uppercase;
+.navbar{
+    background: linear-gradient(90deg,#002D81 0%, #00819F 50%, #00C4C0 100%);
+    position:fixed ;
+    top: 0;
+    height: 60px;
+    width: 100%;
+    z-index: 1000;
 
-    /* Gradiente do seu tema */
-    background: linear-gradient(90deg, #002D81, #00819F, #00C4C0);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+}
 
-    /* Sombra elegante + exagerada */
-    text-shadow:
-        2px 2px 0px rgba(0, 45, 129, 0.3),
-        4px 4px 0px rgba(0, 129, 159, 0.3),
-        6px 6px 15px rgba(0, 0, 0, 0.4);
+.navbar ul li a:hover {
+   color: #00C4C0;  /* Efeito hover */
+}
+.icones :hover {
+    color: #00C4C0;  /* Efeito hover */
+ }
 
-    letter-spacing: 5px;
+.icones{
+    margin-right: 20px;
+}
 
-    /* Glow suave */
-    filter: drop-shadow(0 0 10px rgba(0, 196, 192, 0.6))}
+.icones i{
+    margin-right: 20px;
+}
+
+.menu{
+   display: flex;
+   gap: 30px;
+   list-style: none;
+   margin-left: -920px;
+}
+
+.navbar a{
+    color: white;
+    text-decoration: none;
+    position: sticky;
+}
+
+#h1-logo{
+    color: white;
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+.logo img{
+    width: 40px;
+    margin: 5px;
+}
+
+
+
+.sidebar {
+    height: 100vh; /* Altura total da tela */
+    width: 250px; /* Largura do menu */
+    background: linear-gradient(90deg,#002D81 0%, #00819F 50%, #00C4C0 100%);
+    position: fixed; /* Fixa o menu na tela */
+    top: 0;
+    left: 0;
+    color: white;
+    padding-top: 60px;
+    position: fixed;
+
+}
+
+.sidebar ul {
+    list-style: none; /* Remove pontos da lista */
+    padding: 0;
+}
+
+.sidebar ul li a {
+    display: block;
+    padding: 15px 25px;
+    color: white;
+    text-decoration: none; /* Remove sublinhado */
+    transition: 0.3s;
+}
+
+.sidebar ul li a:hover {
+    background-color:#00819F  /* Efeito hover */
+}
+
+.logo{display:flex;
+    position: sticky;}
+
+.bemvindo{
+    color:linear-gradient(90deg,#002D81 0%, #00819F 50%, #00C4C0 100%);
+}
+
+body{
+    padding-top: 0px;
+}
+

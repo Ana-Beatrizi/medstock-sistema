@@ -2,8 +2,9 @@ from core.crud_base import Crudmedstock
 from core.database import conectar_banco
 from core.validador import Validador
 
+# = Feito pela -- Ana Beatriz //
+
 #============================ CLASSE CLIENTE =========================
-# feito por Ana Beatriz
 
 class Cliente(Crudmedstock):
     table = "cliente"

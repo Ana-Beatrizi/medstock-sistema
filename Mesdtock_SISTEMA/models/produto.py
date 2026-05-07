@@ -2,6 +2,10 @@ from core.crud_base import Crudmedstock
 from core.database import conectar_banco
 from core.validador import Validador
 
+# = Feito pela -- Ana Beatriz //
+
+#============================ CLASSE PRODUTO =========================
+
 class Produto(Crudmedstock):
     table = "produto"
     fields = [
@@ -23,6 +27,7 @@ class Produto(Crudmedstock):
         self.preco_venda = preco_venda
 
 
+#============================ VALIDAÇÃO =========================
     def validate(self):
         erros = [
             Validador.obrigatorio(self.nome, "nome"),

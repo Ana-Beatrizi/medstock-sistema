@@ -1,43 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'tela_home.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='tela_cadastro_produto.css') }}">
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+{% block conteudo %}
+<link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='tela_cadastro_produto.css') }}">
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Ícones -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<!-- Ícones -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- Fonte moderna -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-</head>
+<!-- Fonte moderna -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
-<body>
-    <div class="container d-flex align-items-center justify-content-center cadastro container">
-        <div class="cadastro-card text-center">
-            
-            
-                <h2 class="mb-3 text-dark">{{ 'Editar Produto' if produto and produto.id else 'Cadastrar Produto' }}</h2>
-            <form  method="POST" action="{% if produto and produto.id %}{{ url_for('atualizar_produto', id=produto.id) }}{% else %}{{ url_for('salvar_produto') }}{% endif %}" id="cadastro-form">
-                <a href="{{ url_for('tela_home') }}">Início</a>
+<div class="main-content d-flex align-items-center justify-content-center"></div>
+
+<div class="container d-flex align-items-center justify-content-center cadastro container" id="caixa1">
+    <div class="cadastro-card text-center">
+
+
+        <h2 class="mb-3 text-dark">{{ 'Editar Produto' if produto and produto.id else 'Cadastrar Produto' }}</h2>
+        <form method="POST"
+            action="{% if produto and produto.id %}{{ url_for('atualizar_produto', id=produto.id) }}{% else %}{{ url_for('salvar_produto') }}{% endif %}"
+            id="cadastro-form">
+            <a href="{{ url_for('tela_home') }}">Início</a>
+
+            <div id="linha">
+
                 <div class="mb-3 text-start">
                     <label class="form-label text-dark">Nome</label>
                     <div class="input-group">
-                    
-                        <input type="text" name="nome" id="nome" class="form-control" value="{{ produto.nome if produto else '' }}" required>
+
+                        <input type="text" name="nome" id="nome" class="form-control"
+                            value="{{ produto.nome if produto else '' }}" required>
                     </div>
                 </div>
 
                 <div class="mb-3 text-start">
                     <label class="form-label text-dark">Quantidade</label>
                     <div class="input-group">
-                        
-                        <input type="number" id="quantidade" class="form-control" name="quantidade_estoque" value="{{ produto.quantidade_estoque if produto else 0 }}" required>
+
+                        <input type="number" id="quantidade" class="form-control" name="quantidade_estoque"
+                            value="{{ produto.quantidade_estoque if produto else 0 }}" required>
                     </div>
                 </div>
 
@@ -46,15 +49,20 @@
                 <div class="mb-3 text-start">
                     <label class="form-label text-dark">Categoria</label>
                     <div class="input-group">
-                       <input type="text" name="categoria" id="categoria" class="form-control" value="{{ produto.categoria if produto else '' }}" required>
+                        <input type="text" name="categoria" id="categoria" class="form-control"
+                            value="{{ produto.categoria if produto else '' }}" required>
                     </div>
                 </div>
+
+            </div>
+            <div id="linha">
 
                 <div class="mb-3 text-start">
                     <label class="form-label text-dark">Estoque Mínimo</label>
                     <div class="input-group">
-                       
-                        <input type="number" id="estoque-min" class="form-control" name="estoque_minimo" value="{{ produto.estoque_minimo if produto else 0 }}" required>
+
+                        <input type="number" id="estoque-min" class="form-control" name="estoque_minimo"
+                            value="{{ produto.estoque_minimo if produto else 0 }}" required>
                     </div>
                 </div>
 
@@ -62,10 +70,11 @@
                     <label class="form-label text-dark">Preço de custo</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                          <span class="input-group-text">$</span>
+                            <span class="input-group-text">$</span>
                         </div>
-                        <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)" name="preco_custo" value="{{ produto.preco_custo if produto else 0 }}" required>
-                        
+                        <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)"
+                            name="preco_custo" value="{{ produto.preco_custo if produto else 0 }}" required>
+
                     </div>
                 </div>
 
@@ -73,20 +82,22 @@
                     <label class="form-label text-dark">Preço de venda</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                          <span class="input-group-text">$</span>
+                            <span class="input-group-text">$</span>
                         </div>
-                        <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)" name="preco_venda" value="{{ produto.preco_venda if produto else 0 }}" required>
-                        
+                        <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)"
+                            name="preco_venda" value="{{ produto.preco_venda if produto else 0 }}" required>
+
                     </div>
                 </div>
 
+            </div>
 
-                <button type="submit" class="btn btn-cadastro w-100 text-white mt-2">Cadastrar produto</button>
-            </form>
-            
-           
-        </div>
+
+            <button type="submit" class="btn btn-cadastro w-100 text-white mt-2">Cadastrar produto</button>
+        </form>
+
+
     </div>
-</body>
-
-</html>
+</div>
+</div>
+{% endblock %}
