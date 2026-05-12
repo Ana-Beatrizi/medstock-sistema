@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,7 +16,7 @@
     <!-- Ícones -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- Fonte moderna -->
+    <!-- Fonte -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
 </head>
@@ -27,17 +27,23 @@
 
     <header class="navbar">
 
-        <!-- BOTÃO RETRÁTIL -->
+        <!-- LADO ESQUERDO -->
 
-        <button id="btn-menu" class="btn-menu">
-            <i class="bi bi-list"></i>
-        </button>
+        <div class="left-navbar">
 
-        <!-- LOGO -->
+            <!-- BOTÃO MENU -->
 
-        <div class="logo">
-            <img src="{{ url_for('static', filename='img/medstock_logo_sf.png') }}" alt="" class="logo">
-            <h1 id="h1-logo">MEDSTOCK</h1>
+            <button id="btn-menu" class="btn-menu">
+                <i class="bi bi-list"></i>
+            </button>
+
+            <!-- LOGO -->
+
+            <div class="logo">
+                <img src="{{ url_for('static', filename='img/medstock_logo_sf.png') }}" alt="">
+                <h1 id="h1-logo">MEDSTOCK</h1>
+            </div>
+
         </div>
 
         <!-- MENU -->
@@ -50,11 +56,13 @@
         <!-- ÍCONES -->
 
         <div class="icones">
-            <i class="bi bi-bell text-white"></i>
+
+            <i class="bi bi-bell"></i>
 
             <a href="{{ url_for('tela_perfil_do_usuario', id=cliente.id) }}">
-                <i class="bi bi-person text-white"></i>
+                <i class="bi bi-person"></i>
             </a>
+
         </div>
 
     </header>
