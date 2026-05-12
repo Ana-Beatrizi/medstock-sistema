@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home | MEDSTOCK</title>
+
     <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">  
+
+    <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='tela_home.css') }}">
+
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -14,43 +18,123 @@
 
     <!-- Fonte moderna -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
 </head>
+
 <body>
+
+    <!-- NAVBAR -->
+
     <header class="navbar">
 
-            <div class="logo">
-                <img src="{{ url_for('static', filename='img/medstock_logo_sf.png') }}" alt="" class="logo">
-                <h1 id="h1-logo">MEDSTOCK</h1>
-            </div>
+        <!-- BOTÃO RETRÁTIL -->
 
-            <ul class="menu">
-                <li><a href="#">Fornecedor</a></li>
-                <li><a href="#">Cliente</a></li>
+        <button id="btn-menu" class="btn-menu">
+            <i class="bi bi-list"></i>
+        </button>
 
-            </ul>
+        <!-- LOGO -->
 
-            <div class="icones">
-                <i class="bi bi-bell text-white"></i>
-                <a href="{{ url_for('tela_perfil_do_usuario', id=cliente.id) }}"><i class="bi bi-person text-white"></i></a>
-            </div>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='img/medstock_logo_sf.png') }}" alt="" class="logo">
+            <h1 id="h1-logo">MEDSTOCK</h1>
+        </div>
+
+        <!-- MENU -->
+
+        <ul class="menu">
+            <li><a href="#">Fornecedor</a></li>
+            <li><a href="#">Cliente</a></li>
+        </ul>
+
+        <!-- ÍCONES -->
+
+        <div class="icones">
+            <i class="bi bi-bell text-white"></i>
+
+            <a href="{{ url_for('tela_perfil_do_usuario', id=cliente.id) }}">
+                <i class="bi bi-person text-white"></i>
+            </a>
+        </div>
 
     </header>
 
-        <nav class="sidebar">
+    <!-- SIDEBAR -->
 
-            <ul>
-                <li><a href="{{ url_for('tela_home') }}">Home</a></li>
-                <li><a href="{{ url_for('tela_produtos') }}">Gestão de Estoque</a></li>
-                <li><a href="{{ url_for('tela_cadastro_produto') }}">Cadastro de Produtos</a></li>
-                <li><a href="{{ url_for('tela_entrada') }}">Entrada</a></li>
-                <li><a href="#">Saída</a></li>
-                <li><a href="#">Histórico</a></li>
-            </ul>
-        </nav>
+    <nav class="sidebar" id="sidebar">
+
+        <ul>
+
+            <li>
+                <a href="{{ url_for('tela_home') }}">
+                    <i class="bi bi-house"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('tela_produtos') }}">
+                    <i class="bi bi-box-seam"></i>
+                    <span>Gestão de Estoque</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('tela_cadastro_produto') }}">
+                    <i class="bi bi-plus-square"></i>
+                    <span>Cadastro de Produtos</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('tela_entrada') }}">
+                    <i class="bi bi-arrow-down-circle"></i>
+                    <span>Entrada</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    <i class="bi bi-arrow-up-circle"></i>
+                    <span>Saída</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Histórico</span>
+                </a>
+            </li>
+
+        </ul>
+
+    </nav>
+
+    <!-- CONTEÚDO -->
+
+    <main class="conteudo" id="conteudo">
 
         {% block conteudo %}{% endblock %}
 
+    </main>
 
+    <!-- SCRIPT -->
+
+    <script>
+
+        const btnMenu = document.getElementById("btn-menu");
+        const sidebar = document.getElementById("sidebar");
+        const conteudo = document.getElementById("conteudo");
+
+        btnMenu.addEventListener("click", () => {
+
+            sidebar.classList.toggle("close");
+            conteudo.classList.toggle("expand");
+
+        });
+
+    </script>
 
 </body>
 </html>

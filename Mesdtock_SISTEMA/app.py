@@ -19,11 +19,10 @@ import smtplib #Simple Mail Transfer Protocol - protocolo para enviar e-mail pel
 import random
 #============================
 
-
 app = Flask(__name__)
 app.secret_key = "Medstock_programa_de_estoque_123456"
 
-#! = Feito pela -- Ana Beatriz // linha 1 a 417
+#! = Feito pela -- Ana Beatriz // linha 1 a 417 𖹭.ᐟ
 
 # TRANSFORMA DADOS ============
 # inteiro
@@ -174,7 +173,7 @@ def excluir_cliente(id):
         flash(str(e), "danger")
     except Exception as e:
         flash(f"Erro ao excluir cliente: {e}", "danger")
-    return redirect(url_for("tela_login")) #!
+    return redirect(url_for("tela_login"))
 # ====================================
 
 # Faz LOGIN CLIENTE ===============
@@ -182,7 +181,6 @@ def excluir_cliente(id):
 def fazer_login():
     email = request.form.get("email")
     senha = request.form.get("senha")
-
 
     cliente = Cliente.seleciona_por_email(email)
 
@@ -203,10 +201,24 @@ def tela_esqueci_a_senha():
     if request.method == "POST":
         email = request.form.get("email")
         codigo = random.randint(100000, 999999)
+        session["codigo_recuperacao"] = str(codigo)
         enviar_codigo_email(email, codigo)
-        return  "Código enviado"
+        return redirect(url_for("verificar_codigo"))
 
     return render_template("tela_esqueci_a_senha.html")
+
+# Verificar código ROTA=================
+@app.route("/verificar_codigo", methods=["GET", "POST"])
+def verificar_codigo():
+
+    if request.method == "POST":
+        codigo_digitado = request.form.get("codigo")
+        codigo_salvo = session.get("codigo_recuperacao")
+        if codigo_digitado == codigo_salvo:
+            return "Código correto"
+        else:
+            return "Código inválido"
+    return render_template("tela_verificar_codigo.html")
 
 # Enviar Codigo E-MAIL =============
 def enviar_codigo_email(destinatario, codigo):
@@ -261,7 +273,6 @@ def get_produto_form_cadastro():
         "preco_venda": to_float(request.form.get("preco_venda")),   
     }
 # ===============================
-
 
 # POST SALVAR PRODUTO =======================
 @app.route("/produto/salvar", methods=["POST"])
@@ -366,7 +377,6 @@ def novo_pedido(tipo, id):
 
     return render_template("tela_cadastro_pedidos.html", produto=produto, tipo=tipo, pedido=None)
 
-
 @app.route("/pedido/salvar/<int:produto_id>", methods=["POST"])
 def salvar_pedido():
     dados = get_pedido_form()
@@ -391,7 +401,6 @@ def salvar_pedido():
         flash(f"Erro ao criar pedido: {e}", "danger")
         return render_template("tela_cadastro_pedidos.html", produto=produto, tipo=dados["tipo"], pedido=dados)
 
-
 @app.route("/pedido/processar/<int:id>")
 def processar_pedido(id):
     try:
@@ -402,7 +411,6 @@ def processar_pedido(id):
     except Exception as e:
         flash(f"Erro ao processar pedido: {e}", "erro")
     return redirect(url_for("pedidos"))
-
 
 @app.route("/pedido/cancelar/<int:id>")
 def cancelar_pedido(id):
@@ -415,7 +423,7 @@ def cancelar_pedido(id):
         flash(f"Erro ao cancelar pedido: {e}", "erro")
     return redirect(url_for("pedidos"))
 
-#! = Feito pela -- Ana Beatriz // linha 1 a 417
+#! = Feito pela -- Ana Beatriz // linha 1 a 426 𖹭.ᐟ
 
 '''usuarios = []
 perfil = ["cliente", "fornercedor"]

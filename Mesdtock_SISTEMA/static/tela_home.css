@@ -1,19 +1,39 @@
+/* NAVBAR */
+
 .navbar{
     background: linear-gradient(90deg,#002D81 0%, #00819F 50%, #00C4C0 100%);
-    position:fixed ;
+    position: fixed;
     top: 0;
     height: 60px;
     width: 100%;
     z-index: 1000;
 
+    display: flex;
+    align-items: center;
 }
 
-.navbar ul li a:hover {
-   color: #00C4C0;  /* Efeito hover */
+/* BOTÃO MENU */
+
+.btn-menu{
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 30px;
+    margin-left: 20px;
+    cursor: pointer;
 }
+
+/* HOVER LINKS */
+
+.navbar ul li a:hover {
+   color: #00C4C0;
+}
+
 .icones :hover {
-    color: #00C4C0;  /* Efeito hover */
- }
+    color: #00C4C0;
+}
+
+/* ÍCONES */
 
 .icones{
     margin-right: 20px;
@@ -23,6 +43,8 @@
     margin-right: 20px;
 }
 
+/* MENU SUPERIOR */
+
 .menu{
    display: flex;
    gap: 30px;
@@ -30,11 +52,15 @@
    margin-left: -920px;
 }
 
+/* LINKS */
+
 .navbar a{
     color: white;
     text-decoration: none;
-    position: sticky
+    position: sticky;
 }
+
+/* LOGO */
 
 #h1-logo{
     color: white;
@@ -47,45 +73,99 @@
     margin: 5px;
 }
 
-
-
-.sidebar {
-    height: 100vh; /* Altura total da tela */
-    width: 250px; /* Largura do menu */
-    background: linear-gradient(90deg,#002D81 0%, #00819F 50%, #00C4C0 100%);
-    position: fixed; /* Fixa o menu na tela */
-    top: 0;
-    left: 0;
-    color: white;
-    padding-top: 60px;
-
+.logo{
+    display:flex;
+    position: sticky;
 }
 
+/* SIDEBAR */
+
+.sidebar {
+    height: 100vh;
+    width: 250px;
+
+    background: linear-gradient(90deg,#002D81 0%, #00819F 50%, #00C4C0 100%);
+
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    color: white;
+
+    padding-top: 60px;
+
+    transition: 0.4s;
+    overflow: hidden;
+}
+
+/* SIDEBAR FECHADA */
+
+.sidebar.close{
+    width: 80px;
+}
+
+/* LISTA */
+
 .sidebar ul {
-    list-style: none; /* Remove pontos da lista */
+    list-style: none;
     padding: 0;
 }
 
 .sidebar ul li a {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
     padding: 15px 25px;
+
     color: white;
-    text-decoration: none; /* Remove sublinhado */
+    text-decoration: none;
+
     transition: 0.3s;
 }
 
+/* HOVER SIDEBAR */
+
 .sidebar ul li a:hover {
-    background-color:#00819F  /* Efeito hover */
+    background-color:#00819F;
 }
 
-.logo{display:flex;
-    position: sticky;}
+/* ÍCONES SIDEBAR */
+
+.sidebar ul li a i{
+    font-size: 22px;
+    min-width: 25px;
+}
+
+/* ESCONDER TEXTO */
+
+.sidebar.close span{
+    display: none;
+}
+
+/* CONTEÚDO */
+
+.conteudo{
+    margin-left: 250px;
+    padding: 80px 20px;
+    transition: 0.4s;
+}
+
+/* CONTEÚDO EXPANDIDO */
+
+.conteudo.expand{
+    margin-left: 80px;
+}
+
+/* BODY */
+
+body{
+    padding-top: 0px;
+    overflow-x: hidden;
+}
+
+/* TEXTO */
 
 .bemvindo{
     color:linear-gradient(90deg,#002D81 0%, #00819F 50%, #00C4C0 100%);
 }
-
-body{
-    padding-top: 0px;
-}
-
