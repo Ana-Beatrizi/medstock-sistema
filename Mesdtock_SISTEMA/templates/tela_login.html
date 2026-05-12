@@ -21,7 +21,7 @@
     <div class="container d-flex align-items-center justify-content-center login container">
         <div class="login-card text-center">
             <!--Logo-->
-            <img src="{{ url_for('static', filename='imagens/medstock_logo_sf.png') }}" alt="Logo" class="logo">
+            <img src="{{ url_for('static', filename='img/medstock_logo_sf.png') }}" alt="Logo" class="logo">
             <h4 class="mb-3 text-dark">MEDSTOCK</h4>
             <p class="text-dark mb-4">Acesse sua conta</p>
             <form method="POST" action="{{ url_for('fazer_login') }}">
@@ -51,7 +51,7 @@
                     <label class="form-check-label" for="checkDefault">
                         Lembre de Mim
                     </label>
-                    <p><a class="link-offset-1" href="#">Esqueci a Senha</a></p>
+                    <p><a class="link-offset-1" href="{{ url_for('tela_esqueci_a_senha') }}">Esqueci a Senha</a></p>
                 </div>
                 <button type="submit" class="btn btn-login w-100 text-white mt-2">Entrar</button>
             </form>

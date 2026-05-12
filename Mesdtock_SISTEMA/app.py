@@ -1,13 +1,29 @@
-from flask import Flask, jsonify, request, url_for, render_template, redirect, flash, jsonify
+# Importações FLASK =========
+from flask import Flask, jsonify, request, url_for, render_template, redirect, flash, session
+#============================
+
+# Importações CLASSES =======
 from models.cliente import Cliente
 from models.produto import Produto
 from models.entrada import PedidoEntrada
+#============================
+
+# Importações E-MAIL ========
+from email.mime.text import MIMEText # Texto no email
+from email.mime.image import MIMEImage # Imagem no email
+from email.mime.multipart import MIMEMultipart
+import smtplib #Simple Mail Transfer Protocol - protocolo para enviar e-mail pela internet
+#============================
+
+# OUTRAS Importações ========
+import random
+#============================
 
 
 app = Flask(__name__)
 app.secret_key = "Medstock_programa_de_estoque_123456"
 
-#! = Feito pela -- Ana Beatriz //
+#! = Feito pela -- Ana Beatriz // linha 1 a 417
 
 # TRANSFORMA DADOS ============
 # inteiro
@@ -26,6 +42,7 @@ def to_float(value, default=0.0):
 # ===============================
 
 # ======================= ROTAS =====================
+
 # TELA DE CADASTRO ===============
 @app.route("/")
 def index():
@@ -41,19 +58,23 @@ def tela_login():
 # TELA HOME ===============
 @app.route("/home")
 def tela_home():
-    return render_template("tela_home.html")
+    cliente_id = session.get("cliente_id")
+
+    return render_template("tela_home.html", cliente = Cliente.seleciona_por_id(cliente_id))
 #==============================================
 
 # TELA CADASTRO PRODUTO==============
 @app.route("/cadastro/produto")
 def tela_cadastro_produto():
-    return render_template("tela_cadastro_produto.html", produto = None)
+    cliente_id = session.get("cliente_id")
+    return render_template("tela_cadastro_produto.html", cliente = Cliente.seleciona_por_id(cliente_id), produto = None)
 #==============================================
 
 # TELA PRODUTO==============
 @app.route("/produto")
 def tela_produtos():
-    return render_template("tela_produtos.html", produtos = Produto.seleciona_tudo(order_by="nome"))
+    cliente_id = session.get("cliente_id")
+    return render_template("tela_produtos.html", produtos = Produto.seleciona_tudo(order_by="nome"), cliente = Cliente.seleciona_por_id(cliente_id))
 #==============================================
 
 # TELA ENTRADA==============
@@ -74,6 +95,12 @@ def tela_cadastro_pedidos():
     return render_template("tela_cadastro_pedidos.html", pedidos=PedidoEntrada.encontra_tudo_com_produto())
 #==============================================
 
+# TELA PERFIL DO USUARIO==============
+@app.route("/perfil")
+def tela_perfil_do_usuario():
+    cliente_id = session.get("cliente_id")
+    return render_template("tela_perfil_do_usuario.html", cliente = Cliente.seleciona_por_id(cliente_id))
+#==============================================
 
 # -------------------------------------- CLIENTE ------------------------------------------
 # GET FORM TELA DE CADASTRO ===============
@@ -156,11 +183,11 @@ def fazer_login():
     email = request.form.get("email")
     senha = request.form.get("senha")
 
-    print('email e senha',email)
 
-    usuario = Cliente.seleciona_por_email(email)
+    cliente = Cliente.seleciona_por_email(email)
 
-    if usuario["senha"] == senha:
+    if cliente["senha"] == senha:
+        session["cliente_id"] = cliente["id"]
         flash("Login realizado com sucesso!", "success")
         return redirect(url_for("tela_home"))
     else:
@@ -169,8 +196,58 @@ def fazer_login():
 
 # -------------------------------------- CLIENTE FIM ------------------------------------------
 
-# -------------------------------------- CADASTRAR CLIENTES ------------------------------------------
-# GET FORM CADASTRO DE CLIENTES===============
+#! -------------------------------------- ESQUECI A SENHA ------------------------------------------
+#  Esqueci a senha ROTA===============
+@app.route("/esqueci_a_senha", methods=["GET", "POST"])
+def tela_esqueci_a_senha():
+    if request.method == "POST":
+        email = request.form.get("email")
+        codigo = random.randint(100000, 999999)
+        enviar_codigo_email(email, codigo)
+        return  "Código enviado"
+
+    return render_template("tela_esqueci_a_senha.html")
+
+# Enviar Codigo E-MAIL =============
+def enviar_codigo_email(destinatario, codigo):
+
+    email_remetente = "medstock.sistema@gmail.com" 
+    senha_app = "hahz uyzh eidq txts"
+
+    mensagem = MIMEMultipart()
+
+    mensagem["From"] = email_remetente
+    mensagem["To"] = destinatario
+    mensagem["Subject"] = "Código de recuperação MEDSTOCK"
+
+    corpo = f"""
+    <html>
+        <body style="text-align:center;">
+
+            <img src="cid:logo_medstock" width="200">
+
+            <h2>Seu código de recuperação é:</h2>
+
+            <h1>{codigo}</h1>
+
+        </body>
+    </html>
+    """
+
+    mensagem.attach(MIMEText(corpo, "html"))
+
+    with open("static/img/medstock_logo_sf.png", "rb") as imagem:
+        img = MIMEImage(imagem.read())
+        img.add_header("Content-ID", "<logo_medstock>")
+        mensagem.attach(img)
+
+    servidor = smtplib.SMTP("smtp.gmail.com", 587) #"smtp.gmail.com" = servidor do Gmail - 587 = porta SMTP
+
+    servidor.starttls()
+    servidor.login(email_remetente, senha_app)
+    servidor.send_message(mensagem)
+    servidor.quit()
+# -------------------------------------- ESQUECI A SENHA FIM ------------------------------------------
 
 #! -------------------------------------- PRODUTO ------------------------------------------
 # GET FORM TELA CADASTRO DE PRODUTO ===========
@@ -185,16 +262,6 @@ def get_produto_form_cadastro():
     }
 # ===============================
 
-# GET FORM TELA CADASTRO DE PEDIDOS ===========
-def get_pedido_form():
-    return {
-        "produto_id": request.form.get("produto_id"),
-        "data_pedido": request.form.get("data_pedido"),
-        "valor_total": request.form.get("valor_total"),
-        "observacao": request.form.get("observacao", "").strip(),
-        "data_processamento": request.form.get("data_processamento"),
-        "fornecedor_id": request.form.get("fornecedor_id")
-    }
 
 # POST SALVAR PRODUTO =======================
 @app.route("/produto/salvar", methods=["POST"])
@@ -206,7 +273,7 @@ def salvar_produto():
     if erros:
         for erro in erros:
             flash(erro[0], "danger")
-        return render_template("formulario_produto.html", produto=dados) #! erro
+        return render_template("formulario_produto.html", produto=dados)
 
     try:
         produto.insert()
@@ -217,7 +284,7 @@ def salvar_produto():
         if "1062" in str(e):
             flash("Produto já cadastrado.", "danger")
         else:
-            flash(f"Erro ao cadastrar produto: {e}", "danger") #! erro
+            flash(f"Erro ao cadastrar produto: {e}", "danger")
         return render_template("tela_cadastro_produto.html", produto=dados)
 # ================================================
 
@@ -255,7 +322,7 @@ def editar_produto(id):
     if not produto:
         flash("Produto não encontrado.", "danger")
         return redirect(url_for("tela_produtos"))
-    return render_template("tela_cadastro_produto.html", produto=produto) #! erro
+    return render_template("tela_cadastro_produto.html", produto=produto)
 # ==============================
 
 # DELETAR PRODUTO ==================
@@ -273,6 +340,17 @@ def excluir_produto(id):
 # -------------------------------------- PRODUTO FIM ------------------------------------------
 
 #! -------------------------------------- PEDIDOS ------------------------------------------
+# GET FORM TELA CADASTRO DE PEDIDOS ===========
+def get_pedido_form():
+    return {
+        "produto_id": request.form.get("produto_id"),
+        "data_pedido": request.form.get("data_pedido"),
+        "valor_total": request.form.get("valor_total"),
+        "observacao": request.form.get("observacao", "").strip(),
+        "data_processamento": request.form.get("data_processamento"),
+        "fornecedor_id": request.form.get("fornecedor_id")
+    }
+
 @app.route("/pedido/novo/<tipo>/<int:id>")
 def novo_pedido(tipo, id):
     produto = Produto.seleciona_por_id(id)
@@ -337,6 +415,7 @@ def cancelar_pedido(id):
         flash(f"Erro ao cancelar pedido: {e}", "erro")
     return redirect(url_for("pedidos"))
 
+#! = Feito pela -- Ana Beatriz // linha 1 a 417
 
 '''usuarios = []
 perfil = ["cliente", "fornercedor"]

@@ -19,7 +19,7 @@
     <header class="navbar">
 
             <div class="logo">
-                <img src="{{ url_for('static', filename='imagens/medstock_logo_sf.png') }}" alt="" class="logo">
+                <img src="{{ url_for('static', filename='img/medstock_logo_sf.png') }}" alt="" class="logo">
                 <h1 id="h1-logo">MEDSTOCK</h1>
             </div>
 
@@ -31,7 +31,7 @@
 
             <div class="icones">
                 <i class="bi bi-bell text-white"></i>
-                <i class="bi bi-person text-white"></i>
+                <a href="{{ url_for('tela_perfil_do_usuario', id=cliente.id) }}"><i class="bi bi-person text-white"></i></a>
             </div>
 
     </header>

@@ -33,7 +33,7 @@
 .navbar a{
     color: white;
     text-decoration: none;
-    position: sticky;
+    position: sticky
 }
 
 #h1-logo{
@@ -58,7 +58,6 @@
     left: 0;
     color: white;
     padding-top: 60px;
-    position: fixed;
 
 }
 

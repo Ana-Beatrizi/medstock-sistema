@@ -1,11 +1,76 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+{% extends 'tela_home.html' %}
+
+{% block conteudo %}
+<link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='tela_produtos.css') }}">
+
+<div class="container">
+    <!-- Conteúdo -->
+    <main class="content">
+        <div class="header">
+            <div>
+                <h1>Histórico</h1>
+                <p>de entradas e saídas</p>
+            </div>
+            <input type="text" placeholder="Buscar...">
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Movimentação</th>
+                    <th>Nome Fornecedor/Cliente</th>
+                    <th>Nome do Produto</th>
+                    <th>Quantidade</th>
+                    <th>Valor Total</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="entrada">Entrada</td>
+                    <td>Sanofi</td>
+                    <td>Dipirona</td>
+                    <td>250</td>
+                    <td>R$2.500,00</td>
+                    <td><span class="data">07/04/2026</span></td>
+                </tr>
+                <tr>
+                    <td class="saida">Saída</td>
+                    <td>Drogal</td>
+                    <td>Paracetamol</td>
+                    <td>20</td>
+                    <td>R$300,00</td>
+                    <td><span class="data">01/04/2026</span></td>
+                </tr>
+                <tr>
+                    <td class="entrada">Entrada</td>
+                    <td>Profarma</td>
+                    <td>Tilenol</td>
+                    <td>100</td>
+                    <td>R$1.600,00</td>
+                    <td><span class="data">22/03/2026</span></td>
+                </tr>
+                <tr>
+                    <td class="entrada">Entrada</td>
+                    <td>Cristália</td>
+                    <td>Ibuprofeno</td>
+                    <td>500</td>
+                    <td>R$6.500,00</td>
+                    <td><span class="data">21/03/2026</span></td>
+                </tr>
+                <tr>
+                    <td class="saida">Saída</td>
+                    <td>Raiadrogasil</td>
+                    <td>Rivotril</td>
+                    <td>15</td>
+                    <td>R$300,00</td>
+                    <td><span class="data">20/03/2026</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+</div>
+
     <h1>PRODUTOS</h1>
     <a href="{{ url_for('tela_home') }}">Início</a>
     
@@ -37,5 +102,5 @@
         </tr>
         {% endfor %}
     </table>
-</body>
-</html>
+
+{% endblock %}
