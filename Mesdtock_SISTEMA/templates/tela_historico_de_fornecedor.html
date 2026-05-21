@@ -1,0 +1,58 @@
+{% extends 'tela_home.html' %}
+
+{% block conteudo %}
+    <title>Fornecedor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='tela_historico_de_fornecedor.css') }}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<div class="container">
+
+    <main class="content">
+        <div class="header">
+            <div>
+                <h1>Fornecedores</h1>
+
+            </div>
+
+                <input type="text" placeholder="Buscar...">
+
+
+
+                <a href="{{ url_for('tela_cadastro_de_fornecedor') }}" 
+                class="btn btn-cadastro w-100 text-white mt-2">
+                Cadastrar Novo Fornecedor
+             </a>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>CNPJ</th>
+                    <th>Email</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+
+                </tr>
+            </thead>
+            {% for fornecedor in fornecedor %}
+            <tbody>
+                <tr>
+
+                    <td>{{ fornecedor.nome_fornecedor }}</td>
+                    <td>{{ fornecedor.cnpj }}</td>
+                    <td>{{ fornecedor.email }}</td>
+                    <td> <button class="btn btn-tabela w-100 text-white mt-2">Cadastrar Pedido</button> </td>
+                    <td> <button class="btn btn-tabela w-100 text-white mt-2">Ver Pedidos</button> </td>
+                    <td><a class="btn btn-tabela w-100 text-white mt-2" href="{{ url_for('excluir_fornecedor', id=fornecedor.id) }}" >
+                        Excluir
+                     </a></td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </main>
+</div>
+{% endblock %}

@@ -14,12 +14,11 @@ body {
     border-radius: 16px;
     padding: 40px;
     width: 100%;
-    max-width: 600px;
+    max-width: 500px;
     border: 1px solid rgba(255,255,255,0.1);
-    margin-top: 20px;
     align-items: center;
     grid-template-columns: 1fr 1fr;
-  
+
 }
 
 .logo {
@@ -58,7 +57,7 @@ body {
 .link-offset-1{
     display: flex;
     justify-content: flex-end;
-    
+
 }
 
 .form-check{
@@ -74,14 +73,5 @@ body {
 #cadastro-form{
     align-items: center;
     grid-template-columns: 1fr 1fr;
-    
-   
+
 }
-
-#linha{
-    display: flex;
-    flex-direction: row;
-}
-
-
-

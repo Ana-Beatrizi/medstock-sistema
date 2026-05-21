@@ -35,6 +35,20 @@
                     </div>
                 </div>
 
+                <div class="box">
+                    <label class="form-label">Fornecedor</label>
+                
+                    <select name="fornecedor_id" class="form-select">
+                        <option value="">Fornecedor</option>
+                
+                        {% for fornecedor in fornecedores %}
+                            <option value="{{ fornecedor.id }}">
+                                {{ fornecedor.nome_fornecedor }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
                 <div class="mb-3 text-start">
                     <label class="form-label text-dark">Quantidade</label>
                     <div class="input-group">
@@ -54,7 +68,10 @@
                     </div>
                 </div>
 
+                
+
             </div>
+            
             <div id="linha">
 
                 <div class="mb-3 text-start">

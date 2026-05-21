@@ -1,45 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>ENTRADA</h1>
+{% extends 'tela_home.html' %}
 
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Produto</th>
-        <th>Quantidade</th>
-        <th>Status</th>
-        <th>Observação</th>
-        <th>Data do pedido</th>
-        <th>Data do processamento</th>
-        <th>Ações</th>
-    </tr>
+{% block conteudo %}
+    <title>Histórico</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='tela_entrada.css') }}">
 
-    {% for pedido in pedidos %}
-    <tr>
-        <td>{{ pedido.id }}</td>
-        <td>{{ pedido.produto }}</td>
-        <td>{{ pedido.quantidade }}</td>
-        <td>{{ pedido.status }}</td>
-        <td>{{ pedido.observacao }}</td>
-        <td>{{ pedido.data_pedido }}</td>
-        <td>{{ pedido.data_processamento or '-' }}</td>
-        <td class="acoes">
-            {% if pedido.status == 'PENDENTE' %}
-                <a href="{{ url_for('processar_pedido', id=pedido.id) }}">Processar</a>
-                <a href="{{ url_for('cancelar_pedido', id=pedido.id) }}">Cancelar</a>
-            {% else %}
-                -
-            {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
-</table>
-    
-</body>
-</html>
+
+<div class="container">
+
+    <!-- Conteúdo -->
+    <main class="content">
+        <div class="header">
+            <div>
+                <h1>Histórico</h1>
+                <p>Entrada</p>
+            </div>
+            <input type="text" placeholder="Buscar...">
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Movimentação</th>
+                    <th>Fornecedor</th>
+                    <th>Produto</th>
+                    <th>Quantidade</th>
+                    <th>Valor Total</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in entradas %}
+
+                <tr>
+                    <td class="entrada">Entrada</td>
+                    <td>{{ item.nome_fornecedor}}</td>
+                    <td>{{ item.nome }}</td>
+                    <td>{{ item.quantidade }}</td>
+                    <td>R$ {{ item.valor_total }}</td>
+                    <td><span class="data">{{ item.data_pedido }}</span></td>
+                </tr>
+               
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </main>
+</div>
+
+{% endblock %}

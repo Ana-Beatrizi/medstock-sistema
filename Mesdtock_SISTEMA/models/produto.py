@@ -9,6 +9,7 @@ from core.validador import Validador
 class Produto(Crudmedstock):
     table = "produto"
     fields = [
+        "fornecedor_id",
         "nome",
         "quantidade_estoque",
         "categoria",
@@ -17,8 +18,9 @@ class Produto(Crudmedstock):
         "preco_venda",
     ]
 
-    def __init__(self, nome, quantidade_estoque, categoria, estoque_minimo, preco_custo,
+    def __init__(self, fornecedor_id, nome, quantidade_estoque, categoria, estoque_minimo, preco_custo,
                  preco_venda,):
+        self.fornecedor_id = fornecedor_id
         self.nome = nome
         self.quantidade_estoque = quantidade_estoque
         self.categoria = categoria
@@ -47,6 +49,26 @@ class Produto(Crudmedstock):
         '''if cls.has_related_records(id): #! atencao
             raise ValueError("Não é possível excluir o produto porque ele possui pedidos ou movimentações vinculadas.")'''
         cls.delete(id)
+
+    @classmethod
+    def upd_quantidade(cls, id, nova_quantidade, connection=None):
+        conexao = connection or Database.connect()
+        cursor = conexao.cursor()
+        try:
+            sql = "UPDATE produto SET quantidade = %s WHERE id = %s"
+            cursor.execute(sql, (nova_quantidade, id))
+            if connection is None:
+                conexao.commit()
+            return cursor.rowcount
+        except Exception:
+            if connection is None:
+                conexao.rollback()
+            raise
+        finally:
+            cursor.close()
+            if connection is None:
+                conexao.close()
+
 '''
 #! =================
 #! err

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Novo Pedido de {{ tipo }}</h1>
+
+<p><strong>Produto:</strong> {{ produto.nome }}</p>
+<p><strong>Quantidade atual:</strong> {{ produto.quantidade_estoque }}</p>
+
+<form action="{{ url_for('salvar_pedido', produto_id=produto.id) }}" method="POST">
+
+    <input type="hidden" name="produto_id" value="{{ produto.id }}">
+    <input type="hidden" name="fornecedor_id" value="{{ produto.fornecedor_id }}">
+    <input type="hidden" name="tipo" value="{{ tipo }}">
+
+    <label>Quantidade:</label>
+    <input type="number" name="quantidade" value="{{ pedido.quantidade_estoque if pedido else '' }}" required>
+
+    <label>Observação:</label>
+    <input type="text" name="observacao" value="{{ pedido.observacao if pedido else '' }}">
+
+    <button type="submit">Salvar Pedido</button>
+</form>
+</body>
+</html>

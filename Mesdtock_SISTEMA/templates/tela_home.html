@@ -49,7 +49,7 @@
         <!-- MENU -->
 
         <ul class="menu">
-            <li><a href="#">Fornecedor</a></li>
+            <li><a href="{{ url_for('tela_historico_de_fornecedor') }}">Fornecedor</a></li>
             <li><a href="#">Cliente</a></li>
         </ul>
 
@@ -57,11 +57,12 @@
 
         <div class="icones">
 
-            <i class="bi bi-bell"></i>
+            <button class="btn-icon-nav" aria-label="Notificações">
+                <i class="bi bi-bell"></i>
+            </button>
 
-            <a href="{{ url_for('tela_perfil_do_usuario', id=cliente.id) }}">
-                <i class="bi bi-person"></i>
-            </a>
+            <a href="{{ url_for('tela_perfil_do_usuario', id=cliente.id) }}" class="btn-perfil-nav" aria-label="Perfil do Usuário">
+                <i class="bi bi-person-fill"></i> </a>
 
         </div>
 
@@ -74,7 +75,7 @@
         <ul>
 
             <li>
-                <a href="{{ url_for('tela_home') }}">
+                <a href="{{ url_for('tela_inicial') }}">
                     <i class="bi bi-house"></i>
                     <span>Home</span>
                 </a>

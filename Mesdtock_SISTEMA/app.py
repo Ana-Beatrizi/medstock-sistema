@@ -6,6 +6,7 @@ from flask import Flask, jsonify, request, url_for, render_template, redirect, f
 from models.cliente import Cliente
 from models.produto import Produto
 from models.entrada import PedidoEntrada
+from models.fornecedor import Fornecedor
 #============================
 
 # Importações E-MAIL ========
@@ -17,12 +18,13 @@ import smtplib #Simple Mail Transfer Protocol - protocolo para enviar e-mail pel
 
 # OUTRAS Importações ========
 import random
+from datetime import datetime
 #============================
 
 app = Flask(__name__)
 app.secret_key = "Medstock_programa_de_estoque_123456"
 
-#! = Feito pela -- Ana Beatriz // linha 1 a 417 𖹭.ᐟ
+#! = Feito pela -- Ana Beatriz // linha 1 a 526 𖹭.ᐟ
 
 # TRANSFORMA DADOS ============
 # inteiro
@@ -62,24 +64,53 @@ def tela_home():
     return render_template("tela_home.html", cliente = Cliente.seleciona_por_id(cliente_id))
 #==============================================
 
+# TELA INICIAL ===============
+@app.route("/inicial")
+def tela_inicial():
+    cliente_id = session.get("cliente_id")
+    return render_template("tela_inicial.html", cliente = Cliente.seleciona_por_id(cliente_id)) 
+#==============================================
+
+# TELA HISTORICO DE FORNECEDOR ===============
+@app.route("/historico/fornecedor")
+def tela_historico_de_fornecedor():
+    cliente_id = session.get("cliente_id")
+    return render_template("tela_historico_de_fornecedor.html", fornecedor = Fornecedor.seleciona_tudo(order_by="nome_fornecedor"), cliente = Cliente.seleciona_por_id(cliente_id)) 
+#==============================================
+
+# TELA CADASTRO DE FORNECEDOR ===============
+@app.route("/cadastro/fornecedor")
+def tela_cadastro_de_fornecedor():
+    cliente_id = session.get("cliente_id")
+    return render_template("tela_cadastro_de_fornecedor.html", cliente = Cliente.seleciona_por_id(cliente_id)) 
+#==============================================
+
 # TELA CADASTRO PRODUTO==============
 @app.route("/cadastro/produto")
 def tela_cadastro_produto():
     cliente_id = session.get("cliente_id")
-    return render_template("tela_cadastro_produto.html", cliente = Cliente.seleciona_por_id(cliente_id), produto = None)
+    return render_template("tela_cadastro_produto.html", fornecedores = Fornecedor.seleciona_tudo(order_by="nome_fornecedor") , cliente = Cliente.seleciona_por_id(cliente_id), produto = None)
 #==============================================
 
 # TELA PRODUTO==============
 @app.route("/produto")
 def tela_produtos():
     cliente_id = session.get("cliente_id")
-    return render_template("tela_produtos.html", produtos = Produto.seleciona_tudo(order_by="nome"), cliente = Cliente.seleciona_por_id(cliente_id))
+    produtos = Produto.seleciona_tudo(order_by="nome")
+    for produto in produtos:
+        produto["fornecedor"] = Fornecedor.seleciona_por_id(produto["fornecedor_id"])
+
+
+    return render_template("tela_produtos.html", produtos=produtos, cliente = Cliente.seleciona_por_id(cliente_id))
 #==============================================
 
 # TELA ENTRADA==============
 @app.route("/pedido/entrada")
 def tela_entrada():
-    return render_template("tela_entrada.html", entrada=PedidoEntrada.encontra_tudo_com_produto())
+    cliente_id = session.get("cliente_id")
+    #teste = PedidoEntrada.historico_entrada()
+    #print("teste entradas", teste)
+    return render_template("tela_entrada.html", entradas=PedidoEntrada.historico_entrada(), cliente = Cliente.seleciona_por_id(cliente_id))
 #==============================================
 
 # TELA SAIDA==============
@@ -187,12 +218,88 @@ def fazer_login():
     if cliente["senha"] == senha:
         session["cliente_id"] = cliente["id"]
         flash("Login realizado com sucesso!", "success")
-        return redirect(url_for("tela_home"))
+        return redirect(url_for("tela_inicial"))
     else:
         flash("Email ou senha inválidos!", "danger")
         return render_template("tela_login.html")
 
 # -------------------------------------- CLIENTE FIM ------------------------------------------
+
+# -------------------------------------- FORNECEDOR ------------------------------------------
+#! GET FORM TELA DE CADASTRO FORNECEDOR ===============
+def get_fornecedor_form_cadastro():
+    return {
+        "nome_fornecedor": request.form.get("nome_fornecedor").strip(),
+        "cnpj": request.form.get("cnpj").strip(),
+        "email": request.form.get("email").strip(),
+    }
+#==============================================
+
+# POST SALVA FORNECEDOR ===============
+@app.route("/fornecedor/salvar", methods=["POST"])
+def salvar_fornecedor():
+    dados = get_fornecedor_form_cadastro()
+    fornecedor = Fornecedor(**dados)
+    erros = fornecedor.validate()
+
+    if erros:
+        flash(erros[0], "danger")
+        return render_template("tela_cadastro_de_fornecedor.html", fornecedor=dados) 
+
+    try:
+        fornecedor.insert()
+        flash("Fornecedor cadastrado com sucesso.", "success")
+        return redirect(url_for("tela_historico_de_fornecedor")) 
+    except Exception as e:
+            # Verifica se o erro é de entrada duplicada (código 1062 do MySQL)
+        if "1062" in str(e):
+            flash("CNPJ ou E-MAIL já cadastrado no sistema.", "danger")
+        else:
+            flash(f"Erro ao cadastrar Fornecedor: {e}", "danger")
+        return render_template("tela_cadastro_de_fornecedor.html", fornecedor=dados) 
+#==============================================
+
+#! POST ATUALIZAR FORNECEDOR ======================
+'''@app.route("/cliente/atualizar/<int:id>", methods=["POST"])
+def atualizar_cliente(id):
+    dados = get_cliente_form_cadastro()
+    cliente = Cliente(**dados)
+    erros = cliente.validate()
+
+    if erros:
+        for erro in erros:
+            flash(erro[0], "erro")
+        dados["id"] = id
+        return render_template("tela_cadastro.html", cliente=dados)
+
+    try:
+        if not Cliente.seleciona_por_id(id):
+            flash("Cliente não encontrado.", "danger")
+            return redirect(url_for("tela_login"))
+
+        cliente.atualizar(id)
+        flash("Cliente atualizado com sucesso.", "success")
+        return redirect(url_for("tela_login"))
+    except Exception as e:
+        dados["id"] = id
+        flash(f"Erro ao atualizar cliente: {e}", "danger")
+        return render_template("tela_cadastro.html", cliente=dados)
+# ========================================='''
+
+# DELETAR FORNECEDOR ==================
+@app.route("/fornecedor/excluir/<int:id>")
+def excluir_fornecedor(id):
+    try:
+        Fornecedor.deletar_fornecedor(id)
+        flash("Fornecedor excluído com sucesso.", "success")
+    except ValueError as e:
+        flash(str(e), "danger")
+    except Exception as e:
+        flash(f"Erro ao excluir Fornecedor: {e}", "danger")
+    return redirect(url_for("tela_historico_de_fornecedor")) 
+# ====================================
+
+# -------------------------------------- FORNECEDOR FIM ------------------------------------------
 
 #! -------------------------------------- ESQUECI A SENHA ------------------------------------------
 #  Esqueci a senha ROTA===============
@@ -265,6 +372,7 @@ def enviar_codigo_email(destinatario, codigo):
 # GET FORM TELA CADASTRO DE PRODUTO ===========
 def get_produto_form_cadastro():
     return {
+        "fornecedor_id": to_int(request.form.get("fornecedor_id", 1)),
         "nome": request.form.get("nome", "").strip(),
         "quantidade_estoque": to_int(request.form.get("quantidade_estoque")),
         "categoria": request.form.get("categoria", "").strip(),
@@ -330,10 +438,11 @@ def atualizar_produto(id):
 @app.route("/produto/editar/<int:id>")
 def editar_produto(id):
     produto = Produto.seleciona_por_id(id)
+    cliente_id = session.get("cliente_id")
     if not produto:
         flash("Produto não encontrado.", "danger")
         return redirect(url_for("tela_produtos"))
-    return render_template("tela_cadastro_produto.html", produto=produto)
+    return render_template("tela_cadastro_produto.html", cliente = Cliente.seleciona_por_id(cliente_id), produto=produto)
 # ==============================
 
 # DELETAR PRODUTO ==================
@@ -353,9 +462,16 @@ def excluir_produto(id):
 #! -------------------------------------- PEDIDOS ------------------------------------------
 # GET FORM TELA CADASTRO DE PEDIDOS ===========
 def get_pedido_form():
+    data_campo = request.form.get("data_pedido")
+    
+    # Se o campo for vazio ou não selecionado gera a data/hora atual formatada para o MySQL
+    if not data_campo or data_campo.strip() == "":
+        data_pedido = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    else:
+        data_pedido = data_campo
     return {
-        "produto_id": request.form.get("produto_id"),
-        "data_pedido": request.form.get("data_pedido"),
+        #"produto_id": request.form.get("produto_id"),
+        "data_pedido": data_pedido,
         "valor_total": request.form.get("valor_total"),
         "observacao": request.form.get("observacao", "").strip(),
         "data_processamento": request.form.get("data_processamento"),
@@ -375,12 +491,17 @@ def novo_pedido(tipo, id):
         flash("Tipo de pedido inválido.", "erro")
         return redirect(url_for("tela_produtos"))
 
-    return render_template("tela_cadastro_pedidos.html", produto=produto, tipo=tipo, pedido=None)
+    pedido_padrao = {
+        "data_pedido": datetime.now().strftime("%Y-%m-%dT%H:%M") # Formato correto para input do tipo datetime-local
+    }
+
+    return render_template("tela_cadastro_pedidos.html", produto=produto, tipo=tipo, pedido=pedido_padrao)
 
 @app.route("/pedido/salvar/<int:produto_id>", methods=["POST"])
-def salvar_pedido():
+def salvar_pedido(produto_id):
     dados = get_pedido_form()
-    produto = Produto.seleciona_por_id(dados["produto_id"])
+    #print("pedido", dados)
+    produto = Produto() #Produto.seleciona_por_id(produto_id)
     entrada = PedidoEntrada(**dados)
     erros = entrada.validate()
 
@@ -394,12 +515,13 @@ def salvar_pedido():
         return render_template("tela_cadastro_pedidos.html", pedido=dados)
     
     try:
-        entrada.insert()
+        dados["id"] = produto_id
+        produto.upd_quantidade(produto_id, dados["quantidade"])
         flash("Pedido criado com sucesso.", "success")
         return redirect(url_for("tela_entrada"))
     except Exception as e:
         flash(f"Erro ao criar pedido: {e}", "danger")
-        return render_template("tela_cadastro_pedidos.html", produto=produto, tipo=dados["tipo"], pedido=dados)
+        return render_template("tela_cadastro_pedidos.html")
 
 @app.route("/pedido/processar/<int:id>")
 def processar_pedido(id):
@@ -423,50 +545,11 @@ def cancelar_pedido(id):
         flash(f"Erro ao cancelar pedido: {e}", "erro")
     return redirect(url_for("pedidos"))
 
-#! = Feito pela -- Ana Beatriz // linha 1 a 426 𖹭.ᐟ
-
-'''usuarios = []
-perfil = ["cliente", "fornercedor"]
-
-
-# Fornecedores
-
-fornecedor = []
-
-@app.route("/fornecedor", methods=["POST"])
-def cadastrar_fornecedor():
-    dados = request.get_json()
-    resposta = insert_fornecedor(dados)
-    return jsonify(resposta), 201 if resposta.get('status') == 'sucesso' else 400
-
-
-@app.route("/fornecedor/<int:idfornecedor>", methods=["GET"])
-def listar_fornecedor(idfornecedor):
-    resposta = read_fornecedor(idfornecedor)
-    return jsonify(resposta), 201 if resposta.get('status') == 'sucesso' else 400
-
-
-@app.route("/fornecedor/atualizar/<int:idfornecedor>", methods=["PUT"])
-def atualizar_fornecedor(idfornecedor):
-    dados = request.json
-    dados['idfornecedor'] = idfornecedor
-    resposta = update_fornecedor(dados)
-    return jsonify(resposta), 200 if resposta.get('status') == 'sucesso' else 400
-
-@app.route("/fornecedor/delete/<int:idfornecedor>", methods=["DELETE"])
-def deletar_fornecedor(idfornecedor):
-    resposta = delete_fornecedor(idfornecedor)
-    return jsonify(resposta)
-
-@app.route("/fornecedor/<int:indice>/pagto", methods=["GET"])
-def listar_pagto(indice):
-    if indice < len(fornecedor):
-        return jsonify(fornecedor[indice].get("pagamento", {}))
-    return jsonify({"erro": "Pagamento não encontrado"})
+#! = Feito pela -- Ana Beatriz // linha 1 a 531 𖹭.ᐟ
 
 
 # Pagamentos
-
+'''
 pagamento = []
 
 @app.route("/pagamento", methods=["POST"])

@@ -42,10 +42,26 @@ class PedidoEntrada(Crudmedstock):
         cursor = conexao.cursor(dictionary=True)
         try:
             sql = """
-            SELECT en.*, p.nome AS produto
-            FROM entrada en
-            INNER JOIN produto p ON en.produto_id = p.id
-            ORDER BY en.data_pedido DESC
+            SELECT * from entrada 
+            order by data_pedido desc
+            """
+            cursor.execute(sql)
+            return cursor.fetchall()
+        finally:
+            cursor.close()
+            conexao.close()
+
+    @classmethod
+    def historico_entrada(cls):
+        conexao = conectar_banco.connect()
+        cursor = conexao.cursor(dictionary=True)
+        try:
+            sql = """
+            SELECT e.id, f.nome_fornecedor, i.produto_id, p.nome, i.quantidade, e.valor_total, data_pedido from entrada e
+            join fornecedor f on e.fornecedor_id = f.id
+            join item_pedido_fornecedor i on e.id = i.entrada_id
+            join produto p on i.produto_id = p.id
+            order by data_pedido desc
             """
             cursor.execute(sql)
             return cursor.fetchall()

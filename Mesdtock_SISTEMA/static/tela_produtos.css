@@ -1,76 +1,219 @@
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: Arial, sans-serif;
-    }
-    body {
-        background: #f5f5f5;
-    }
-    #container {
-        display: flex;
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body{
+    background: #f5f5f5;
+    overflow-x: hidden;
+}
+
+/* ================= CONTAINER ================= */
+
+#container{
+    display: flex;
+}
+
+/* ================= CONTEÚDO ================= */
+
+#content{
+    flex: 1;
+    padding: 30px 40px;
+}
+
+/* ================= HEADER ================= */
+
+#header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 25px;
+
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+#header h1{
+    color: #002D81;
+    font-size: 56px;
+    font-weight: 400;
+}
+
+/* ================= INPUT ================= */
+
+#header input{
+    width: 250px;
+    height: 58px;
+
+    padding: 0 20px;
+
+    border-radius: 22px;
+    border: 1px solid #cfcfcf;
+
+    background: #f8f8f8;
+
+    outline: none;
+
+    font-size: 18px;
+
+    transition: 0.3s;
+}
+
+#header input:focus{
+    border: 1px solid #00C4C0;
+    box-shadow: 0 0 8px rgba(0,196,192,0.2);
+}
+
+/* ================= TABELA ================= */
+
+table{
+    width: 100%;
+
+    border-collapse: collapse;
+
+    background: white;
+
+    border-radius: 0;
+
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+/* ================= TÍTULO DA TABELA ================= */
+
+#table_titulo{
+    background: #002D81;
+    color: white;
+}
+
+#table_titulo th{
+    padding: 14px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* ================= CABEÇALHO ================= */
+
+thead{
+    background: #00C4C0;
+    color: white;
+}
+
+th{
+    padding: 14px;
+
+    text-align: left;
+
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* ================= LINHAS ================= */
+
+td{
+    padding: 16px 14px;
+
+    font-size: 15px;
+
+    color: #222;
+
+    border-bottom: 1px solid #e5e5e5;
+}
+
+tbody tr:hover{
+    background: #00aca916;
+}
+
+/* ================= STATUS ================= */
+
+.em_estoque{
+    color: green;
+    font-weight: bold;
+}
+
+.fora_estoque{
+    color: red;
+    font-weight: bold;
+}
+
+.alerta{
+    color: rgb(255, 191, 0);
+    font-weight: bold;
+}
+
+/* ================= DATA ================= */
+
+.data{
+    background: #e9ecef;
+
+    padding: 6px 12px;
+
+    border-radius: 10px;
+}
+
+/* ================= LINKS ================= */
+
+a{
+    color: #0d6efd;
+    text-decoration: underline;
+}
+
+/* ================= RESPONSIVO ================= */
+
+@media(max-width: 900px){
+
+    #header{
+        flex-direction: column;
+        align-items: flex-start;
     }
 
-    /* Conteúdo */
-    #content {
-        flex: 1;
-        padding: 40px;
-    }
-    #header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    #table_titulo{
-        background-color: #002D81;
-    }
-
-    #header h1 {
-        color: #002D81;
-    }
-
-    #header p {
-        color: #6c757d;
-    }
-
-    #header input {
-        padding: 10px;
-        border-radius: 20px;
-        border: 1px solid #ccc;
-        width: 200px;
-    }
-
-    /* Tabela */
-    table {
+    #header input{
         width: 100%;
-        border-collapse: collapse;
-        background: white;
     }
-    thead {
-        background: #00C4C0;
-        color: white;
+
+    table{
+        display: block;
+        overflow-x: auto;
     }
-    th, td {
-        padding: 12px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-    }
-    .em_estoque {
-        color: green;
-        font-weight: bold;
-    }
-    .fora_estoque {
-        color: red;
-        font-weight: bold;
-    }
-    .alerta{
-        color: rgb(255, 221, 0);
-        font-weight: bold;
-    }
-    .data {
-        background: #e9ecef;
-        padding: 5px 10px;
-        border-radius: 10px;
-    }
+}
+
+/* COLUNA ID */
+
+th:first-child,
+td:first-child{
+    width: 70px;
+    max-width: 70px;
+}
+
+.acoes{
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    
+}
+
+.btn-tabela {
+    background: #00C4C0;
+    border: none;
+    color: white;
+    border-radius: 6px;
+    width: 50px;
+    min-width: 80px;
+    height: 32px;
+    padding: 0 12px;
+    font-size: 14px;
+    transition: 0.3s;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-tabela:hover {
+    cursor: pointer;
+    background: #00aca8;
+}
+
