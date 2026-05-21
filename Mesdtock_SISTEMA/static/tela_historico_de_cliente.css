@@ -21,15 +21,15 @@ body {
     padding: 30px 40px;
 }
 
-/* ================= HEADER MELHORADO ================= */
+/* ================= HEADER MODERNIZADO ================= */
 
 .header {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Alinha título na esquerda e ferramentas na direita */
+    justify-content: space-between; /* Mantém título na esquerda e ações na direita */
     margin-bottom: 30px;
     padding-bottom: 15px;
-    border-bottom: 1px solid #eef2f5; /* Divisória sutil */
+    border-bottom: 1px solid #eef2f5; /* Divisória elegante */
 }
 
 .header h1 {
@@ -40,14 +40,14 @@ body {
     letter-spacing: -0.5px;
 }
 
-/* Agrupador dos elementos da direita */
+/* Agrupador dos elementos posicionados à direita */
 .header-right {
     display: flex;
     align-items: center;
     gap: 15px;
 }
 
-/* Container para posicionar a lupa interna ao input */
+/* Wrapper do Input para alinhar a lupa interna */
 .search-wrapper {
     position: relative;
     display: flex;
@@ -62,12 +62,12 @@ body {
     pointer-events: none;
 }
 
-/* Campo de busca modernizado */
+/* Input de pesquisa refinado */
 .header input {
     width: 280px;
     height: 44px;
-    padding: 0 15px 0 40px;
-    border-radius: 8px;
+    padding: 0 15px 0 40px; /* Margem esquerda interna para não colidir com o ícone */
+    border-radius: 8px; /* Cantos combinando com o botão principal */
     border: 1px solid #cbd5e1;
     outline: none;
     background: #ffffff;
@@ -88,7 +88,7 @@ body {
     width: auto !important;
     min-width: 240px;
     height: 44px;
-    margin-top: 0 !important; /* Corrige o desalinhamento vertical antigo */
+    margin-top: 0 !important; /* Elimina o desalinhamento gerado pelo mt-2 do bootstrap */
     padding: 0 20px;
     border: none;
     border-radius: 8px;
@@ -152,12 +152,12 @@ th {
     font-weight: 600;
 }
 
-/* Força as colunas de botões a terem espaçamentos simétricos */
+/* Mantém as colunas de ação com larguras idênticas e estáveis */
 .col-acao {
     width: 145px;
 }
 
-/* ================= LINHAS ================= */
+/* ================= LINHAS DA TABELA ================= */
 
 td {
     padding: 16px 14px;
@@ -177,7 +177,7 @@ tbody tr:hover {
     border: none;
     color: white !important;
     border-radius: 6px;
-    width: 135px; /* Tamanho calibrado para não quebrar textos longos */
+    width: 135px; /* Largura controlada e idêntica à tela de fornecedores */
     height: 34px;
     padding: 0 8px;
     font-size: 13px;
@@ -196,7 +196,7 @@ tbody tr:hover {
     background: #00aca8;
 }
 
-/* Botão de Exclusão Destacado */
+/* Botão de Exclusão Vermelho */
 .btn-excluir {
     background: #dc3545;
 }
@@ -205,7 +205,7 @@ tbody tr:hover {
     background: #bb2d3b;
 }
 
-/* ================= RESPONSIVO SEGURO ================= */
+/* ================= RESPONSIVIDADE CORRIGIDA ================= */
 
 @media(max-width: 992px){
     .header {

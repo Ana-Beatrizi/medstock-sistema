@@ -1,25 +1,26 @@
 {% extends 'tela_home.html' %}
 
 {% block conteudo %}
-    <title>Fornecedores | MEDSTOCK</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='tela_historico_de_fornecedor.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<title>Clientes | MEDSTOCK</title>
+<link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='tela_historico_de_cliente.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
 <div class="container">
     <main class="content">
         
         <div class="header">
             <div class="header-left">
-                <h1>Fornecedores</h1>
+                <h1>Clientes</h1>
             </div>
 
             <div class="header-right">
                 <div class="search-wrapper">
                     <i class="bi bi-search search-icon"></i>
-                    <input type="text" id="inpuBusca" placeholder="Buscar fornecedor...">
+                    <input type="text" placeholder="Buscar cliente...">
                 </div>
-                <a href="{{ url_for('tela_cadastro_de_fornecedor') }}" class="btn btn-cadastro">
-                    <i class="bi bi-plus-lg me-2"></i> Cadastrar Novo Fornecedor
+                <a href="{{ url_for('tela_clientes_cadastro') }}" class="btn btn-cadastro">
+                    <i class="bi bi-plus-lg me-2"></i> Cadastrar Novo Cliente
                 </a>
             </div>
         </div>
@@ -43,34 +44,41 @@
         {% endif %}
         {% endwith %}
 
-        <table class="">
+        <table>
             <thead>
                 <tr>
                     <th>Nome</th>
-                    <th>CNPJ</th>
-                    <th>Email</th>
+                    <th>CPF</th>
+                    <th>Telefone</th>
+                    <th>Estado</th>
+                    <th>Cidade</th>
+                    <th>CEP</th>
                     <th class="col-acao"></th>
                     <th class="col-acao"></th>
                     <th class="col-acao"></th>
                 </tr>
             </thead>
-            <tbody id="tabelaDados">
-                {% for fornecedor in fornecedor %}
+            <tbody>
+                {% for cliente in clientes %}
                 <tr>
-                    <td>{{ fornecedor.nome_fornecedor }}</td>
-                    <td>{{ fornecedor.cnpj }}</td>
-                    <td>{{ fornecedor.email }}</td>
+                    <td>{{ cliente.nome }}</td>
+                    <td>{{ cliente.cpf }}</td>
+                    <td>{{ cliente.telefone }}</td>
+                    <td>{{ cliente.estado }}</td>
+                    <td>{{ cliente.cidade }}</td>
+                    <td>{{ cliente.cep }}</td>
                     <td> <button class="btn btn-tabela w-100 text-white mt-2">Cadastrar Pedido</button> </td>
                     <td> <button class="btn btn-tabela w-100 text-white mt-2">Ver Pedidos</button> </td>
-                    <td>
-                        <a class="btn btn-tabela w-100 text-white mt-2 btn-excluir" href="{{ url_for('excluir_fornecedor', id=fornecedor.id) }}">
+                    <td> 
+                        <a class="btn btn-tabela w-100 text-white mt-2 btn-excluir" href="{{ url_for('excluir_clientes_cadastro', id=cliente.id) }}">
                             Excluir
-                        </a>
+                        </a> 
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+
     </main>
 </div>
 {% endblock %}

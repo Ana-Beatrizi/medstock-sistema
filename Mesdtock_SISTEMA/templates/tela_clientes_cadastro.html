@@ -1,0 +1,103 @@
+{% extends 'tela_home.html' %}
+
+{% block conteudo %}
+<title>Document</title>
+<link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='tela_clientes_cadastro.css') }}">
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Ícones -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<!-- Fonte moderna -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <div class="container d-flex align-items-center justify-content-center cadastro container">
+        <div class="cadastro-card text-center">
+
+            <h2 class="mb-3 text-dark">Cadastro Cliente</h2>
+
+            <form method="POST" action="{{ url_for('salvar_clientes_cadastro') }}" id="cadastro-form">
+
+                <div class="linha">
+                <div class="mb-3 text-start">
+                    <label class="form-label text-dark">Nome</label>
+                    <div class="input-group">
+
+                        <input type="text" name="nome" id="nome" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="mb-3 text-start">
+                    <label class="form-label text-dark">CPF</label>
+                    <div class="input-group">
+
+                        <!--implementar api externa para validar cnpj posteriormente-->
+                        <input type="text" name="cpf" id="cpf" class="form-control" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="linha">
+                <div class="mb-3 text-start">
+                    <label class="form-label text-dark">telefone</label>
+                    <div class="input-group">
+
+                        <input type="tel" name="telefone" id="telefone" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="mb-3 text-start">
+                    <label class="form-label text-dark">Cidade</label>
+                    <div class="input-group">
+
+                        <input type="text" name="cidade" id="cidade" class="form-control" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="linha">
+                <div class="mb-3 text-start">
+                    <label class="form-label text-dark">Estado</label>
+                    <div class="input-group">
+
+                        <input type="text" name="estado" id="estado" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="mb-3 text-start">
+                    <label class="form-label text-dark">CEP</label>
+                    <div class="input-group">
+
+                        <input type="text" name="cep" id="cep" class="form-control" required>
+                    </div>
+                </div>
+            </div>
+
+            {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% if mensagens %}
+              {% for categoria, msg in mensagens %}
+                <div class="custom-alert alert-{{ categoria }} alert-flash animate__animated animate__fadeIn" role="alert">
+                    <div class="alert-content">
+                        {% if categoria == 'success' %}
+                            <i class="bi bi-check-circle-fill alert-icon"></i>
+                        {% elif categoria == 'danger' or categoria == 'error' %}
+                            <i class="bi bi-exclamation-triangle-fill alert-icon"></i>
+                        {% else %}
+                            <i class="bi bi-info-circle-fill alert-icon"></i>
+                        {% endif %}
+                        <span class="alert-text">{{ msg }}</span>
+                    </div>
+                </div>
+              {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+                <button class="btn btn-cadastro w-100 text-white mt-2">Cadastrar</button>
+            </form>
+
+
+        </div>
+    </div>
+    {% endblock %}

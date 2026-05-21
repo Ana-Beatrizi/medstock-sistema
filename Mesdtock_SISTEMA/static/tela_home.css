@@ -97,7 +97,6 @@ body {
     background-color: rgba(255, 255, 255, 0.12);
 }
 
-/* Linha minimalista tratada via GPU para evitar lentidão */
 .menu li a::after {
     content: '';
     position: absolute;
@@ -139,7 +138,6 @@ body {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Notificação */
 .btn-icon-nav i {
     font-size: 19px;
     transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -154,7 +152,6 @@ body {
     transform: rotate(15deg);
 }
 
-/* Perfil (Avatar) */
 .btn-perfil-nav {
     background-color: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.15);
@@ -189,18 +186,15 @@ body {
     z-index: 999;
     box-shadow: 4px 0 15px rgba(0, 45, 129, 0.1);
     overflow: hidden;
-    
-    /* Correção do travamento: Curva otimizada para transições de largura */
     transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: width;
 }
 
-/* SIDEBAR FECHADA */
+/* ALTERADO: Estado base padrão inicializado como fechado (80px) */
 .sidebar.close {
     width: 80px;
 }
 
-/* LISTA SIDEBAR */
 .sidebar ul {
     list-style: none;
     padding: 90px 10px 20px 10px;
@@ -211,7 +205,6 @@ body {
     margin-bottom: 4px;
 }
 
-/* LINKS SIDEBAR */
 .sidebar ul li a {
     display: flex;
     align-items: center;
@@ -226,7 +219,6 @@ body {
     transition: color 0.2s ease, background-color 0.2s ease;
 }
 
-/* ÍCONES SIDEBAR */
 .sidebar ul li a i {
     font-size: 20px;
     min-width: 25px;
@@ -236,10 +228,9 @@ body {
 
 .sidebar ul li a span {
     white-space: nowrap;
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
 }
 
-/* HOVER SIDEBAR */
 .sidebar ul li a:hover {
     color: #ffffff;
     background-color: rgba(255, 255, 255, 0.12);
@@ -250,13 +241,12 @@ body {
     transform: scale(1.05);
 }
 
-/* Pequena barra vertical corrigida para rodar liso por GPU */
 .sidebar ul li a::before {
     content: '';
     position: absolute;
     left: 0;
     top: 50%;
-    margin-top: -15px; /* Centraliza perfeitamente o height fixo de 30px */
+    margin-top: -15px;
     width: 3px;
     height: 30px;
     background-color: #00C4C0;
@@ -270,9 +260,10 @@ body {
     transform: scaleY(1);
 }
 
-/* ESCONDER TEXTO DA SIDEBAR */
+/* ALTERADO: Adicionado visibility hidden para remover links fantasmas na renderização inicial */
 .sidebar.close span {
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
 }
 
@@ -280,14 +271,97 @@ body {
 
 .conteudo {
     margin-left: 250px;
-    padding: 90px 25px;
-    
-    /* Correção do empurrão da tela: sincronizado exatamente com o tempo de animação da barra */
+    padding: 50px 25px;
     transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: margin-left;
 }
 
-/* CONTEÚDO EXPANDIDO */
+/* ALTERADO: Estado base padrão inicializado como expandido (80px) */
 .conteudo.expand {
     margin-left: 80px;
+}
+
+
+/* ================= ANIMAÇÃO DE TRANSIÇÃO DE TELAS ================= */
+
+/* Criando o efeito de surgimento profissional */
+@keyframes fadeInPage {
+    0% {
+        opacity: 0;
+        transform: translateY(8px); /* Começa um pouco abaixo */
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0); /* Termina na posição perfeita */
+    }
+}
+
+/* Aplicando na tag main que guarda todo o conteúdo dinâmico */
+.conteudo {
+    /* 0.4 segundos é o tempo perfeito para dar fluidez sem parecer lento */
+    animation: fadeInPage 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    
+    /* Garante estabilidade visual enquanto renderiza */
+    will-change: transform, opacity; 
+}
+
+
+/* TESTE*/
+
+/* ================= ALERTAS PERSONALIZADOS MEDSTOCK ================= */
+
+.custom-alert {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 45, 129, 0.05);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+/* Alinhamento interno */
+.alert-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.alert-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #334155; /* Texto escuro suave, mais legível */
+}
+
+.alert-icon {
+    font-size: 18px;
+}
+
+/* --- Variação: Sucesso (Verde Medstock) --- */
+.custom-alert.alert-success {
+    border-left: 5px solid #00C4C0; /* Barra lateral com o ciano da sua marca */
+}
+.custom-alert.alert-success .alert-icon {
+    color: #00C4C0;
+}
+
+/* --- Variação: Erro / Perigo (Vermelho Suave) --- */
+.custom-alert.alert-danger, 
+.custom-alert.alert-error {
+    border-left: 5px solid #ef4444; 
+}
+.custom-alert.alert-danger .alert-icon,
+.custom-alert.alert-error .alert-icon {
+    color: #ef4444;
+}
+
+/* --- Variação: Informação / Avisos (Azul Medstock) --- */
+.custom-alert.alert-info {
+    border-left: 5px solid #00819F;
+}
+.custom-alert.alert-info .alert-icon {
+    color: #00819F;
 }

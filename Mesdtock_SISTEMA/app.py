@@ -7,6 +7,7 @@ from models.cliente import Cliente
 from models.produto import Produto
 from models.entrada import PedidoEntrada
 from models.fornecedor import Fornecedor
+from models.cliente_cadastro import ClientesCadastro
 #============================
 
 # Importações E-MAIL ========
@@ -78,11 +79,25 @@ def tela_historico_de_fornecedor():
     return render_template("tela_historico_de_fornecedor.html", fornecedor = Fornecedor.seleciona_tudo(order_by="nome_fornecedor"), cliente = Cliente.seleciona_por_id(cliente_id)) 
 #==============================================
 
+# TELA HISTORICO DE CLIENTE ===============
+@app.route("/historico/cliente")
+def tela_historico_de_cliente():
+    cliente_id = session.get("cliente_id")
+    return render_template("tela_historico_de_cliente.html", clientes = ClientesCadastro.seleciona_tudo(order_by="nome"), cliente = Cliente.seleciona_por_id(cliente_id)) 
+#==============================================
+
 # TELA CADASTRO DE FORNECEDOR ===============
 @app.route("/cadastro/fornecedor")
 def tela_cadastro_de_fornecedor():
     cliente_id = session.get("cliente_id")
     return render_template("tela_cadastro_de_fornecedor.html", cliente = Cliente.seleciona_por_id(cliente_id)) 
+#==============================================
+
+# TELA CLIENTES CADASTRO ===============
+@app.route("/cadastro/clientescadastro")
+def tela_clientes_cadastro():
+    cliente_id = session.get("cliente_id")
+    return render_template("tela_clientes_cadastro.html", cliente = Cliente.seleciona_por_id(cliente_id)) 
 #==============================================
 
 # TELA CADASTRO PRODUTO==============
@@ -215,7 +230,7 @@ def fazer_login():
 
     cliente = Cliente.seleciona_por_email(email)
 
-    if cliente["senha"] == senha:
+    if cliente and cliente["senha"] == senha:
         session["cliente_id"] = cliente["id"]
         flash("Login realizado com sucesso!", "success")
         return redirect(url_for("tela_inicial"))
@@ -300,6 +315,87 @@ def excluir_fornecedor(id):
 # ====================================
 
 # -------------------------------------- FORNECEDOR FIM ------------------------------------------
+
+# -------------------------------------- CLIENTE CADASTRO ------------------------------------------
+#! GET FORM TELA DE CLIENTE CADASTRO ===============
+def get_form_cliente_cadastro():
+    return {
+        "nome": request.form.get("nome").strip(),
+        "cpf": request.form.get("cpf").strip(),
+        "telefone": request.form.get("telefone").strip(),
+        "cidade": request.form.get("cidade").strip(),
+        "estado": request.form.get("estado").strip(),
+        "cep": request.form.get("cep").strip(),
+    }
+#==============================================
+
+#! POST SALVA CLIENTE CADASTRO ===============
+@app.route("/clientescadastro/salvar", methods=["POST"])
+def salvar_clientes_cadastro():
+    dados = get_form_cliente_cadastro()
+    clientes = ClientesCadastro(**dados)
+    erros = clientes.validate()
+
+    cliente_id = session.get("cliente_id")
+
+    if erros:
+        flash(erros[0], "danger")
+        return render_template("tela_clientes_cadastro.html", clientes=dados, cliente = Cliente.seleciona_por_id(cliente_id)) #!
+
+    try:
+        clientes.insert()
+        flash("Cliente cadastrado com sucesso!", "success")
+        return redirect(url_for("tela_historico_de_cliente")) 
+    except Exception as e:
+            # Verifica se o erro é de entrada duplicada (código 1062 do MySQL)
+        if "1062" in str(e):
+            flash("CPF já cadastrado no sistema.", "danger")
+        else:
+            flash(f"Erro ao cadastrar Cliente: {e}", "danger")
+        return render_template("tela_clientes_cadastro.html", clientes=dados, cliente = Cliente.seleciona_por_id(cliente_id)) 
+#==============================================
+
+#! POST ATUALIZAR FORNECEDOR ======================
+'''@app.route("/cliente/atualizar/<int:id>", methods=["POST"])
+def atualizar_cliente(id):
+    dados = get_cliente_form_cadastro()
+    cliente = Cliente(**dados)
+    erros = cliente.validate()
+
+    if erros:
+        for erro in erros:
+            flash(erro[0], "erro")
+        dados["id"] = id
+        return render_template("tela_cadastro.html", cliente=dados)
+
+    try:
+        if not Cliente.seleciona_por_id(id):
+            flash("Cliente não encontrado.", "danger")
+            return redirect(url_for("tela_login"))
+
+        cliente.atualizar(id)
+        flash("Cliente atualizado com sucesso.", "success")
+        return redirect(url_for("tela_login"))
+    except Exception as e:
+        dados["id"] = id
+        flash(f"Erro ao atualizar cliente: {e}", "danger")
+        return render_template("tela_cadastro.html", cliente=dados)
+# ========================================='''
+
+# DELETAR FORNECEDOR ==================
+@app.route("/clientescadastro/excluir/<int:id>")
+def excluir_clientes_cadastro(id):
+    try:
+        ClientesCadastro.deletar_clientes_cadastro(id)
+        flash("Cliente excluído com sucesso!", "danger")
+    except ValueError as e:
+        flash(str(e), "danger")
+    except Exception as e:
+        flash(f"Erro ao excluir Cliente: {e}", "danger")
+    return redirect(url_for("tela_historico_de_cliente")) 
+# ====================================
+
+# -------------------------------------- CLIENTES CADASTRO FIM ------------------------------------------
 
 #! -------------------------------------- ESQUECI A SENHA ------------------------------------------
 #  Esqueci a senha ROTA===============
@@ -545,310 +641,7 @@ def cancelar_pedido(id):
         flash(f"Erro ao cancelar pedido: {e}", "erro")
     return redirect(url_for("pedidos"))
 
-#! = Feito pela -- Ana Beatriz // linha 1 a 531 𖹭.ᐟ
+#! = Feito pela -- Ana Beatriz // linha 1 a 642 𖹭.ᐟ
 
-
-# Pagamentos
-'''
-pagamento = []
-
-@app.route("/pagamento", methods=["POST"])
-def adicionar_pagamento():
-    novo_pagamento = request.get_json()
-    pagamentos = {
-        "forma de pagamento": novo_pagamento["forma de pagamento"],
-        "valor a ser pago": novo_pagamento["valor a ser pago"]
-    }
-    pagamento.append(pagamentos)
-    return jsonify({"mensagem": "Pagamento adicionado com sucesso!"}), 201
-
-@app.route("/pagamento", methods=["GET"])
-def listar_pagamento():
-    return jsonify(pagamento)
-
-@app.route("/pagamento/<int:indice>", methods=["GET"])
-def buscar_pagamento(indice):
-    if indice < len(pagamento):
-        return jsonify(pagamento[indice])
-    return jsonify({"erro": "Pagamento não encontrado"}), 404
-
-@app.route("/pagamento/<int:indice>", methods=["PUT"])
-def atualizar_pagamento(indice):
-    if indice < len(pagamento):
-        dados = request.get_json()
-        pagamento[indice].update(dados)
-        return jsonify({"mensagem": "Pagamento atualizado com sucesso!"})
-    return jsonify({"erro": "Pagamento não encontrado"}), 404
-
-@app.route("/pagamento/<int:indice>", methods=["DELETE"])
-def deletar_pagamento(indice):
-    if indice < len(pagamento):
-        pagamento.pop(indice)
-        return jsonify({"mensagem": "Pagamento removido com sucesso!"})
-    return jsonify({"erro": "Pagamento não encontrado"})
-
-
-
-# Compras (entrada do fornecedor)
-
-entrada = []
-
-@app.route("/comprafornecedor", methods=["POST"])
-def adicionar_entrada():
-    nova_entrada = request.get_json()
-    entradas = {
-        "nome": nova_entrada["nome"],
-        "quantidade": nova_entrada["quantidade"],
-        "cnpj": nova_entrada["cnpj"]
-    }
-    
-    res_nome = validar_nome_fornecedor(nova_entrada["nome"])
-    res_quant = validar_quant_fornecedor(nova_entrada["quantidade"])
-    res_cnpj = validar_cnpj(nova_entrada["cnpj"])
-
-    
-    entrada.append({"nome": res_nome, "quantidade": res_quant, "cnpj": res_cnpj})
-
-
-    return jsonify({"nome": res_nome, "quantidade": res_quant}), 201
-
-@app.route("/comprafornecedor", methods=["GET"])
-def listar_entradas():
-    return jsonify(entrada)
-
-@app.route("/comprafornecedor/<int:indice>", methods=["GET"])
-def buscar_entrada(indice):
-    if indice < len(entrada):
-        return jsonify(entrada[indice])
-    return jsonify({"erro": "Entrada não encontrada"}), 404
-
-@app.route("/comprafornecedor/<int:indice>", methods=["PUT"])
-def atualizar_entrada(indice):
-    if indice < len(entrada):
-        dados = request.get_json()
-        entrada[indice].update(dados)
-        return jsonify({"mensagem": "Entrada atualizada com sucesso!"})
-    return jsonify({"erro": "Entrada não encontrada"}), 404
-
-@app.route("/comprafornecedor/<int:indice>", methods=["DELETE"])
-def deletar_entrada(indice):
-    if indice < len(entrada):
-        entrada.pop(indice)
-        return jsonify({"mensagem": "Entrada removida com sucesso!"})
-    return jsonify({"erro": "Entrada não encontrada"}), 404
-
-
-# Saídas (vendas)
-
-saidas = []
-
-@app.route("/saida", methods=["POST"])
-def registrar_saida():
-    nova_saida = request.get_json()
-    saida = {
-        "cliente": nova_saida.get("cliente"),
-        "produtos": nova_saida.get("produtos", []),
-        "pagamento": nova_saida.get("pagamento", {}),
-        "valor_total": nova_saida.get("valor_total", 0.0)
-    }
-    saidas.append(saida)
-    return jsonify({"mensagem": "Saída registrada com sucesso!"})
-
-@app.route("/saida", methods=["GET"])
-def listar_saidas():
-    return jsonify(saidas)
-
-@app.route("/saida/<int:indice>", methods=["PUT"])
-def atualizar_saida(indice):
-    if indice < len(saidas):
-        dados = request.get_json()
-        saidas[indice].update(dados)
-        return jsonify({"mensagem": "Saída atualizada com sucesso!"})
-    return jsonify({"erro": "Saída não encontrada"})
-
-@app.route("/saida/<int:indice>", methods=["DELETE"])
-def excluir_saida(indice):
-    if indice < len(saidas):
-        saidas.pop(indice)
-        return jsonify({"mensagem": "Saída excluída com sucesso!"})
-    return jsonify({"erro": "Saída não encontrada"})
-
-@app.route("/saida/<int:indice>/produtos", methods=["GET"])
-def get_produtos_saida(indice):
-    if indice < len(saidas):
-        return jsonify(saidas[indice].get("produtos", []))
-    return jsonify({"erro": "Saída não encontrada"})
-
-@app.route("/saida/<int:indice>/cliente", methods=["GET"])
-def get_cliente_saida(indice):
-    if indice < len(saidas):
-        return jsonify(saidas[indice].get("cliente", {}))
-    return jsonify({"erro": "Saída não encontrada"})
-
-@app.route("/saida/<int:indice>/pagto", methods=["GET"])
-def get_pagto_saida(indice):
-    if indice < len(saidas):
-        return jsonify(saidas[indice].get("pagamento", {}))
-    return jsonify({"erro": "Saída não encontrada"})
-
-
-# Movimentação de estoque
-
-item = []
-
-@app.route("/movimentacao", methods=["GET"])
-def listar_item():
-    return jsonify(item)
-
-@app.route("/movimentacao", methods=["POST"])
-def adicionar_item():
-    novo_item = request.get_json()
-    itens = {
-        "nome": novo_item["nome"],
-        "codigo": novo_item["codigo"],
-        "quantidade": novo_item["quantidade"],
-        "compra": novo_item["compra"],
-        "venda": novo_item["venda"],
-        "nome_entrada": novo_item["nome_entrada"],
-        "quantidade_entrada": novo_item["quantidade_entrada"],
-        "data_entrada": novo_item["data_entrada"],
-        "fornecedor_e": novo_item["fornecedor_e"],
-        "nome_saida": novo_item["nome_saida"],
-        "quantidade_saida": novo_item["quantidade_saida"],
-        "data_saida": novo_item["data_saida"],
-        "fornecedor_s": novo_item["fornecedor_s"]
-    }
-    item.append(itens)
-    return jsonify({"mensagem": "Item adicionado com sucesso!"})
-
-@app.route("/movimentacao/<int:indice>", methods=["PUT"])
-def atualizar_item(indice):
-    if indice < len(item):
-        dados = request.get_json()
-        item[indice].update(dados)
-        return jsonify({"mensagem": "Item atualizado com sucesso!"})
-    return jsonify({"erro": "Item não encontrado"})
-
-@app.route("/movimentacao/<int:indice>", methods=["DELETE"])
-def deletar_item(indice):
-    if indice < len(item):
-        item.pop(indice)
-        return jsonify({"mensagem": "Item deletado com sucesso!"})
-    return jsonify({"erro": "Item não encontrado"})
-
-@app.route("/movimentacao/produto/<int:indice>", methods=["GET"])
-def consultar_item(indice):
-    if indice < len(item):
-        resultado = {"nome": item[indice]["nome"], "quantidade": item[indice]["quantidade"]}
-        return jsonify(resultado)
-    return jsonify({"erro": "Movimentação do item não encontrada"})
-
-@app.route("/movimentacao/pedido/<int:indice>", methods=["GET"])
-def visualizar_item(indice):
-    if indice < len(item):
-        resultado = {"compra": item[indice]["compra"], "venda": item[indice]["venda"]}
-        return jsonify(resultado)
-    return jsonify({"erro": "Pedido do item não encontrado"})
-
-@app.route("/movimentacao/entrada/<int:indice>", methods=["GET"])
-def registrar_entrada_item(indice):
-    if indice < len(item):
-        resultado = {
-            "nome_entrada": item[indice]["nome_entrada"],
-            "quantidade_entrada": item[indice]["quantidade_entrada"],
-            "data_entrada": item[indice]["data_entrada"],
-            "fornecedor_e": item[indice]["fornecedor_e"]
-        }
-        return jsonify(resultado)
-    return jsonify({"erro": "Movimentação de entrada não encontrada"})
-
-@app.route("/movimentacao/saida/<int:indice>", methods=["GET"])
-def registrar_saida_item(indice):
-    if indice < len(item):
-        resultado = {
-            "nome_saida": item[indice]["nome_saida"],
-            "quantidade_saida": item[indice]["quantidade_saida"],
-            "data_saida": item[indice]["data_saida"],
-            "fornecedor_s": item[indice]["fornecedor_s"]
-        }
-        return jsonify(resultado)
-    return jsonify({"erro": "Movimentação de saída não encontrada"})
-
-# ITEM PEDIDO FORNECEDOR
-item_pedido_fornecedor = []
-@app.route("/item_pedido_fornecedor", methods=["POST"])
-def adicionar_item_pfornecedor():
-    dados = request.get_json()
-    resposta = insert_item_pfornecedor(dados)
-    return jsonify(resposta), 201 if resposta.get('status') == 'sucesso' else 400
-
-@app.route("/fornecedor/atualizar/<int:iditempedidofornecedor>", methods=["PUT"])
-def atualizar_iditempedidofornecedor(iditempedidofornecedor):
-    dados = request.json
-    dados['iditempedidofornecedor'] = iditempedidofornecedor
-    resposta = update_iditempedidofornecedor(dados)
-    return jsonify(resposta), 200 if resposta.get('status') == 'sucesso' else 400
-
-    
-@app.route("/item_pedido_fornecedor/<int:indice>", methods=["GET"]) #quantidade INT NOT NULL, valor_unitario  pedido_cliente_idpedido_cliente  produto_idproduto  movimentacao_idmovimentacao,
-def ler_item_pfornecedor(indice):
-    if indice < len(item_pedido_fornecedor):
-        return jsonify(item_pedido_fornecedor[indice])
-    return jsonify({"erro": "Item pedido não encontrado"}), 404
-
-@app.route("/item_pedido_fornecedor/delete/<int:indice>", methods=["DELETE"])
-def deletar_item_pedidofor(indice):
-    if indice < len(item_pedido_fornecedor):
-        item_pedido_fornecedor.pop(indice)
-        return jsonify({"mensagem": "Item removido com sucesso!"}), 201
-    return jsonify({"erro": "Item não encontrado"}), 404
-
-#===============================#
-
-@app.route("/fornecedor/<int:idfornecedor>", methods=["GET"])
-def listar_item_fornecedor(idfornecedor):
-    resposta = read_fornecedor(idfornecedor)
-    return jsonify(resposta), 201 if resposta.get('status') == 'sucesso' else 400
-
-
-@app.route("/fornecedor/atualizar/<int:idfornecedor>", methods=["PUT"])
-def atualizar_item_fornecedor(idfornecedor):
-    dados = request.json
-    dados['idfornecedor'] = idfornecedor
-    resposta = update_fornecedor(dados)
-    return jsonify(resposta), 200 if resposta.get('status') == 'sucesso' else 400
-
-@app.route("/fornecedor/delete/<int:idfornecedor>", methods=["DELETE"])
-def deletar_item_fornecedor(idfornecedor):
-    resposta = delete_fornecedor(idfornecedor)
-    return jsonify(resposta)
-
-@app.route("/fornecedor/<int:indice>/pagto", methods=["GET"])
-def listar_item_pagto(indice):
-    if indice < len(fornecedor):
-        return jsonify(fornecedor[indice].get("pagamento", {}))
-    return jsonify({"erro": "Pagamento não encontrado"})
-
-# ITEM PEDIDO CLIENTE
-item_pedido_cliente = []
-@app.route("/item_pedido_cliente", methods=["POST"])
-def adicionar_item_pcliente():
-    n = request.get_json()
-    produtos.append(novo_produto)
-    return jsonify({"mensagem": "Produto adicionado com sucesso"}), 201
-
-@app.route("/item_pedido_cliente/<int:indice>", methods=["GET"]) #quantidade INT NOT NULL, valor_unitario  pedido_cliente_idpedido_cliente  produto_idproduto  movimentacao_idmovimentacao,
-def ler_item_pcliente(indice):
-    if indice < len(item_pedido_cliente):
-        return jsonify(item_pedido_cliente[indice])
-    return jsonify({"erro": "Item pedido não encontrado"}), 404
-
-@app.route("/item_pedido_cliente/delete/<int:indice>", methods=["DELETE"])
-def deletar_item_pedidocli(indice):
-    if indice < len(item_pedido_cliente):
-        item_pedido_cliente.pop(indice)
-        return jsonify({"mensagem": "Item removido com sucesso!"}), 201
-    return jsonify({"erro": "Item não encontrado"}), 404
-'''
 if __name__ == "__main__":
     app.run(debug=True)

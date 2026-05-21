@@ -48,10 +48,32 @@
                     </div>
                 </div>
 
+                {% with mensagens = get_flashed_messages(with_categories=true) %}
+                {% if mensagens %}
+                  {% for categoria, msg in mensagens %}
+                    <div class="custom-alert alert-{{ categoria }} alert-flash animate__animated animate__fadeIn" role="alert">
+                        <div class="alert-content">
+                            {% if categoria == 'success' %}
+                                <i class="bi bi-check-circle-fill alert-icon"></i>
+                            {% elif categoria == 'danger' or categoria == 'error' %}
+                                <i class="bi bi-exclamation-triangle-fill alert-icon"></i>
+                            {% else %}
+                                <i class="bi bi-info-circle-fill alert-icon"></i>
+                            {% endif %}
+                            <span class="alert-text">{{ msg }}</span>
+                        </div>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+                {% endwith %}
+
                 <button type="submit" class="btn btn-cadastro w-100 text-white mt-2">Cadastrar</button>
             </form>
 
 
         </div>
     </div>
+
+
+    
     {% endblock %}

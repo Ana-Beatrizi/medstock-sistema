@@ -4,6 +4,26 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='tela_inicial.css') }}">
 
 <div class="dashboard-welcome">
+
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+    {% if mensagens %}
+      {% for categoria, msg in mensagens %}
+        <div class="custom-alert alert-{{ categoria }} alert-flash animate__animated animate__fadeIn" role="alert">
+            <div class="alert-content">
+                {% if categoria == 'success' %}
+                    <i class="bi bi-check-circle-fill alert-icon"></i>
+                {% elif categoria == 'danger' or categoria == 'error' %}
+                    <i class="bi bi-exclamation-triangle-fill alert-icon"></i>
+                {% else %}
+                    <i class="bi bi-info-circle-fill alert-icon"></i>
+                {% endif %}
+                <span class="alert-text">{{ msg }}</span>
+            </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+    {% endwith %}
+
     
     <header class="welcome-header">
         <div class="welcome-brand">
@@ -31,7 +51,7 @@
                 <i class="bi bi-arrow-right-short arrow-action"></i>
             </a>
 
-            <a href="#" class="welcome-card-btn">
+            <a href="{{ url_for('tela_historico_de_cliente') }}" class="welcome-card-btn">
                 <div class="card-icon-wrapper">
                     <i class="bi bi-people-fill"></i>
                 </div>

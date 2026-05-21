@@ -50,7 +50,7 @@
 
         <ul class="menu">
             <li><a href="{{ url_for('tela_historico_de_fornecedor') }}">Fornecedor</a></li>
-            <li><a href="#">Cliente</a></li>
+            <li><a href="{{ url_for('tela_historico_de_cliente') }}">Cliente</a></li>
         </ul>
 
         <!-- ÍCONES -->
@@ -70,7 +70,7 @@
 
     <!-- SIDEBAR -->
 
-    <nav class="sidebar" id="sidebar">
+    <nav class="sidebar close" id="sidebar">
 
         <ul>
 
@@ -122,13 +122,66 @@
 
     <!-- CONTEÚDO -->
 
-    <main class="conteudo" id="conteudo">
+    <main class="conteudo expand" id="conteudo">
 
         {% block conteudo %}{% endblock %}
 
     </main>
 
     <!-- SCRIPT -->
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const conteudo = document.getElementById("conteudo");
+            const linksMenu = document.querySelectorAll(".sidebar a, .menu a, .btn-cadastro, .btn-retorno-universal");
+    
+            linksMenu.forEach(link => {
+                // Ignora links vazios, de exclusão ou javascript puro
+                if (!link.getAttribute("href") || link.getAttribute("href").startsWith("#") || link.getAttribute("href").startsWith("javascript")) {
+                    return;
+                }
+    
+                link.addEventListener("click", function(e) {
+                    e.preventDefault(); // Segura o carregamento por milissegundos
+                    const destino = this.href;
+    
+                    // Suaviza a saída do conteúdo atual
+                    conteudo.style.transition = "opacity 0.2s ease, transform 0.2s ease";
+                    conteudo.style.opacity = "0";
+                    conteudo.style.transform = "translateY(-4px)";
+    
+                    // Redireciona logo após o início do fade-out
+                    setTimeout(() => {
+                        window.location.href = destino;
+                    }, 180);
+                });
+            });
+        });
+    </script>
+
+    <script>
+        // Executa o código assim que a página terminar de carregar
+        document.addEventListener("DOMContentLoaded", function() {
+            // Seleciona todos os alertas que possuem a classe 'alert-flash'
+            const alertas = document.querySelectorAll('.alert-flash');
+            
+            alertas.forEach(function(alerta) {
+                // Define um temporizador de 4000 milissegundos (4 segundos)
+                setTimeout(function() {
+                    // Aplica uma transição suave de opacidade (efeito fade-out)
+                    alerta.style.transition = "opacity 0.5s ease";
+                    alerta.style.opacity = "0";
+                    
+                    // Remove o elemento do HTML completamente após o término da transição (0.5s)
+                    setTimeout(function() {
+                        alerta.remove();
+                    }, 500);
+                    
+                }, 7000); 
+            });
+        });
+    </script>
 
     <script>
 
