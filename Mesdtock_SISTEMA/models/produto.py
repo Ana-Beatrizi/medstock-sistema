@@ -2,7 +2,7 @@ from core.crud_base import Crudmedstock
 from core.database import conectar_banco
 from core.validador import Validador
 
-# = Feito pela -- Ana Beatriz //
+#! = Feito pela -- Ana Beatriz //  𖹭.ᐟ
 
 #============================ CLASSE PRODUTO =========================
 

@@ -6,6 +6,7 @@ from flask import Flask, jsonify, request, url_for, render_template, redirect, f
 from models.cliente import Cliente
 from models.produto import Produto
 from models.entrada import PedidoEntrada
+from models.saida import PedidoSaida
 from models.fornecedor import Fornecedor
 from models.cliente_cadastro import ClientesCadastro
 #============================
@@ -25,7 +26,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = "Medstock_programa_de_estoque_123456"
 
-#! = Feito pela -- Ana Beatriz // linha 1 a 526 𖹭.ᐟ
+#! = Feito pela -- Ana Beatriz // linha 1 a 647 𖹭.ᐟ
 
 # TRANSFORMA DADOS ============
 # inteiro
@@ -128,18 +129,33 @@ def tela_entrada():
     return render_template("tela_entrada.html", entradas=PedidoEntrada.historico_entrada(), cliente = Cliente.seleciona_por_id(cliente_id))
 #==============================================
 
+# TELA ENTRADA==============
+@app.route("/movimentacao")
+def tela_movimentacao():
+    cliente_id = session.get("cliente_id")
+    #teste = PedidoEntrada.historico_entrada()
+    #print("teste entradas", teste)
+    return render_template("tela_movimentacao.html", entradas=PedidoEntrada.historico_entrada(), cliente = Cliente.seleciona_por_id(cliente_id)) #! errrr
+
 # TELA SAIDA==============
 @app.route("/pedido/saida")
 def tela_saida():
-    return render_template("tela_saida.html")
+    cliente_id = session.get("cliente_id")
+    return render_template("tela_saida.html", saidas=PedidoSaida.historico_saida(), cliente = Cliente.seleciona_por_id(cliente_id))
 #==============================================
 
 # TELA CADASTRO PEDIDOS==============
 @app.route("/cadastro/pedido")
 def tela_cadastro_pedidos():
-    return render_template("tela_cadastro_pedidos.html", pedidos=PedidoEntrada.encontra_tudo_com_produto())
+    cliente_id = session.get("cliente_id")
+    return render_template("tela_cadastro_pedidos.html", pedidos=PedidoEntrada.encontra_tudo_com_produto(), cliente = Cliente.seleciona_por_id(cliente_id))
 #==============================================
 
+# TELA CADASTRO PEDIDOS==============
+@app.route("/cadastro/pedido/saida")
+def tela_cadastro_pedidos_saida():
+    cliente_id = session.get("cliente_id")
+    return render_template("tela_cadastro_pedidos_saida.html",  clientes_cadastro = ClientesCadastro.seleciona_tudo(order_by="nome"), cliente = Cliente.seleciona_por_id(cliente_id))
 # TELA PERFIL DO USUARIO==============
 @app.route("/perfil")
 def tela_perfil_do_usuario():
@@ -538,7 +554,7 @@ def editar_produto(id):
     if not produto:
         flash("Produto não encontrado.", "danger")
         return redirect(url_for("tela_produtos"))
-    return render_template("tela_cadastro_produto.html", cliente = Cliente.seleciona_por_id(cliente_id), produto=produto)
+    return render_template("tela_cadastro_produto.html", cliente = Cliente.seleciona_por_id(cliente_id), produto=produto, fornecedores = Fornecedor.seleciona_tudo(order_by="nome_fornecedor"))
 # ==============================
 
 # DELETAR PRODUTO ==================
@@ -555,7 +571,7 @@ def excluir_produto(id):
 # ====================================
 # -------------------------------------- PRODUTO FIM ------------------------------------------
 
-#! -------------------------------------- PEDIDOS ------------------------------------------
+#! -------------------------------------- PEDIDO ENTRADA ------------------------------------------
 # GET FORM TELA CADASTRO DE PEDIDOS ===========
 def get_pedido_form():
     data_campo = request.form.get("data_pedido")
@@ -570,14 +586,17 @@ def get_pedido_form():
         "data_pedido": data_pedido,
         "valor_total": request.form.get("valor_total"),
         "observacao": request.form.get("observacao", "").strip(),
+        "quantidade_pedido": request.form.get("quantidade_pedido", "").strip(),
         "data_processamento": request.form.get("data_processamento"),
-        "fornecedor_id": request.form.get("fornecedor_id")
+        "fornecedor_id": request.form.get("fornecedor_id"),
+        "produto_id": request.form.get("produto_id")
     }
 
-@app.route("/pedido/novo/<tipo>/<int:id>")
+@app.route("/pedido/entrada/<tipo>/<int:id>")
 def novo_pedido(tipo, id):
     produto = Produto.seleciona_por_id(id)
     tipo = tipo.upper()
+    cliente_id = session.get("cliente_id")
 
     if not produto:
         flash("Produto não encontrado.", "danger")
@@ -591,13 +610,16 @@ def novo_pedido(tipo, id):
         "data_pedido": datetime.now().strftime("%Y-%m-%dT%H:%M") # Formato correto para input do tipo datetime-local
     }
 
-    return render_template("tela_cadastro_pedidos.html", produto=produto, tipo=tipo, pedido=pedido_padrao)
+    return render_template("tela_cadastro_pedidos.html", produto=produto, tipo=tipo, pedido=pedido_padrao, cliente = Cliente.seleciona_por_id(cliente_id))
 
 @app.route("/pedido/salvar/<int:produto_id>", methods=["POST"])
 def salvar_pedido(produto_id):
     dados = get_pedido_form()
     #print("pedido", dados)
-    produto = Produto() #Produto.seleciona_por_id(produto_id)
+    produto = Produto.seleciona_por_id(produto_id)
+
+    dados["valor_total"] = (float(produto["preco_custo"]) * int(dados["quantidade_pedido"]))
+
     entrada = PedidoEntrada(**dados)
     erros = entrada.validate()
 
@@ -611,37 +633,131 @@ def salvar_pedido(produto_id):
         return render_template("tela_cadastro_pedidos.html", pedido=dados)
     
     try:
-        dados["id"] = produto_id
-        produto.upd_quantidade(produto_id, dados["quantidade"])
+        entrada.insert()
         flash("Pedido criado com sucesso.", "success")
         return redirect(url_for("tela_entrada"))
     except Exception as e:
         flash(f"Erro ao criar pedido: {e}", "danger")
-        return render_template("tela_cadastro_pedidos.html")
+        return render_template("tela_cadastro_pedidos.html", pedido=dados, produto=produto, tipo="ENTRADA")
 
 @app.route("/pedido/processar/<int:id>")
 def processar_pedido(id):
     try:
-        mensagem = PedidoMovimentacao.processar(id)
+        mensagem = PedidoEntrada.processar(id)
         flash(mensagem, "sucesso")
     except ValueError as e:
         flash(str(e), "erro")
     except Exception as e:
         flash(f"Erro ao processar pedido: {e}", "erro")
-    return redirect(url_for("pedidos"))
+    return redirect(url_for("pedidos_entrada"))
 
 @app.route("/pedido/cancelar/<int:id>")
 def cancelar_pedido(id):
     try:
-        mensagem = PedidoMovimentacao.cancelar(id)
+        mensagem = PedidoEntrada.cancelar(id)
         flash(mensagem, "sucesso")
     except ValueError as e:
         flash(str(e), "erro")
     except Exception as e:
         flash(f"Erro ao cancelar pedido: {e}", "erro")
-    return redirect(url_for("pedidos"))
+    return redirect(url_for("tela_entrada"))
+# -------------------------------------- PEDIDO ENTRADA FIM ------------------------------------------
 
-#! = Feito pela -- Ana Beatriz // linha 1 a 642 𖹭.ᐟ
+#! -------------------------------------- PEDIDO SAIDA ------------------------------------------
+# GET FORM TELA CADASTRO DE PEDIDOS ===========
+def get_pedido_saida_form():
+    data_campo = request.form.get("data_pedido")
+    
+    # Se o campo for vazio ou não selecionado gera a data/hora atual formatada para o MySQL
+    if not data_campo or data_campo.strip() == "":
+        data_pedido = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    else:
+        data_pedido = data_campo
+    return {
+        #"produto_id": request.form.get("produto_id"),
+        "data_pedido": data_pedido,
+        "valor_total": request.form.get("valor_total"),
+        "observacao": request.form.get("observacao", "").strip(),
+        "quantidade_pedido": request.form.get("quantidade_pedido", "").strip(),
+        "data_processamento": request.form.get("data_processamento"),
+        "clientes_cadastro_id": request.form.get("clientes_cadastro_id"),
+        "produto_id": request.form.get("produto_id")
+    }
+
+@app.route("/pedido/saida/<tipo>/<int:id>")
+def novo_pedido_saida(tipo, id):
+    produto = Produto.seleciona_por_id(id)
+    tipo = tipo.upper()
+    cliente_id = session.get("cliente_id")
+
+    if not produto:
+        flash("Produto não encontrado.", "danger")
+        return redirect(url_for("tela_produtos"))
+    
+    if tipo not in ["ENTRADA", "SAIDA"]:
+        flash("Tipo de pedido inválido.", "erro")
+        return redirect(url_for("tela_produtos"))
+
+    pedido_padrao = {
+        "data_pedido": datetime.now().strftime("%Y-%m-%dT%H:%M") # Formato correto para input do tipo datetime-local
+    }
+
+    return render_template("tela_cadastro_pedidos_saida.html", produto=produto, tipo=tipo, pedido=pedido_padrao, cliente = Cliente.seleciona_por_id(cliente_id), clientes_cadastro = ClientesCadastro.seleciona_tudo(order_by="nome"))
+
+@app.route("/pedido/salvar/saida/<int:produto_id>", methods=["POST"])
+def salvar_pedido_saida(produto_id):
+    dados = get_pedido_saida_form()
+    #print("pedido", dados)
+    produto = Produto.seleciona_por_id(produto_id)
+    cliente_id = session.get("cliente_id")
+
+    dados["valor_total"] = (float(produto["preco_custo"]) * int(dados["quantidade_pedido"]))
+
+    saida = PedidoSaida(**dados)
+    erros = saida.validate()
+
+    if not produto:
+        flash("Produto não encontrado.", "erro")
+        return redirect(url_for("tela_produtos"))
+
+    if erros:
+        for erro in erros:
+            flash(erro, "erro")
+        return render_template("tela_cadastro_pedidos_saida.html",produto=produto, tipo="SAIDA", pedido=dados, cliente = Cliente.seleciona_por_id(cliente_id))
+    
+    try:
+        saida.insert()
+        flash("Pedido de saida criado com sucesso.", "success")
+        return redirect(url_for("tela_saida"))
+    except Exception as e:
+        flash(f"Erro ao criar pedido: {e}", "danger")
+        return render_template("tela_cadastro_pedidos_saida.html", pedido=dados, produto=produto, tipo="SAIDA", cliente = Cliente.seleciona_por_id(cliente_id))
+'''
+@app.route("/pedido/processar/<int:id>")
+def processar_pedido(id):
+    try:
+        mensagem = PedidoEntrada.processar(id)
+        flash(mensagem, "sucesso")
+    except ValueError as e:
+        flash(str(e), "erro")
+    except Exception as e:
+        flash(f"Erro ao processar pedido: {e}", "erro")
+    return redirect(url_for("pedidos_entrada"))
+'''
+'''
+@app.route("/pedido/cancelar/<int:id>")
+def cancelar_pedido(id):
+    try:
+        mensagem = PedidoEntrada.cancelar(id)
+        flash(mensagem, "sucesso")
+    except ValueError as e:
+        flash(str(e), "erro")
+    except Exception as e:
+        flash(f"Erro ao cancelar pedido: {e}", "erro")
+    return redirect(url_for("tela_entrada"))
+'''
+
+#! = Feito pela -- Ana Beatriz // linha 1 a 762 𖹭.ᐟ
 
 if __name__ == "__main__":
     app.run(debug=True)

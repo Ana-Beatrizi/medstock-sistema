@@ -8,16 +8,12 @@
 
 /* Fundo com gradiente */
 body {
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     background: linear-gradient(to right, #0b3c78, #16c0b0);
 }
 
 /* Container principal */
 .conteudo {
-    text-align: center;
+    display: flex;
 }
 
 /* Título */

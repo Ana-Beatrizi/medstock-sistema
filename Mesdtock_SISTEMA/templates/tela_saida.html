@@ -1,0 +1,74 @@
+{% extends 'tela_home.html' %}
+
+{% block conteudo %}
+    <title>Histórico</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='tela_entrada.css') }}">
+
+
+<div class="container">
+
+    <!-- Conteúdo -->
+    <main class="content">
+        <div class="header">
+            <div>
+                <h1>Pedidos</h1>
+                <p>de Saida</p>
+            </div>
+            <input type="text" placeholder="Buscar...">
+        </div>
+
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+        {% if mensagens %}
+          {% for categoria, msg in mensagens %}
+            <div class="custom-alert alert-{{ categoria }} alert-flash animate__animated animate__fadeIn" role="alert">
+                <div class="alert-content">
+                    {% if categoria == 'success' %}
+                        <i class="bi bi-check-circle-fill alert-icon"></i>
+                    {% elif categoria == 'danger' or categoria == 'error' %}
+                        <i class="bi bi-exclamation-triangle-fill alert-icon"></i>
+                    {% else %}
+                        <i class="bi bi-info-circle-fill alert-icon"></i>
+                    {% endif %}
+                    <span class="alert-text">{{ msg }}</span>
+                </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Cliente</th>
+                    <th>Quantidade</th>
+                    <th>Observação</th>
+                    <th>Valor Total</th>
+                    <th>Data</th>
+                    <th>Cancelar</th>
+                    <th>Processar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in saidas %}
+
+                <tr>
+                    <td>{{ item.nome }}</td>
+                    <td>{{ item.cliente}}</td>
+                    <td>{{ item.quantidade_pedido }}</td>
+                    <td>{{ item.observacao }}</td>
+                    <td>R$ {{ item.valor_total }}</td>
+                    <td><span class="data">{{ item.data_pedido.strftime('%d/%m/%Y') }}</span></td>
+                    <td><a class="btn-tabela" href="{{ url_for('cancelar_pedido', id=item.id) }}">Cancelar</a></td>
+                    <td><a class="btn-tabela" href="{{ url_for('processar_pedido', id=item.id) }}">Processar</a></td>
+                </tr>
+               
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </main>
+</div>
+
+{% endblock %}

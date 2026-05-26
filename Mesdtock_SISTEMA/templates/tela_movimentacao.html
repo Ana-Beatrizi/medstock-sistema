@@ -11,8 +11,8 @@
     <main class="content">
         <div class="header">
             <div>
-                <h1>Pedidos</h1>
-                <p>de Entrada</p>
+                <h1>Histórico</h1>
+                <p>Entrada</p>
             </div>
             <input type="text" placeholder="Buscar...">
         </div>
@@ -58,7 +58,7 @@
                     <td>R$ {{ item.valor_total }}</td>
                     <td><span class="data">{{ item.data_pedido.strftime('%d/%m/%Y') }}</span></td>
                     <td><a class="btn-tabela" href="{{ url_for('cancelar_pedido', id=item.id) }}">Cancelar</a></td>
-                    <td><a class="btn-tabela" href="{{ url_for('processar_pedido', id=item.id) }}">Processar</a></td>
+                    <td><a class="btn-tabela" href="{{ url_for('processar_pedido', id=item.id) }}">Cancelar</a></td>
                 </tr>
                
                 </tr>

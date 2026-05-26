@@ -67,7 +67,7 @@
                     <td>{{ cliente.estado }}</td>
                     <td>{{ cliente.cidade }}</td>
                     <td>{{ cliente.cep }}</td>
-                    <td> <button class="btn btn-tabela w-100 text-white mt-2">Cadastrar Pedido</button> </td>
+                    <td> <a class="btn btn-tabela w-100 text-white mt-2" href="{{ url_for('tela_produtos') }}">Fazer Pedido</a> </td>
                     <td> <button class="btn btn-tabela w-100 text-white mt-2">Ver Pedidos</button> </td>
                     <td> 
                         <a class="btn btn-tabela w-100 text-white mt-2 btn-excluir" href="{{ url_for('excluir_clientes_cadastro', id=cliente.id) }}">

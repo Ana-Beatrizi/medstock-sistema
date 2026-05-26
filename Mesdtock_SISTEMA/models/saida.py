@@ -9,22 +9,22 @@ from models.produto import Produto
 #! = Feito pela -- Ana Beatriz //  𖹭.ᐟ
 
 #============================ CLASSE PEDIDO ENTRADA =========================
-class PedidoEntrada(Crudmedstock):
-    table = "entrada"
+class PedidoSaida(Crudmedstock):
+    table = "saida"
     fields = [
         "data_pedido",
         "valor_total",
         "observacao",
         "quantidade_pedido",
         "data_processamento",
-        "fornecedor_id",
+        "clientes_cadastro_id",
         "produto_id"
     ]
 
-    def __init__(self, data_pedido, valor_total, fornecedor_id, produto_id, quantidade_pedido, observacao="", data_processamento=None):
+    def __init__(self, data_pedido, valor_total, clientes_cadastro_id, produto_id, quantidade_pedido, observacao="", data_processamento=None):
         self.data_pedido = data_pedido or datetime.now()
         self.valor_total = valor_total
-        self.fornecedor_id = fornecedor_id
+        self.clientes_cadastro_id = clientes_cadastro_id
         self.produto_id = produto_id
         self.observacao = observacao
         self.quantidade_pedido = quantidade_pedido
@@ -32,13 +32,10 @@ class PedidoEntrada(Crudmedstock):
 
 #============================ VALIDAÇÃO =========================
     def validate(self):
-        erros = []
-
-        erro_fornecedor = Validador.positivo(self.fornecedor_id, "fornecedor")
-        if erro_fornecedor:
-            erros.append(erro_fornecedor)
-
-        return erros
+        erros = [
+            Validador.obrigatorio(self.quantidade_pedido, "quantidade_pedido"),
+        ]
+        return [erro for erro in erros if erro]
 
     @classmethod
     def encontra_tudo_com_produto(cls):
@@ -46,7 +43,7 @@ class PedidoEntrada(Crudmedstock):
         cursor = conexao.cursor(dictionary=True)
         try:
             sql = """
-            SELECT * from entrada 
+            SELECT * from saida 
             order by data_pedido desc
             """
             cursor.execute(sql)
@@ -56,20 +53,20 @@ class PedidoEntrada(Crudmedstock):
             conexao.close()
 
     @classmethod
-    def historico_entrada(cls):
+    def historico_saida(cls):
         conexao = conectar_banco.connect()
         cursor = conexao.cursor(dictionary=True)
         try:
             sql = """
 SELECT
     e.id,
-    f.nome_fornecedor,
+    f.nome as cliente,
     p.nome,
     e.quantidade_pedido,
     e.valor_total,
     e.data_pedido
-FROM entrada e
-JOIN fornecedor f ON e.fornecedor_id = f.id
+FROM saida e
+JOIN clientes_cadastro f ON e.clientes_cadastro_id = f.id
 JOIN produto p ON e.produto_id = p.id
 ORDER BY e.data_pedido DESC
             """
@@ -136,7 +133,7 @@ ORDER BY e.data_pedido DESC
         finally:
             cursor.close()
             conexao.close()
-
+'''
     @classmethod
     def cancelar(cls, id):
         conexao = conectar_banco.connect()
@@ -166,3 +163,4 @@ ORDER BY e.data_pedido DESC
         finally:
             cursor.close()
             conexao.close()
+'''
