@@ -17,7 +17,7 @@
             <div class="header-right">
                 <div class="search-wrapper">
                     <i class="bi bi-search search-icon"></i>
-                    <input type="text" placeholder="Buscar cliente...">
+                    <input type="text" id="inputBusca" placeholder="Buscar cliente...">
                 </div>
                 <a href="{{ url_for('tela_clientes_cadastro') }}" class="btn btn-cadastro">
                     <i class="bi bi-plus-lg me-2"></i> Cadastrar Novo Cliente
@@ -56,9 +56,10 @@
                     <th class="col-acao"></th>
                     <th class="col-acao"></th>
                     <th class="col-acao"></th>
+                    <th class="col-acao"></th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="tabelaDados">
                 {% for cliente in clientes %}
                 <tr>
                     <td>{{ cliente.nome }}</td>
@@ -67,12 +68,40 @@
                     <td>{{ cliente.estado }}</td>
                     <td>{{ cliente.cidade }}</td>
                     <td>{{ cliente.cep }}</td>
-                    <td> <a class="btn btn-tabela w-100 text-white mt-2" href="{{ url_for('tela_produtos') }}">Fazer Pedido</a> </td>
-                    <td> <button class="btn btn-tabela w-100 text-white mt-2">Ver Pedidos</button> </td>
-                    <td> 
-                        <a class="btn btn-tabela w-100 text-white mt-2 btn-excluir" href="{{ url_for('excluir_clientes_cadastro', id=cliente.id) }}">
+                    <td class="acoes">
+                        <a class="btn-acao btn-editar" href="{{ url_for('editar_clientes_cadastro', id=cliente.id) }}">
+                            <i class="bi bi-pencil-square"></i>
+                            Editar
+                        </a>
+                    </td>
+                    <td class="acoes">
+
+                        <a class="btn-acao btn-pedido"
+                           href="{{ url_for('tela_produtos') }}">
+                            <i class="bi bi-cart-plus"></i>
+                            Fazer Pedido
+                        </a>
+                    
+                    </td>
+                    
+                    <td class="acoes">
+                    
+                        <a class="btn-acao btn-ver"
+                           href="{{ url_for('tela_pedidos_clientes', clientes_cadastro_id=cliente.id) }}">
+                            <i class="bi bi-clipboard-data"></i>
+                            Ver Pedidos
+                        </a>
+                    
+                    </td>
+                    
+                    <td class="acoes">
+                    
+                        <a class="btn-acao btn-excluir"
+                           href="{{ url_for('excluir_clientes_cadastro', id=cliente.id) }}">
+                            <i class="bi bi-trash"></i>
                             Excluir
-                        </a> 
+                        </a>
+                    
                     </td>
                 </tr>
                 {% endfor %}
@@ -81,4 +110,36 @@
 
     </main>
 </div>
+
+<script>
+    document.getElementById("inputBusca").addEventListener("keyup", function() {
+    
+        let filtro = this.value.toLowerCase();
+        let linhas = document.querySelectorAll("#tabelaDados tr");
+    
+        linhas.forEach(function(linha) {
+    
+            let nome = linha.cells[0].textContent.toLowerCase();
+            let cpf = linha.cells[1].textContent.toLowerCase();
+            let telefone = linha.cells[2].textContent.toLowerCase();
+            let estado = linha.cells[3].textContent.toLowerCase();
+            let cidade = linha.cells[4].textContent.toLowerCase();
+            let cep = linha.cells[5].textContent.toLowerCase();
+    
+            if (
+                nome.includes(filtro) ||
+                cpf.includes(filtro) ||
+                telefone.includes(filtro) ||
+                estado.includes(filtro) ||
+                cidade.includes(filtro) ||
+                cep.includes(filtro)
+            ) {
+                linha.style.display = "";
+            } else {
+                linha.style.display = "none";
+            }
+    
+        });
+    });
+    </script>
 {% endblock %}

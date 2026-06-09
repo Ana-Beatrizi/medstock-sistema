@@ -17,16 +17,18 @@ class PedidoEntrada(Crudmedstock):
         "observacao",
         "quantidade_pedido",
         "data_processamento",
+        "status",
         "fornecedor_id",
         "produto_id"
     ]
 
-    def __init__(self, data_pedido, valor_total, fornecedor_id, produto_id, quantidade_pedido, observacao="", data_processamento=None):
+    def __init__(self, data_pedido, valor_total, fornecedor_id, produto_id, quantidade_pedido, status="PENDENTE", observacao="", data_processamento=None):
         self.data_pedido = data_pedido or datetime.now()
         self.valor_total = valor_total
         self.fornecedor_id = fornecedor_id
         self.produto_id = produto_id
         self.observacao = observacao
+        self.status = status
         self.quantidade_pedido = quantidade_pedido
         self.data_processamento = data_processamento
 
@@ -57,112 +59,266 @@ class PedidoEntrada(Crudmedstock):
 
     @classmethod
     def historico_entrada(cls):
+
         conexao = conectar_banco.connect()
         cursor = conexao.cursor(dictionary=True)
+
         try:
+
             sql = """
-SELECT
-    e.id,
-    f.nome_fornecedor,
-    p.nome,
-    e.quantidade_pedido,
-    e.valor_total,
-    e.data_pedido
-FROM entrada e
-JOIN fornecedor f ON e.fornecedor_id = f.id
-JOIN produto p ON e.produto_id = p.id
-ORDER BY e.data_pedido DESC
+            SELECT
+                e.id,
+                e.status,
+                f.nome_fornecedor,
+                p.nome,
+                e.quantidade_pedido,
+                e.observacao,
+                e.valor_total,
+                e.data_pedido
+
+            FROM entrada e
+
+            JOIN fornecedor f
+                ON e.fornecedor_id = f.id
+
+            JOIN produto p
+                ON e.produto_id = p.id
+
+            ORDER BY e.data_pedido DESC
             """
+
             cursor.execute(sql)
+
             return cursor.fetchall()
+
+        finally:
+
+            cursor.close()
+            conexao.close()
+
+    @classmethod
+    def seleciona_por_fornecedor(cls, fornecedor_id):
+
+        conexao = conectar_banco.connect()
+        cursor = conexao.cursor(dictionary=True)
+
+        try:
+
+            sql = """
+            SELECT
+                e.id,
+                p.nome,
+                f.nome_fornecedor,
+                e.quantidade_pedido,
+                e.observacao,
+                e.valor_total,
+                e.status,
+                e.data_pedido
+            FROM entrada e
+
+            JOIN produto p
+                ON e.produto_id = p.id
+
+            JOIN fornecedor f
+                ON e.fornecedor_id = f.id
+
+            WHERE e.fornecedor_id = %s
+
+            ORDER BY e.data_pedido DESC
+            """
+
+            cursor.execute(sql, (fornecedor_id,))
+            return cursor.fetchall()
+
         finally:
             cursor.close()
             conexao.close()
 
     @classmethod
-    def processar(cls, id):
+    def processar_entrada(cls, id):
         conexao = conectar_banco.connect()
         cursor = conexao.cursor(dictionary=True)
         try:
             conexao.start_transaction()
-
-            cursor.execute("SELECT * FROM pedido_movimentacao WHERE id = %s FOR UPDATE", (id,))
-            pedido = cursor.fetchone()
-            if not pedido:
-                raise ValueError("Pedido não encontrado.")
-
-            if pedido["status"] != "PENDENTE":
+            # ==========================================
+            # BUSCA ENTRADA
+            # ==========================================
+            cursor.execute(
+                """
+                SELECT *
+                FROM entrada
+                WHERE id = %s
+                FOR UPDATE
+                """,
+                (id,)
+            )
+            entrada = cursor.fetchone()
+            if not entrada:
+                raise ValueError("Entrada não encontrada.")
+            # ==========================================
+            # VERIFICA SE JÁ FOI PROCESSADA
+            # ==========================================
+            if entrada["status"] != "PENDENTE":
                 raise ValueError("Somente pedidos pendentes podem ser processados.")
+            # ==========================================
+            # BUSCA PRODUTO
+            # ==========================================
+            cursor.execute(
+                """
+                SELECT *
+                FROM produto
+                WHERE id = %s
+                FOR UPDATE
+                """,
+                (entrada["produto_id"],)
+            )
 
-            cursor.execute("SELECT * FROM produto WHERE id = %s FOR UPDATE", (pedido["produto_id"],))
             produto = cursor.fetchone()
+
             if not produto:
                 raise ValueError("Produto não encontrado.")
 
-            if pedido["tipo"] == "ENTRADA":
-                nova_quantidade = produto["quantidade"] + pedido["quantidade"]
-            elif pedido["tipo"] == "SAIDA":
-                if pedido["quantidade"] > produto["quantidade"]:
-                    raise ValueError("Estoque insuficiente para concluir a saída.")
-                nova_quantidade = produto["quantidade"] - pedido["quantidade"]
-            else:
-                raise ValueError("Tipo de pedido inválido.")
-
-            Produto.update_quantity(produto["id"], nova_quantidade, connection=conexao)
-
-            mov = Movimentacao(produto["id"], pedido["tipo"], pedido["quantidade"])
-            cursor.execute(
-                """
-                INSERT INTO movimentacao (produto_id, tipo_movimentacao, quantidade, data_movimentacao)
-                VALUES (%s, %s, %s, %s)
-                """,
-                (mov.produto_id, mov.tipo_movimentacao, mov.quantidade, mov.data_movimentacao)
+            # ==========================================
+            # CALCULA NOVO ESTOQUE
+            # ==========================================
+            nova_quantidade = (
+                produto["quantidade_estoque"]
+                + entrada["quantidade_pedido"]
             )
 
+            # ==========================================
+            # ATUALIZA ESTOQUE
+            # ==========================================
             cursor.execute(
                 """
-                UPDATE pedido_movimentacao
-                SET status = %s, data_processamento = %s
+                UPDATE produto
+                SET quantidade_estoque = %s
                 WHERE id = %s
                 """,
-                ("CONCLUIDO", datetime.now(), id)
+                (nova_quantidade, produto["id"])
             )
 
+            # ==========================================
+            # CRIA MOVIMENTAÇÃO
+            # ==========================================
+            cursor.execute(
+                """
+                INSERT INTO movimentacao (
+                    tipo,
+                    quantidade,
+                    valor_total,
+                    data_mov,
+                    produto_id,
+                    fornecedor_id,
+                    entrada_id
+                )
+                VALUES (
+                    %s, %s, %s, %s, %s, %s, %s
+                )
+                """,
+                (
+                    "ENTRADA",
+                    entrada["quantidade_pedido"],
+                    entrada["valor_total"],
+                    datetime.now(),
+                    entrada["produto_id"],
+                    entrada["fornecedor_id"],
+                    entrada["id"]
+                )
+            )
+
+            # ==========================================
+            # MARCA COMO PROCESSADA
+            # ==========================================
+            cursor.execute(
+                """
+                UPDATE entrada
+                SET
+                    status = %s,
+                    data_processamento = %s
+                WHERE id = %s
+                """,
+                ("PROCESSADO", datetime.now(), id)
+            )
+
+            # ==========================================
+            # COMMIT
+            # ==========================================
             conexao.commit()
-            return "Pedido processado com sucesso."
+
+            return "Entrada processada com sucesso."
+
         except Exception:
+
             conexao.rollback()
             raise
+
         finally:
+
             cursor.close()
             conexao.close()
 
     @classmethod
-    def cancelar(cls, id):
-        conexao = conectar_banco.connect()
-        cursor = conexao.cursor(dictionary=True)
-        try:
-            cursor.execute("SELECT * FROM entrada WHERE id = %s", (id,))
-            pedido = cursor.fetchone()
-            if not pedido:
-                raise ValueError("Pedido não encontrado.")
-            if pedido["status"] != "PENDENTE":
-                raise ValueError("Somente pedidos pendentes podem ser cancelados.")
+    def cancelar_entrada(cls, id):
 
-            cursor = conexao.cursor()
+        conexao = conectar_banco.connect()
+
+        cursor = conexao.cursor(dictionary=True)
+
+        try:
+
+            conexao.start_transaction()
+
+            # ==========================================
+            # BUSCA ENTRADA
+            # ==========================================
+            cursor.execute(
+                """
+                SELECT *
+                FROM entrada
+                WHERE id = %s
+                """,
+                (id,)
+            )
+
+            entrada = cursor.fetchone()
+
+            if not entrada:
+                raise ValueError("Entrada não encontrada.")
+
+            # ==========================================
+            # VERIFICA STATUS
+            # ==========================================
+            if entrada["status"] != "PENDENTE":
+                raise ValueError(
+                    "Somente pedidos pendentes podem ser cancelados."
+                )
+
+            # ==========================================
+            # CANCELA PEDIDO
+            # ==========================================
             cursor.execute(
                 """
                 UPDATE entrada
-                SET status = %s, data_processamento = %s
+                SET status = %s
                 WHERE id = %s
                 """,
-                ("CANCELADO", datetime.now(), id)
+                ("CANCELADO", id)
             )
+
+            # ==========================================
+            # COMMIT
+            # ==========================================
             conexao.commit()
-            return "Pedido cancelado com sucesso."
+
+            return "Entrada cancelada com sucesso."
+
         except Exception:
+
             conexao.rollback()
             raise
+
         finally:
+
             cursor.close()
             conexao.close()

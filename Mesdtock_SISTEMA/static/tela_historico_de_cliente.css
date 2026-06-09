@@ -211,7 +211,7 @@ tbody tr:hover {
     .header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 20px;
+        gap: 1px;
     }
 
     .header-right {
@@ -230,4 +230,71 @@ tbody tr:hover {
         display: block;
         overflow-x: auto;
     }
+}
+.acoes{
+    text-align: center;
+}
+
+/* BOTÃO BASE */
+.btn-acao{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    padding: 10px 10px;
+    border-radius: 16px;
+
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+
+    transition: 0.25s ease;
+    border: 1px solid transparent;
+
+    min-width: 120px;
+    max-width: 120px;
+}
+
+/* HOVER */
+.btn-acao:hover{
+    transform: translateY(-2px);
+}
+
+/* FAZER PEDIDO */
+.btn-pedido{
+    background: #dff5e8;
+    color: #0f9f6e;
+    border-color: #a7e9c8;
+}
+
+.btn-pedido:hover{
+    background: #c9efd9;
+}
+
+/* VER PEDIDOS */
+.btn-ver{
+    background: #dfeeff;
+    color: #2563eb;
+    border-color: #b9d3ff;
+}
+
+.btn-ver:hover{
+    background: #d2e6ff;
+}
+
+/* EXCLUIR */
+.btn-excluir{
+    background: #fde2e2;
+    color: #dc2626;
+    border-color: #f5b5b5;
+}
+
+.btn-excluir:hover{
+    background: #ffd4d4;
+}
+.btn-editar {
+    background: #EEF2FF;
+    color: #4F46E5;
+    border: 1px solid #C7D2FE;
 }

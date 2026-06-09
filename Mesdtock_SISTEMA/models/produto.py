@@ -51,6 +51,28 @@ class Produto(Crudmedstock):
         cls.delete(id)
 
     @classmethod
+    def seleciona_por_fornecedor(cls, fornecedor_id):
+
+        conexao = conectar_banco.connect()
+        cursor = conexao.cursor(dictionary=True)
+
+        try:
+
+            sql = """
+            SELECT *
+            FROM produto
+            WHERE fornecedor_id = %s
+            ORDER BY nome
+            """
+
+            cursor.execute(sql, (fornecedor_id,))
+            return cursor.fetchall()
+
+        finally:
+            cursor.close()
+            conexao.close()
+
+    @classmethod
     def upd_quantidade(cls, id, nova_quantidade, connection=None):
         conexao = connection or Database.connect()
         cursor = conexao.cursor()

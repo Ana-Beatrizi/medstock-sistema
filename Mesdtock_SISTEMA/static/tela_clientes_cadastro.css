@@ -19,6 +19,9 @@ body {
     align-items: center;
     grid-template-columns: 1fr 1fr;
 
+    display: flex;
+    flex-direction: column;
+
 }
 
 .logo {
@@ -79,4 +82,10 @@ body {
 .linha{
     display: flex;
     flex-direction: row;
+    gap: 15px;
+    width: 100%;
+}
+
+.linha .mb-3{
+    flex: 1;
 }

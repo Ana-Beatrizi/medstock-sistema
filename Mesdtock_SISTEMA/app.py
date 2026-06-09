@@ -9,6 +9,7 @@ from models.entrada import PedidoEntrada
 from models.saida import PedidoSaida
 from models.fornecedor import Fornecedor
 from models.cliente_cadastro import ClientesCadastro
+from models.movimentacao import Movimentacao
 #============================
 
 # Importações E-MAIL ========
@@ -26,7 +27,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = "Medstock_programa_de_estoque_123456"
 
-#! = Feito pela -- Ana Beatriz // linha 1 a 647 𖹭.ᐟ
+#! = Feito pela -- Ana Beatriz // linha 1 a 762 𖹭.ᐟ
 
 # TRANSFORMA DADOS ============
 # inteiro
@@ -63,21 +64,124 @@ def tela_login():
 def tela_home():
     cliente_id = session.get("cliente_id")
 
-    return render_template("tela_home.html", cliente = Cliente.seleciona_por_id(cliente_id))
+    return render_template("tela_home.html", cliente=Cliente.seleciona_por_id(cliente_id))
 #==============================================
+
+@app.context_processor
+def carregar_cliente():
+
+    cliente_id = session.get("cliente_id")
+
+    if cliente_id:
+        cliente = Cliente.seleciona_por_id(cliente_id)
+    else:
+        cliente = None
+
+    return dict(cliente=cliente)
+
+@app.context_processor
+def carregar_notificacoes():
+
+    produtos = Produto.seleciona_tudo()
+
+    notificacoes = []
+
+    for produto in produtos:
+
+        if produto["quantidade_estoque"] == 0:
+            notificacoes.append({
+                "tipo": "vermelho",
+                "titulo": "Fora de Estoque",
+                "mensagem": f'{produto["nome"]} está fora de estoque'
+            })
+
+        elif produto["quantidade_estoque"] <= produto["estoque_minimo"]:
+            notificacoes.append({
+                "tipo": "amarelo",
+                "titulo": "Alerta",
+                "mensagem": f'{produto["nome"]} está com estoque baixo'
+            })
+
+    return dict(notificacoes=notificacoes)
 
 # TELA INICIAL ===============
 @app.route("/inicial")
 def tela_inicial():
     cliente_id = session.get("cliente_id")
-    return render_template("tela_inicial.html", cliente = Cliente.seleciona_por_id(cliente_id)) 
+
+    return render_template(
+        "tela_inicial.html",
+        cliente=Cliente.seleciona_por_id(cliente_id),
+    )
+#==============================================
+
+# TELA DASHBOARD ===============
+@app.route("/dashboard")
+def tela_dashboard():
+    cliente_id = session.get("cliente_id")
+    produtos = Produto.seleciona_tudo()
+    total_produtos = len(produtos)
+    entradas = PedidoEntrada.historico_entrada()
+
+    processados = 0
+    pendentes = 0
+    cancelados = 0
+    estoque_baixo = 0
+    estoque_normal = 0
+
+    for pedido in entradas:
+        if pedido["status"] == "PROCESSADO":
+            processados += 1
+        elif pedido["status"] == "PENDENTE":
+            pendentes += 1
+        elif pedido["status"] == "CANCELADO":
+            cancelados += 1
+
+    total = processados + pendentes + cancelados
+
+    if total > 0:
+        percentual_processado = round((processados / total) * 100)
+        percentual_pendente = round((pendentes / total) * 100)
+        percentual_cancelado = round((cancelados / total) * 100)
+    else:
+        percentual_processado = 0
+        percentual_pendente = 0
+        percentual_cancelado = 0
+
+
+
+    for produto in produtos:
+        if produto["quantidade_estoque"] <= produto["estoque_minimo"]:
+            estoque_baixo += 1
+        else:
+            estoque_normal += 1
+
+    total = estoque_baixo + estoque_normal
+
+    if total > 0:
+        percentual_baixo = round((estoque_baixo / total) * 100)
+    else:
+        percentual_baixo = 0
+    
+    return render_template(
+        "tela_dashboard.html",
+        cliente=Cliente.seleciona_por_id(cliente_id),
+        estoque_baixo=estoque_baixo,
+        estoque_normal=estoque_normal,
+        percentual_baixo=percentual_baixo,
+        total_produtos=total_produtos,
+        percentual_processado=percentual_processado,
+        percentual_pendente=percentual_pendente,
+        percentual_cancelado=percentual_cancelado,
+    )
+
 #==============================================
 
 # TELA HISTORICO DE FORNECEDOR ===============
 @app.route("/historico/fornecedor")
 def tela_historico_de_fornecedor():
     cliente_id = session.get("cliente_id")
-    return render_template("tela_historico_de_fornecedor.html", fornecedor = Fornecedor.seleciona_tudo(order_by="nome_fornecedor"), cliente = Cliente.seleciona_por_id(cliente_id)) 
+    return render_template("tela_historico_de_fornecedor.html", fornecedores = Fornecedor.seleciona_tudo(order_by="nome_fornecedor"), cliente = Cliente.seleciona_por_id(cliente_id)) 
 #==============================================
 
 # TELA HISTORICO DE CLIENTE ===============
@@ -112,36 +216,203 @@ def tela_cadastro_produto():
 @app.route("/produto")
 def tela_produtos():
     cliente_id = session.get("cliente_id")
-    produtos = Produto.seleciona_tudo(order_by="nome")
+    fornecedor_id = request.args.get("fornecedor_id")
+    estoque = request.args.get("estoque")
+    # LISTA DE FORNECEDORES
+    fornecedores = Fornecedor.seleciona_tudo(order_by="nome_fornecedor")
+    # FILTRO
+    if fornecedor_id:
+        produtos = Produto.seleciona_por_fornecedor(fornecedor_id)
+    else:
+        produtos = Produto.seleciona_tudo(order_by="nome")
+    # ADICIONA O FORNECEDOR EM CADA PRODUTO
     for produto in produtos:
         produto["fornecedor"] = Fornecedor.seleciona_por_id(produto["fornecedor_id"])
+        # filtro de estoque
+    if estoque == "baixo":
+        produtos = [
+            p for p in produtos
+            if p["quantidade_estoque"] <= p["estoque_minimo"]
+        ]
 
-
-    return render_template("tela_produtos.html", produtos=produtos, cliente = Cliente.seleciona_por_id(cliente_id))
+    elif estoque == "normal":
+        produtos = [
+            p for p in produtos
+            if p["quantidade_estoque"] > p["estoque_minimo"]
+        ]
+    return render_template("tela_produtos.html", produtos=produtos,fornecedores=fornecedores, fornecedor_selecionado=fornecedor_id, estoque_selecionado=estoque, cliente = Cliente.seleciona_por_id(cliente_id))
 #==============================================
 
 # TELA ENTRADA==============
 @app.route("/pedido/entrada")
 def tela_entrada():
     cliente_id = session.get("cliente_id")
-    #teste = PedidoEntrada.historico_entrada()
-    #print("teste entradas", teste)
-    return render_template("tela_entrada.html", entradas=PedidoEntrada.historico_entrada(), cliente = Cliente.seleciona_por_id(cliente_id))
+    produto = request.args.get("produto")
+    fornecedor = request.args.get("fornecedor")
+    status = request.args.get("status")
+
+    entradas = PedidoEntrada.historico_entrada()
+
+    # filtros
+    if produto:
+        entradas = [
+            e for e in entradas
+            if e["nome"] == produto
+        ]
+
+    if fornecedor:
+        entradas = [
+            e for e in entradas
+            if e["nome_fornecedor"] == fornecedor
+        ]
+
+    if status:
+        entradas = [
+            e for e in entradas
+            if e["status"] == status
+        ]
+
+    # listas para popular os selects
+    produtos_filtro = []
+    fornecedores_filtro = []
+
+    historico = PedidoEntrada.historico_entrada()
+
+    for item in historico:
+        if not any(p["nome"] == item["nome"] for p in produtos_filtro):
+            produtos_filtro.append({"nome": item["nome"]})
+
+        if not any(
+            f["nome_fornecedor"] == item["nome_fornecedor"]
+            for f in fornecedores_filtro
+        ):
+            fornecedores_filtro.append({
+                "nome_fornecedor": item["nome_fornecedor"]
+            })
+
+    return render_template("tela_entrada.html", entradas=entradas,produtos_filtro=produtos_filtro ,fornecedores_filtro=fornecedores_filtro, produto_selecionado=produto, fornecedor_selecionado=fornecedor, status_selecionado=status, cliente = Cliente.seleciona_por_id(cliente_id))
 #==============================================
 
-# TELA ENTRADA==============
+# TELA ENTRADA FORNECEDOR ESPECIFICO==============
+@app.route("/pedido/entrada/fornecedor/<int:fornecedor_id>")
+def tela_pedidos_fornecedor(fornecedor_id):
+    cliente_id = session.get("cliente_id")
+    entradas = PedidoEntrada.seleciona_por_fornecedor(fornecedor_id)
+    return render_template("tela_entrada.html", entradas=entradas, cliente=Cliente.seleciona_por_id(cliente_id))
+#==============================================
+
+# TELA MOVIMENTAÇÃO==============
 @app.route("/movimentacao")
 def tela_movimentacao():
     cliente_id = session.get("cliente_id")
-    #teste = PedidoEntrada.historico_entrada()
-    #print("teste entradas", teste)
-    return render_template("tela_movimentacao.html", entradas=PedidoEntrada.historico_entrada(), cliente = Cliente.seleciona_por_id(cliente_id)) #! errrr
+    produto = request.args.get("produto")
+    tipo = request.args.get("tipo")
+    fornecedor = request.args.get("fornecedor")
+    movimentacoes = Movimentacao.movimentar_tudo()
+
+        # Listas dos filtros
+    produtos_filtro = []
+    fornecedores_filtro = []
+
+    for item in movimentacoes:
+
+        if item["produto"] not in [p["produto"] for p in produtos_filtro]:
+            produtos_filtro.append({
+                "produto": item["produto"]
+            })
+
+        nome_pessoa = item["fornecedor"] if item["fornecedor"] else item["cliente"]
+
+        if nome_pessoa not in [f["nome"] for f in fornecedores_filtro]:
+            fornecedores_filtro.append({
+                "nome": nome_pessoa
+            })
+
+    # Filtro produto
+    if produto:
+        movimentacoes = [
+            m for m in movimentacoes
+            if m["produto"] == produto
+        ]
+
+    # Filtro tipo
+    if tipo:
+        movimentacoes = [
+            m for m in movimentacoes
+            if m["tipo"] == tipo
+        ]
+
+    # Filtro fornecedor/cliente
+    if fornecedor:
+        movimentacoes = [
+            m for m in movimentacoes
+            if (
+                m["fornecedor"] == fornecedor or
+                m["cliente"] == fornecedor
+            )
+        ]
+
+
+    return render_template("tela_movimentacao.html",movimentacoes=movimentacoes,
+        produtos_filtro=produtos_filtro,
+        fornecedores_filtro=fornecedores_filtro,
+        produto_selecionado=produto,
+        tipo_selecionado=tipo,
+        fornecedor_selecionado=fornecedor,
+        cliente=Cliente.seleciona_por_id(cliente_id))
 
 # TELA SAIDA==============
 @app.route("/pedido/saida")
 def tela_saida():
     cliente_id = session.get("cliente_id")
-    return render_template("tela_saida.html", saidas=PedidoSaida.historico_saida(), cliente = Cliente.seleciona_por_id(cliente_id))
+    produto = request.args.get("produto")
+    cliente_filtro = request.args.get("cliente")
+    status = request.args.get("status")
+    saidas = PedidoSaida.historico_saida()
+
+        # Listas para os filtros
+    produtos_filtro = []
+    clientes_filtro = []
+
+    for item in saidas:
+        if item not in produtos_filtro:
+            produtos_filtro.append({
+                "nome": item["nome"]
+            })
+
+        if item["cliente"] not in [c["cliente"] for c in clientes_filtro]:
+            clientes_filtro.append({
+                "cliente": item["cliente"]
+            })
+
+    # Aplicar filtros
+    if produto:
+        saidas = [
+            s for s in saidas
+            if s["nome"] == produto
+        ]
+
+    if cliente_filtro:
+        saidas = [
+            s for s in saidas
+            if s["cliente"] == cliente_filtro
+        ]
+
+    if status:
+        saidas = [
+            s for s in saidas
+            if s["status"] == status
+        ]
+
+    return render_template("tela_saida.html", saidas=saidas,produtos_filtro=produtos_filtro, clientes_filtro=clientes_filtro,produto_selecionado=produto,cliente_selecionado=cliente_filtro,status_selecionado=status, cliente = Cliente.seleciona_por_id(cliente_id))
+#==============================================
+
+# TELA SAIDA CLIENTE ESPECIFICO==============
+@app.route("/pedido/saida/cliente/<int:clientes_cadastro_id>")
+def tela_pedidos_clientes(clientes_cadastro_id):
+    cliente_id = session.get("cliente_id")
+    saidas = PedidoSaida.seleciona_por_clientes(clientes_cadastro_id)
+    return render_template("tela_saida.html", saidas=saidas, cliente=Cliente.seleciona_por_id(cliente_id))
 #==============================================
 
 # TELA CADASTRO PEDIDOS==============
@@ -275,7 +546,7 @@ def salvar_fornecedor():
 
     if erros:
         flash(erros[0], "danger")
-        return render_template("tela_cadastro_de_fornecedor.html", fornecedor=dados) 
+        return render_template("tela_cadastro_de_fornecedor.html", fornecedor=dados, ) 
 
     try:
         fornecedor.insert()
@@ -290,32 +561,43 @@ def salvar_fornecedor():
         return render_template("tela_cadastro_de_fornecedor.html", fornecedor=dados) 
 #==============================================
 
-#! POST ATUALIZAR FORNECEDOR ======================
-'''@app.route("/cliente/atualizar/<int:id>", methods=["POST"])
-def atualizar_cliente(id):
-    dados = get_cliente_form_cadastro()
-    cliente = Cliente(**dados)
-    erros = cliente.validate()
+# POST ATUALIZAR FORNECEDOR ======================
+@app.route("/fornecedor/editar/<int:id>")
+def editar_fornecedor(id):
+    fornecedor_editar = Fornecedor.seleciona_por_id(id)
+    cliente_id = session.get("cliente_id")
+    if not fornecedor_editar:
+        flash("Fornecedor não encontrado.", "danger")
+        return redirect(url_for("tela_cadastro_de_fornecedor"))
+    return render_template("tela_cadastro_de_fornecedor.html", cliente = Cliente.seleciona_por_id(cliente_id), fornecedor=fornecedor_editar, fornecedores=Fornecedor.seleciona_tudo(order_by="nome_fornecedor"))
+# ==============================
+
+# POST ATUALIZAR FORNECEDOR ======================
+@app.route("/fornecedor/atualizar/<int:id>", methods=["POST"])
+def atualizar_fornecedor(id):
+    dados = get_fornecedor_form_cadastro()
+    fornecedor = Fornecedor(**dados)
+    erros = fornecedor.validate()
 
     if erros:
         for erro in erros:
             flash(erro[0], "erro")
         dados["id"] = id
-        return render_template("tela_cadastro.html", cliente=dados)
+        return render_template("tela_historico_de_fornecedor.html", fornecedor=dados) 
 
     try:
-        if not Cliente.seleciona_por_id(id):
-            flash("Cliente não encontrado.", "danger")
-            return redirect(url_for("tela_login"))
+        if not Fornecedor.seleciona_por_id(id):
+            flash("Fornecedor não encontrado.", "erro")
+            return redirect(url_for("tela_historico_de_fornecedor"))
 
-        cliente.atualizar(id)
-        flash("Cliente atualizado com sucesso.", "success")
-        return redirect(url_for("tela_login"))
+        fornecedor.atualizar(id)
+        flash("Fornecedor atualizado com sucesso.", "success")
+        return redirect(url_for("tela_historico_de_fornecedor"))
     except Exception as e:
         dados["id"] = id
-        flash(f"Erro ao atualizar cliente: {e}", "danger")
-        return render_template("tela_cadastro.html", cliente=dados)
-# ========================================='''
+        flash(f"Erro ao atualizar Fornecedor: {e}", "danger")
+        return render_template("tela_cadastro_de_fornecedor.html", fornecedor=dados)
+# =========================================
 
 # DELETAR FORNECEDOR ==================
 @app.route("/fornecedor/excluir/<int:id>")
@@ -371,32 +653,43 @@ def salvar_clientes_cadastro():
         return render_template("tela_clientes_cadastro.html", clientes=dados, cliente = Cliente.seleciona_por_id(cliente_id)) 
 #==============================================
 
-#! POST ATUALIZAR FORNECEDOR ======================
-'''@app.route("/cliente/atualizar/<int:id>", methods=["POST"])
-def atualizar_cliente(id):
-    dados = get_cliente_form_cadastro()
-    cliente = Cliente(**dados)
-    erros = cliente.validate()
+# POST EIDTAR CLIENTE CADASTRO ======================
+@app.route("/clientes/cadastro/editar/<int:id>")
+def editar_clientes_cadastro(id):
+    clientes_cadastro_editar = ClientesCadastro.seleciona_por_id(id)
+    cliente_id = session.get("cliente_id")
+    if not clientes_cadastro_editar:
+        flash("Cliente não encontrado.", "danger")
+        return redirect(url_for("tela_clientes_cadastro"))
+    return render_template("tela_clientes_cadastro.html", cliente = Cliente.seleciona_por_id(cliente_id), clientes_cadastro=clientes_cadastro_editar)
+# ==============================
+
+# POST ATUALIZAR CLIENTES CADASTRO ======================
+@app.route("/clientes/cadastro/atualizar/<int:id>", methods=["POST"])
+def atualizar_clientes_cadastro(id):
+    dados = get_form_cliente_cadastro()
+    clientes= ClientesCadastro(**dados)
+    erros = clientes.validate()
 
     if erros:
         for erro in erros:
             flash(erro[0], "erro")
         dados["id"] = id
-        return render_template("tela_cadastro.html", cliente=dados)
+        return render_template("tela_historico_de_cliente.html", clientes=dados) 
 
     try:
-        if not Cliente.seleciona_por_id(id):
-            flash("Cliente não encontrado.", "danger")
-            return redirect(url_for("tela_login"))
+        if not ClientesCadastro.seleciona_por_id(id):
+            flash("Cliente não encontrado.", "erro")
+            return redirect(url_for("tela_historico_de_cliente"))
 
-        cliente.atualizar(id)
+        clientes.atualizar(id)
         flash("Cliente atualizado com sucesso.", "success")
-        return redirect(url_for("tela_login"))
+        return redirect(url_for("tela_historico_de_cliente"))
     except Exception as e:
         dados["id"] = id
-        flash(f"Erro ao atualizar cliente: {e}", "danger")
-        return render_template("tela_cadastro.html", cliente=dados)
-# ========================================='''
+        flash(f"Erro ao atualizar Cliente: {e}", "danger")
+        return render_template("tela_clientes_cadastro.html", clientes=dados)
+# =========================================
 
 # DELETAR FORNECEDOR ==================
 @app.route("/clientescadastro/excluir/<int:id>")
@@ -588,6 +881,7 @@ def get_pedido_form():
         "observacao": request.form.get("observacao", "").strip(),
         "quantidade_pedido": request.form.get("quantidade_pedido", "").strip(),
         "data_processamento": request.form.get("data_processamento"),
+        "status": "PENDENTE",
         "fornecedor_id": request.form.get("fornecedor_id"),
         "produto_id": request.form.get("produto_id")
     }
@@ -619,7 +913,8 @@ def salvar_pedido(produto_id):
     produto = Produto.seleciona_por_id(produto_id)
 
     dados["valor_total"] = (float(produto["preco_custo"]) * int(dados["quantidade_pedido"]))
-
+    dados["status"] = "PENDENTE"
+    
     entrada = PedidoEntrada(**dados)
     erros = entrada.validate()
 
@@ -637,24 +932,25 @@ def salvar_pedido(produto_id):
         flash("Pedido criado com sucesso.", "success")
         return redirect(url_for("tela_entrada"))
     except Exception as e:
+        cliente_id = session.get("cliente_id")
         flash(f"Erro ao criar pedido: {e}", "danger")
-        return render_template("tela_cadastro_pedidos.html", pedido=dados, produto=produto, tipo="ENTRADA")
+        return render_template("tela_cadastro_pedidos.html", pedido=dados, produto=produto, tipo="ENTRADA", cliente=Cliente.seleciona_por_id(cliente_id))
 
-@app.route("/pedido/processar/<int:id>")
-def processar_pedido(id):
+@app.route("/pedido/processar/entrada/<int:id>")
+def processar_entrada(id):
     try:
-        mensagem = PedidoEntrada.processar(id)
-        flash(mensagem, "sucesso")
+        mensagem = PedidoEntrada.processar_entrada(id)
+        flash(mensagem, "success")
     except ValueError as e:
-        flash(str(e), "erro")
+        flash(str(e), "danger")
     except Exception as e:
-        flash(f"Erro ao processar pedido: {e}", "erro")
-    return redirect(url_for("pedidos_entrada"))
+        flash(f"Erro ao processar pedido: {e}", "danger")
+    return redirect(url_for("tela_movimentacao"))
 
-@app.route("/pedido/cancelar/<int:id>")
-def cancelar_pedido(id):
+@app.route("/entrada/cancelar/<int:id>")
+def cancelar_entrada(id):
     try:
-        mensagem = PedidoEntrada.cancelar(id)
+        mensagem = PedidoEntrada.cancelar_entrada(id)
         flash(mensagem, "sucesso")
     except ValueError as e:
         flash(str(e), "erro")
@@ -680,6 +976,7 @@ def get_pedido_saida_form():
         "observacao": request.form.get("observacao", "").strip(),
         "quantidade_pedido": request.form.get("quantidade_pedido", "").strip(),
         "data_processamento": request.form.get("data_processamento"),
+        "status": "PENDENTE",
         "clientes_cadastro_id": request.form.get("clientes_cadastro_id"),
         "produto_id": request.form.get("produto_id")
     }
@@ -707,18 +1004,22 @@ def novo_pedido_saida(tipo, id):
 @app.route("/pedido/salvar/saida/<int:produto_id>", methods=["POST"])
 def salvar_pedido_saida(produto_id):
     dados = get_pedido_saida_form()
-    #print("pedido", dados)
     produto = Produto.seleciona_por_id(produto_id)
     cliente_id = session.get("cliente_id")
-
-    dados["valor_total"] = (float(produto["preco_custo"]) * int(dados["quantidade_pedido"]))
-
-    saida = PedidoSaida(**dados)
-    erros = saida.validate()
 
     if not produto:
         flash("Produto não encontrado.", "erro")
         return redirect(url_for("tela_produtos"))
+
+# Valida se estoque está disponivel ============
+    quantidade_solicitada = int(dados["quantidade_pedido"])
+    if quantidade_solicitada > produto["quantidade_estoque"]:
+        flash( f"Estoque insuficiente. Disponível: {produto['quantidade_estoque']}", "danger")
+        return render_template("tela_cadastro_pedidos_saida.html", produto=produto, tipo="SAIDA", pedido=dados,cliente=Cliente.seleciona_por_id(cliente_id) )
+    dados["valor_total"] = (float(produto["preco_custo"]) * int(dados["quantidade_pedido"]))
+
+    saida = PedidoSaida(**dados)
+    erros = saida.validate()
 
     if erros:
         for erro in erros:
@@ -732,32 +1033,31 @@ def salvar_pedido_saida(produto_id):
     except Exception as e:
         flash(f"Erro ao criar pedido: {e}", "danger")
         return render_template("tela_cadastro_pedidos_saida.html", pedido=dados, produto=produto, tipo="SAIDA", cliente = Cliente.seleciona_por_id(cliente_id))
-'''
+
 @app.route("/pedido/processar/<int:id>")
-def processar_pedido(id):
+def processar_saida(id):
     try:
-        mensagem = PedidoEntrada.processar(id)
+        mensagem = PedidoSaida.processar_saida(id)
         flash(mensagem, "sucesso")
     except ValueError as e:
         flash(str(e), "erro")
     except Exception as e:
         flash(f"Erro ao processar pedido: {e}", "erro")
-    return redirect(url_for("pedidos_entrada"))
-'''
-'''
-@app.route("/pedido/cancelar/<int:id>")
-def cancelar_pedido(id):
+    return redirect(url_for("tela_movimentacao"))
+
+@app.route("/saida/cancelar/<int:id>") #! errrrrrrrrrrrrrrrrrrrrrrrrrr
+def cancelar_saida(id):
     try:
-        mensagem = PedidoEntrada.cancelar(id)
+        mensagem = PedidoSaida.deletar_saida(id)
         flash(mensagem, "sucesso")
     except ValueError as e:
         flash(str(e), "erro")
     except Exception as e:
         flash(f"Erro ao cancelar pedido: {e}", "erro")
-    return redirect(url_for("tela_entrada"))
-'''
+    return redirect(url_for("tela_saida"))
 
-#! = Feito pela -- Ana Beatriz // linha 1 a 762 𖹭.ᐟ
+
+#! = Feito pela -- Ana Beatriz // linha 1 a 765 𖹭.ᐟ
 
 if __name__ == "__main__":
     app.run(debug=True)

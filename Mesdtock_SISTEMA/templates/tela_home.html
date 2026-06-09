@@ -57,13 +57,68 @@
 
         <div class="icones">
 
-            <button class="btn-icon-nav" aria-label="Notificações">
+            <button id="btnNotificacao"
+                    class="btn-icon-nav"
+                    aria-label="Notificações">
                 <i class="bi bi-bell"></i>
             </button>
+        
+            <div id="painelNotificacao" class="painel-notificacao">
 
-            <a href="{{ url_for('tela_perfil_do_usuario', id=cliente.id) }}" class="btn-perfil-nav" aria-label="Perfil do Usuário">
-                <i class="bi bi-person-fill"></i> </a>
-
+                {% if notificacoes %}
+            
+                    {% for noti in notificacoes %}
+            
+                    <div class="noti-card">
+            
+                        <div class="circulo-{{ noti.tipo }}">
+            
+                            {% if noti.tipo == "vermelho" %}
+                                <i class="bi bi-exclamation-circle-fill"></i>
+            
+                            {% elif noti.tipo == "amarelo" %}
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+            
+                            {% endif %}
+            
+                        </div>
+            
+                        <div>
+            
+                            <h5>{{ noti.titulo }}</h5>
+            
+                            <p>{{ noti.mensagem }}</p>
+            
+                        </div>
+            
+                    </div>
+            
+                    {% endfor %}
+            
+                {% else %}
+            
+                    <div class="noti-card">
+            
+                        <div class="circulo-azul">
+                            <i class="bi bi-check-circle-fill"></i>
+                        </div>
+            
+                        <div>
+                            <h5>Sistema OK</h5>
+                            <p>Nenhuma notificação pendente.</p>
+                        </div>
+            
+                    </div>
+            
+                {% endif %}
+            
+            </div>
+        
+            <a href="{{ url_for('tela_perfil_do_usuario', id=cliente.id) }}"
+               class="btn-perfil-nav">
+                <i class="bi bi-person-fill"></i>
+            </a>
+        
         </div>
 
     </header>
@@ -78,6 +133,13 @@
                 <a href="{{ url_for('tela_inicial') }}">
                     <i class="bi bi-house"></i>
                     <span>Home</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('tela_dashboard') }}">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
                 </a>
             </li>
 
@@ -198,5 +260,29 @@
 
     </script>
 
+
+<script>
+
+    const btnNotificacao =
+        document.getElementById("btnNotificacao");
+    
+    const painelNotificacao =
+        document.getElementById("painelNotificacao");
+    
+    btnNotificacao.addEventListener("click", function(e){
+    
+        e.stopPropagation();
+    
+        painelNotificacao.classList.toggle("ativo");
+    
+    });
+    
+    document.addEventListener("click", function(){
+    
+        painelNotificacao.classList.remove("ativo");
+    
+    });
+    
+    </script>
 </body>
 </html>

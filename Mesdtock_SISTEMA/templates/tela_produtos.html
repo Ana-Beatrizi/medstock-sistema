@@ -3,76 +3,162 @@
 {% block conteudo %}
 <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='tela_produtos.css') }}">
-    <div id="container">
 
-        <main id="content">
-            <div id="header">
-                <div>
-                    <h1>Produtos</h1>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<div id="container">
+
+    <main id="content">
+
+        <div id="header">
+
+            <div class="header-left">
+                <h1>Produtos</h1>
+            </div>
+
+
+            <div class="header-right">
+                <div class="filtros-card">
+
+                    <div class="filtro-item">
+                        <i class="bi bi-funnel-fill"></i>
+                        <span>Filtros:</span>
+                    </div>
+                
+                    <form method="GET" action="{{ url_for('tela_produtos') }}" class="filtros-form">
+                
+                        <select name="fornecedor_id" onchange="this.form.submit()">
+                            <option value="">Todos os fornecedores</option>
+                
+                            {% for fornecedor in fornecedores %}
+                            <option value="{{ fornecedor.id }}"
+                                {% if fornecedor_selecionado == fornecedor.id|string %}selected{% endif %}>
+                                {{ fornecedor.nome_fornecedor }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                
+                        <select name="estoque" onchange="this.form.submit()">
+                            <option value="">Todos os produtos</option>
+                            <option value="baixo" {% if estoque_selecionado == 'baixo' %}selected{% endif %}>⚠ Estoque baixo</option>
+                            <option value="normal" {% if estoque_selecionado == 'normal' %}selected{% endif %}>✅ Estoque alto</option>
+                        </select>
+                
+                    </form>
+                
                 </div>
 
-                <input type="text" placeholder="Buscar...">
-
+                <input type="text" id="inputBusca" placeholder="Buscar...">
+                <a href="{{ url_for('tela_cadastro_produto') }}" class="btn btn-cadastro">
+                    <i class="bi bi-plus-lg me-2"></i> Cadastrar Novo Produto
+                </a>
             </div>
-{% with mensagens = get_flashed_messages(with_categories=true) %}
+
+
+        </div>
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
         {% if mensagens %}
-          {% for categoria, msg in mensagens %}
-            <div class="custom-alert alert-{{ categoria }} alert-flash animate__animated animate__fadeIn" role="alert">
-                <div class="alert-content">
-                    {% if categoria == 'success' %}
-                        <i class="bi bi-check-circle-fill alert-icon"></i>
-                    {% elif categoria == 'danger' or categoria == 'error' %}
-                        <i class="bi bi-exclamation-triangle-fill alert-icon"></i>
-                    {% else %}
-                        <i class="bi bi-info-circle-fill alert-icon"></i>
-                    {% endif %}
-                    <span class="alert-text">{{ msg }}</span>
-                </div>
+        {% for categoria, msg in mensagens %}
+        <div class="custom-alert alert-{{ categoria }} alert-flash animate__animated animate__fadeIn" role="alert">
+            <div class="alert-content">
+                {% if categoria == 'success' %}
+                <i class="bi bi-check-circle-fill alert-icon"></i>
+                {% elif categoria == 'danger' or categoria == 'error' %}
+                <i class="bi bi-exclamation-triangle-fill alert-icon"></i>
+                {% else %}
+                <i class="bi bi-info-circle-fill alert-icon"></i>
+                {% endif %}
+                <span class="alert-text">{{ msg }}</span>
             </div>
-          {% endfor %}
+        </div>
+        {% endfor %}
         {% endif %}
         {% endwith %}
 
-            <table>
-                <thead>
-                    <tr>
-                        <th id="table_titulo" colspan="8">Estoque de Produtos</th>
+        <table>
+            <thead>
+                <tr>
+                    <th id="table_titulo" colspan="10">Estoque de Produtos</th>
 
 
-                    </tr>
-                    <tr>
-                        <th>Id</th>
-                        <th>Nome</th>
-                        <th>Fornecedor</th>
-                        <th>categoria</th>
-                        <th>Quantidade</th>
-                        <th>Estoque Mínimo</th>
-                        <th>Preço Venda</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                {% for produto in produtos %}
-                <tbody>
+                </tr>
+                <tr>
+                    <th>Id</th>
+                    <th>Nome</th>
+                    <th>Fornecedor</th>
+                    <th>categoria</th>
+                    <th>Quantidade</th>
+                    <th>Estoque Mínimo</th>
+                    <th>Preço Venda</th>
+                    <th colspan="">Ações</th>
+                    <th colpsan="">Solicitar</th>
+                </tr>
+            </thead>
+            {% for produto in produtos %}
+            <tbody id="tabelaDados">
 
-                    <tr>
-                        <td>{{ produto.id }}</td>
-                        <td>{{ produto.nome }}</td>
-                        <td>{{ produto.fornecedor.nome_fornecedor }}</td>
-                        <td>{{ produto.categoria }}</td>
-                        <td>{{ produto.quantidade_estoque }}</td>
-                        <td>{{ produto.estoque_minimo }}</td>
-                        <td>R$ {{ '%.2f'|format(produto.preco_venda) }}</td>
-                        <td class="acoes">
-                            <a class="btn-tabela" href="{{ url_for('editar_produto', id=produto.id) }}">Editar</a>
-                            <a class="btn-tabela" href="{{ url_for('excluir_produto', id=produto.id) }}">Excluir</a>
-                            <a href="{{ url_for('novo_pedido', tipo='entrada', id=produto.id) }}">Solicitar Entrada</a>
-                            <a href="{{ url_for('novo_pedido_saida', tipo='saida', id=produto.id) }}">Solicitar Saída</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </main>
-    </div>
+                <tr>
+                    <td>{{ produto.id }}</td>
+                    <td>{{ produto.nome }}</td>
+                    <td>{{ produto.fornecedor.nome_fornecedor }}</td>
+                    <td>{{ produto.categoria }}</td>
+                    <td id="quantidade" class="{% if produto.quantidade_estoque <= produto.estoque_minimo %}estoque-baixo{% endif %}"> {% if produto.quantidade_estoque <= produto.estoque_minimo %}
+                    <i class="bi bi-exclamation-triangle-fill text-danger" title="Estoque baixo"></i> {% endif %}{{ produto.quantidade_estoque }}</td>
+                    <td id="estoque_minimo">{{ produto.estoque_minimo }}</td>
+                    <td class="preco-venda">
+                        <span class="moeda">R$</span>
+                        <span>{{ '%.2f'|format(produto.preco_venda) }}</span>
+                    </td>
+                    <td class="acoes">
 
+                        <a class="btn-acao btn-editar" href="{{ url_for('editar_produto', id=produto.id) }}">
+                            <i class="bi bi-pencil-square"></i>
+                            Editar
+                        </a>
+
+                        <a class="btn-acao btn-excluir" href="{{ url_for('excluir_produto', id=produto.id) }}">
+                            <i class="bi bi-trash3-fill"></i>
+                            Excluir
+                        </a>
+                    </td>
+
+                    <td>
+                        <a class="btn-acao btn-entrada"
+                            href="{{ url_for('novo_pedido', tipo='entrada', id=produto.id) }}">
+                            <i class="bi bi-box-arrow-in-down"></i>
+                            Entrada
+                        </a>
+
+                        <a class="btn-acao btn-saida"
+                            href="{{ url_for('novo_pedido_saida', tipo='saida', id=produto.id) }}">
+                            <i class="bi bi-box-arrow-up"></i>
+                            Saída
+                        </a>
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+</div>
+
+
+<script>
+    document.getElementById("inputBusca").addEventListener("keyup", function () {
+        let filtro = this.value.toLowerCase();
+        let linhas = document.querySelectorAll("#tabelaDados tr");
+        linhas.forEach(function (linha) {
+            let nomeProduto = linha.cells[1].textContent.toLowerCase();
+            let nomeFornecedor = linha.cells[2].textContent.toLowerCase();
+            if (nomeProduto.includes(filtro) ||
+            nomeFornecedor.includes(filtro)) {
+            linha.style.display = "";
+        } else {
+            linha.style.display = "none";
+        }
+
+    });
+
+    });
+</script>
 {% endblock %}

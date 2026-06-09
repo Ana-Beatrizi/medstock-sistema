@@ -24,7 +24,7 @@
 	 telefone VARCHAR(20),
 	 cidade VARCHAR(50),
 	 estado CHAR(2),
-	 cep CHAR(8),
+	 cep CHAR(8), 
 	 PRIMARY KEY (id)
 	) ENGINE=InnoDB;
 
@@ -53,29 +53,44 @@
 	) ENGINE = InnoDB;
 
 	-- ================= MOVIMENTACAO =================
-	CREATE TABLE IF NOT EXISTS movimentacao (
-	  id INT NOT NULL AUTO_INCREMENT,
-	  quantidade INT NULL,
-	  data_mov DATETIME NULL,
-	  idorigem INT NOT NULL,
-	  tipo varchar(20) NOT Null,
-	  produto_id INT NOT NULL,
-	  PRIMARY KEY (id),
-	  FOREIGN KEY (produto_id) REFERENCES produto (id)
-	) ENGINE = InnoDB;
-
+CREATE TABLE IF NOT EXISTS movimentacao (
+    id INT NOT NULL AUTO_INCREMENT,
+    tipo ENUM('ENTRADA', 'SAIDA') NOT NULL,
+    quantidade INT NOT NULL,
+    valor_total DECIMAL(10,2) NOT NULL,
+    data_mov DATETIME NOT NULL,
+    produto_id INT NOT NULL,
+    fornecedor_id INT NULL,
+    cliente_id INT NULL,
+    entrada_id INT NULL,
+    saida_id INT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (produto_id) REFERENCES produto(id),
+    FOREIGN KEY (fornecedor_id) REFERENCES fornecedor(id),
+    FOREIGN KEY (cliente_id) REFERENCES clientes_cadastro(id),
+    FOREIGN KEY (entrada_id) REFERENCES entrada(id),
+    FOREIGN KEY (saida_id) REFERENCES saida(id)
+) ENGINE = InnoDB;
 
 	-- ================= PEDIDO FORNECEDOR =================
 	CREATE TABLE IF NOT EXISTS entrada (
 	  id INT NOT NULL AUTO_INCREMENT,
 	  data_pedido DATETIME NULL,
-	  valor_total DECIMAL(10,2) NOT NULL,
+	  valor_total INT NOT NULL DEFAULT 0,
 	  observacao VARCHAR(255),
+      quantidade_pedido INT NOT NULL DEFAULT 0,
 	  data_processamento DATETIME NULL,
 	  fornecedor_id INT NOT NULL,
+      produto_id INT NOT NULL,
 	  PRIMARY KEY (id),
+      FOREIGN KEY (produto_id) REFERENCES produto (id),
 	  FOREIGN KEY (fornecedor_id) REFERENCES fornecedor (id)
 	) ENGINE = InnoDB;
+    
+ALTER TABLE entrada
+ADD COLUMN produto_id INT,
+ADD CONSTRAINT fk_entrada_produto
+FOREIGN KEY (produto_id) REFERENCES produto(id);
 
 	-- ================= ITEM PEDIDO FORNECEDOR =================
 	CREATE TABLE IF NOT EXISTS item_pedido_fornecedor (
@@ -92,15 +107,16 @@
 	-- ================= PEDIDO CLIENTE =================
 	CREATE TABLE IF NOT EXISTS saida (
 	  id INT NOT NULL AUTO_INCREMENT,
-	  data_pedido DATETIME NOT NULL,
-	  tipo VARCHAR(10) NOT NULL,
-	  quantidade INT NOT NULL,
-	  valor_total DECIMAL(10,2) NOT NULL,
+	  data_pedido DATETIME NULL,
+	  valor_total INT NOT NULL DEFAULT 0,
 	  observacao VARCHAR(255),
+      quantidade_pedido INT NOT NULL DEFAULT 0,
 	  data_processamento DATETIME NULL,
-	  cliente_id INT NOT NULL,
+	  produto_id INT NOT NULL,
+      clientes_cadastro_id INT NOT NULL,
 	  PRIMARY KEY (id),
-	  FOREIGN KEY (cliente_id) REFERENCES cliente (id)
+      FOREIGN KEY (produto_id) REFERENCES produto (id),
+	  FOREIGN KEY (clientes_cadastro_id) REFERENCES clientes_cadastro (id)
 	) ENGINE = InnoDB;
 
 

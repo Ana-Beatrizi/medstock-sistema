@@ -18,15 +18,24 @@
     <div class="container d-flex align-items-center justify-content-center cadastro container">
         <div class="cadastro-card text-center">
 
-            <h2 class="mb-3 text-dark">Cadastro Fornecedor</h2>
+            <h2 class="mb-3 text-dark">
 
-            <form method="POST" action="{{ url_for('salvar_fornecedor') }}" id="cadastro-form">
+                {% if fornecedor and fornecedor.id %}
+                    Editar Fornecedor
+                {% else %}
+                    Cadastro Fornecedor
+                {% endif %}
+            
+            </h2>
+
+            <form method="POST" id="cadastro-form"
+            action="{% if fornecedor and fornecedor.id %}{{ url_for('atualizar_fornecedor', id=fornecedor.id) }}{% else %}{{ url_for('salvar_fornecedor') }}{% endif %}">
 
                 <div class="mb-3 text-start">
                     <label class="form-label text-dark">Nome</label>
                     <div class="input-group">
 
-                        <input type="text" name="nome_fornecedor" id="nome" class="form-control" required>
+                        <input type="text" name="nome_fornecedor" id="nome" class="form-control" value="{{ fornecedor.nome_fornecedor if fornecedor else '' }}" required>
                     </div>
                 </div>
 
@@ -34,7 +43,7 @@
                     <label class="form-label text-dark">Email</label>
                     <div class="input-group">
 
-                        <input type="email" name="email" id="email" class="form-control" required>
+                        <input type="email" name="email" id="email" class="form-control" value="{{ fornecedor.email if fornecedor else '' }}" required>
                     </div>
                 </div>
 
@@ -44,7 +53,7 @@
                     <div class="input-group">
 
                         <!--implementar api externa para validar cnpj posteriormente-->
-                        <input type="text" name="cnpj" id="cnpj" class="form-control" required>
+                        <input type="text" name="cnpj" id="cnpj" class="form-control" value="{{ fornecedor.cnpj if fornecedor else '' }}" required>
                     </div>
                 </div>
 
