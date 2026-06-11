@@ -241,7 +241,10 @@ def tela_produtos():
         produtos = Produto.seleciona_tudo(order_by="nome")
     # ADICIONA O FORNECEDOR EM CADA PRODUTO
     for produto in produtos:
-        produto["fornecedor"] = Fornecedor.seleciona_por_id(produto["fornecedor_id"])
+        if "fornecedor_id" in produto and produto["fornecedor_id"]:
+            produto["fornecedor"] = Fornecedor.seleciona_por_id(produto["fornecedor_id"])
+        else:
+            produto["fornecedor"] = None
         # filtro de estoque
     if estoque == "baixo":
         produtos = [
