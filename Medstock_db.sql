@@ -10,11 +10,13 @@
 	  nome VARCHAR(100) NOT NULL,
 	  email VARCHAR(45) NOT NULL,
 	  cpf CHAR(11) NOT NULL,
-	  senha varchar(45) NOT NULL,
+	  senha varchar(250) NOT NULL,
+      status VARCHAR(20) DEFAULT 'ativo',
 	  PRIMARY KEY (id),
 	  UNIQUE (email),
 	  UNIQUE (cpf)
 	) ENGINE = InnoDB;
+    
 
 	-- ================= CLIENTE CADASTRADOS =================
 	CREATE TABLE IF NOT EXISTS clientes_cadastro (
@@ -27,6 +29,15 @@
 	 cep CHAR(8), 
 	 PRIMARY KEY (id)
 	) ENGINE=InnoDB;
+    
+	-- ================= FORNECEDOR =================
+	CREATE TABLE IF NOT EXISTS fornecedor (
+	  id INT NOT NULL AUTO_INCREMENT,
+	  nome_fornecedor VARCHAR(100) NOT NULL,
+	  cnpj CHAR(14) NOT NULL,
+	  email VARCHAR(50) NOT NULL,
+	  PRIMARY KEY (id)
+	) ENGINE = InnoDB;
 
 	-- ================= PRODUTO =================
 	CREATE TABLE IF NOT EXISTS produto (
@@ -42,16 +53,38 @@
 	  CONSTRAINT fk_produto_fornecedor FOREIGN KEY (fornecedor_id) REFERENCES fornecedor (id)
 	) ENGINE = InnoDB;
 
-
-	-- ================= FORNECEDOR =================
-	CREATE TABLE IF NOT EXISTS fornecedor (
+	-- ================= PEDIDO FORNECEDOR =================
+	CREATE TABLE IF NOT EXISTS entrada (
 	  id INT NOT NULL AUTO_INCREMENT,
-	  nome_fornecedor VARCHAR(100) NOT NULL,
-	  cnpj CHAR(14) NOT NULL,
-	  email VARCHAR(50) NOT NULL,
-	  PRIMARY KEY (id)
+	  data_pedido DATETIME NULL,
+	  valor_total INT NOT NULL DEFAULT 0,
+	  observacao VARCHAR(255),
+      quantidade_pedido INT NOT NULL DEFAULT 0,
+	  data_processamento DATETIME NULL,
+      status ENUM('PENDENTE','PROCESSADO','CANCELADO') NOT NULL DEFAULT 'PENDENTE',
+	  fornecedor_id INT NOT NULL,
+      produto_id INT NOT NULL,
+	  PRIMARY KEY (id),
+      FOREIGN KEY (produto_id) REFERENCES produto (id),
+	  FOREIGN KEY (fornecedor_id) REFERENCES fornecedor (id)
 	) ENGINE = InnoDB;
-
+    
+	-- ================= PEDIDO CLIENTE =================
+	CREATE TABLE IF NOT EXISTS saida (
+	  id INT NOT NULL AUTO_INCREMENT,
+	  data_pedido DATETIME NULL,
+	  valor_total INT NOT NULL DEFAULT 0,
+	  observacao VARCHAR(255),
+      quantidade_pedido INT NOT NULL DEFAULT 0,
+	  data_processamento DATETIME NULL,
+      status ENUM('PENDENTE','PROCESSADO','CANCELADO') NOT NULL DEFAULT 'PENDENTE',
+	  produto_id INT NOT NULL,
+      clientes_cadastro_id INT NOT NULL,
+	  PRIMARY KEY (id),
+      FOREIGN KEY (produto_id) REFERENCES produto (id),
+	  FOREIGN KEY (clientes_cadastro_id) REFERENCES clientes_cadastro (id)
+	) ENGINE = InnoDB;
+    
 	-- ================= MOVIMENTACAO =================
 CREATE TABLE IF NOT EXISTS movimentacao (
     id INT NOT NULL AUTO_INCREMENT,
@@ -72,51 +105,6 @@ CREATE TABLE IF NOT EXISTS movimentacao (
     FOREIGN KEY (saida_id) REFERENCES saida(id)
 ) ENGINE = InnoDB;
 
-	-- ================= PEDIDO FORNECEDOR =================
-	CREATE TABLE IF NOT EXISTS entrada (
-	  id INT NOT NULL AUTO_INCREMENT,
-	  data_pedido DATETIME NULL,
-	  valor_total INT NOT NULL DEFAULT 0,
-	  observacao VARCHAR(255),
-      quantidade_pedido INT NOT NULL DEFAULT 0,
-	  data_processamento DATETIME NULL,
-      status,
-	  fornecedor_id INT NOT NULL,
-      produto_id INT NOT NULL,
-	  PRIMARY KEY (id),
-      FOREIGN KEY (produto_id) REFERENCES produto (id),
-	  FOREIGN KEY (fornecedor_id) REFERENCES fornecedor (id)
-	) ENGINE = InnoDB;
-    
-ALTER TABLE saida
-ADD COLUMN status ENUM(
-    'PENDENTE',
-    'PROCESSADO',
-    'CANCELADO'
-) NOT NULL DEFAULT 'PENDENTE';
-
-ALTER TABLE entrada
-ADD COLUMN status ENUM(
-    'PENDENTE',
-    'PROCESSADO',
-    'CANCELADO'
-) NOT NULL DEFAULT 'PENDENTE';
-
-	-- ================= PEDIDO CLIENTE =================
-	CREATE TABLE IF NOT EXISTS saida (
-	  id INT NOT NULL AUTO_INCREMENT,
-	  data_pedido DATETIME NULL,
-	  valor_total INT NOT NULL DEFAULT 0,
-	  observacao VARCHAR(255),
-      quantidade_pedido INT NOT NULL DEFAULT 0,
-	  data_processamento DATETIME NULL,
-      status,
-	  produto_id INT NOT NULL,
-      clientes_cadastro_id INT NOT NULL,
-	  PRIMARY KEY (id),
-      FOREIGN KEY (produto_id) REFERENCES produto (id),
-	  FOREIGN KEY (clientes_cadastro_id) REFERENCES clientes_cadastro (id)
-	) ENGINE = InnoDB;
 
 	SHOW WARNINGS;
 

@@ -2,6 +2,11 @@
 from flask import Flask, jsonify, request, url_for, render_template, redirect, flash, session
 #============================
 
+#! ver
+import os
+from werkzeug.utils import secure_filename
+from core.seguranca import login_obrigatorio
+
 # Importações CLASSES =======
 from models.cliente import Cliente
 from models.produto import Produto
@@ -50,6 +55,15 @@ def to_float(value, default=0.0):
 # TELA DE CADASTRO ===============
 @app.route("/")
 def index():
+    if "cliente_id" in session:
+        return redirect(url_for("tela_inicial"))
+
+    return redirect(url_for("tela_login"))
+#==============================================
+
+# TELA DE CADASTRO ===============
+@app.route("/cadastro")
+def tela_cadastro():
     return render_template("tela_cadastro.html") 
 #==============================================
 
@@ -442,6 +456,7 @@ def get_cliente_form_cadastro():
         "email": request.form.get("email").strip(),
         "cpf": request.form.get("cpf").strip(),
         "senha": request.form.get("senha").strip(),
+        "status": request.form.get("status", "ativo")
     }
 #==============================================
 
@@ -457,7 +472,7 @@ def salvar_cliente():
             return render_template("tela_cadastro.html", cliente=dados)
 
     try:
-        cliente.insert()
+        cliente.inserir_usuario(dados)
         flash("Cliente cadastrado com sucesso.", "success")
         return redirect(url_for("tela_login"))
     except Exception as e:
@@ -512,18 +527,36 @@ def excluir_cliente(id):
 # Faz LOGIN CLIENTE ===============
 @app.route("/cliente/login", methods=['POST'])
 def fazer_login():
-    email = request.form.get("email")
-    senha = request.form.get("senha")
+    if request.method == "POST":
+        email = request.form.get("email")
+        senha = request.form.get("senha")
 
-    cliente = Cliente.seleciona_por_email(email)
+        cliente = Cliente.autenticar(email, senha)
 
-    if cliente and cliente["senha"] == senha:
-        session["cliente_id"] = cliente["id"]
-        flash("Login realizado com sucesso!", "success")
-        return redirect(url_for("tela_inicial"))
-    else:
-        flash("Email ou senha inválidos!", "danger")
-        return render_template("tela_login.html")
+        if cliente:
+            session["cliente_id"] = cliente["id"]
+            session["cliente_nome"] = cliente["nome"]
+
+            flash("Login realizado com sucesso!", "success")
+            return redirect(url_for("tela_inicial"))
+        else:
+            flash("Email ou senha inválidos!", "danger")
+            return render_template("tela_login.html")
+# ====================================
+
+# Faz LOGOUT CLIENTE ===============
+@app.route("/cliente/logout")
+def logout():
+    session.clear()
+    flash("Você saiu da sua conta.", "info")
+    return redirect(url_for("tela_login"))
+
+# Faz LOGOUT CLIENTE E ACASSA TELA CADASTRO ===============
+@app.route("/cliente/logout/cadastro")
+def logout2():
+    session.clear()
+    flash("Você saiu da sua conta.", "info")
+    return redirect(url_for("tela_cadastro"))
 
 # -------------------------------------- CLIENTE FIM ------------------------------------------
 

@@ -29,7 +29,9 @@ class ClientesCadastro(Crudmedstock):
     def validate(self):
         erros = [
             Validador.obrigatorio(self.nome, "nome"),
+            Validador.obrigatorio(self.n, "nome"),
             Validador.minimo_de_caracteres(self.nome, "nome", 3),
+            Validador.minimo_de_caracteres(self.cpf, "cpf", 11),
         ]
         return [erro for erro in erros if erro]
 #===========================================================

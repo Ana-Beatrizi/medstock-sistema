@@ -11,6 +11,7 @@
 	  email VARCHAR(45) NOT NULL,
 	  cpf CHAR(11) NOT NULL,
 	  senha varchar(45) NOT NULL,
+	  status VARCHAR(20) DEFAULT 'ativo',
 	  PRIMARY KEY (id),
 	  UNIQUE (email),
 	  UNIQUE (cpf)

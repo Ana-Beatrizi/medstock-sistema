@@ -35,19 +35,6 @@ class Crudmedstock:
             conexao.close()
 
 
-# SELECIONA TUDO POR EMAIL
-    @classmethod
-    def seleciona_por_email(cls, email):
-        conexao = conectar_banco.connect()
-        cursor = conexao.cursor(dictionary=True)
-        try:
-            sql = f"SELECT * FROM {cls.table} WHERE email = %s"
-            cursor.execute(sql, (email,))
-            return cursor.fetchone()
-        finally:
-            cursor.close()
-            conexao.close()
-
 
 # DELETA SELECIONANDO POR ID
     @classmethod

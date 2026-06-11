@@ -24,6 +24,7 @@ class Fornecedor(Crudmedstock):
         erros = [
             Validador.obrigatorio(self.nome_fornecedor, "nome_fornecedor"),
             Validador.minimo_de_caracteres(self.nome_fornecedor, "nome_fornecedor", 3),
+            Validador.minimo_de_caracteres(self.cnpj, "cnpj", 14),
             Validador.valida_externa_email(self.email, "email", "22558|TvTq03AbZrLvC2Db5SLfeCW67P49qnQ3"),
         ]
         return [erro for erro in erros if erro]
