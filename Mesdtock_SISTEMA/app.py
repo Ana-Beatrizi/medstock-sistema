@@ -38,7 +38,7 @@ import re
 app = Flask(__name__)
 app.secret_key = "Medstock_programa_de_estoque_123456"
 
-#! = Feito pela -- Ana Beatriz // linha 1 a 1096 𖹭.ᐟ
+#! = Feito pela -- Ana Beatriz // linha 1 a 1105 𖹭.ᐟ
 
 # TRANSFORMA DADOS ============
 # inteiro
@@ -63,7 +63,6 @@ def to_float(value, default=0.0):
 def index():
     if "cliente_id" in session:
         return redirect(url_for("tela_inicial"))
-
     return redirect(url_for("tela_login"))
 #==============================================
 
@@ -83,20 +82,16 @@ def tela_login():
 @app.route("/home")
 def tela_home():
     cliente_id = session.get("cliente_id")
-
     return render_template("tela_home.html", cliente=Cliente.seleciona_por_id(cliente_id))
 #==============================================
 
 @app.context_processor
 def carregar_cliente():
-
     cliente_id = session.get("cliente_id")
-
     if cliente_id:
         cliente = Cliente.seleciona_por_id(cliente_id)
     else:
         cliente = None
-
     return dict(cliente=cliente)
 
 @app.context_processor
@@ -167,8 +162,6 @@ def tela_dashboard():
         percentual_processado = 0
         percentual_pendente = 0
         percentual_cancelado = 0
-
-
 
     for produto in produtos:
         if produto["quantidade_estoque"] <= produto["estoque_minimo"]:
@@ -450,6 +443,8 @@ def tela_cadastro_pedidos():
 def tela_cadastro_pedidos_saida():
     cliente_id = session.get("cliente_id")
     return render_template("tela_cadastro_pedidos_saida.html",  clientes_cadastro = ClientesCadastro.seleciona_todos_clientescadastro(), cliente = Cliente.seleciona_por_id(cliente_id))
+#==============================================
+
 # TELA PERFIL DO USUARIO==============
 @app.route("/perfil")
 def tela_perfil_do_usuario():
@@ -559,6 +554,7 @@ def logout():
     session.clear()
     flash("Você saiu da sua conta.", "info")
     return redirect(url_for("tela_login"))
+# ====================================
 
 # Faz LOGOUT CLIENTE E ACASSA TELA CADASTRO ===============
 @app.route("/cliente/logout/cadastro")
@@ -566,11 +562,12 @@ def logout2():
     session.clear()
     flash("Você saiu da sua conta.", "info")
     return redirect(url_for("tela_cadastro"))
+# ====================================
 
 # -------------------------------------- CLIENTE FIM ------------------------------------------
 
 # -------------------------------------- FORNECEDOR ------------------------------------------
-#! GET FORM TELA DE CADASTRO FORNECEDOR ===============
+# GET FORM TELA DE CADASTRO FORNECEDOR ===============
 def get_fornecedor_form_cadastro():
     return {
         "nome_fornecedor": request.form.get("nome_fornecedor").strip(),
@@ -657,7 +654,7 @@ def excluir_fornecedor(id):
 # -------------------------------------- FORNECEDOR FIM ------------------------------------------
 
 # -------------------------------------- CLIENTE CADASTRO ------------------------------------------
-#! GET FORM TELA DE CLIENTE CADASTRO ===============
+# GET FORM TELA DE CLIENTE CADASTRO ===============
 def get_form_cliente_cadastro():
     return {
         "nome": request.form.get("nome").strip(),
@@ -669,7 +666,7 @@ def get_form_cliente_cadastro():
     }
 #==============================================
 
-#! POST SALVA CLIENTE CADASTRO ===============
+# POST SALVA CLIENTE CADASTRO ===============
 @app.route("/clientescadastro/salvar", methods=["POST"])
 def salvar_clientes_cadastro():
     dados = get_form_cliente_cadastro()
@@ -748,7 +745,7 @@ def excluir_clientes_cadastro(id):
 
 # -------------------------------------- CLIENTES CADASTRO FIM ------------------------------------------
 
-#! -------------------------------------- ESQUECI A SENHA ------------------------------------------
+# -------------------------------------- ESQUECI A SENHA ------------------------------------------
 #  Esqueci a senha ROTA===============
 @app.route("/esqueci_a_senha", methods=["GET", "POST"])
 def tela_esqueci_a_senha():
@@ -815,7 +812,7 @@ def enviar_codigo_email(destinatario, codigo):
     servidor.quit()
 # -------------------------------------- ESQUECI A SENHA FIM ------------------------------------------
 
-#! -------------------------------------- PRODUTO ------------------------------------------
+# -------------------------------------- PRODUTO ------------------------------------------
 # GET FORM TELA CADASTRO DE PRODUTO ===========
 def get_produto_form_cadastro():
     return {
@@ -906,7 +903,7 @@ def excluir_produto(id):
 # ====================================
 # -------------------------------------- PRODUTO FIM ------------------------------------------
 
-#! -------------------------------------- PEDIDO ENTRADA ------------------------------------------
+# -------------------------------------- PEDIDO ENTRADA ------------------------------------------
 # GET FORM TELA CADASTRO DE PEDIDOS ===========
 def get_pedido_form():
     data_campo = request.form.get("data_pedido")
@@ -1001,7 +998,7 @@ def cancelar_entrada(id):
     return redirect(url_for("tela_entrada"))
 # -------------------------------------- PEDIDO ENTRADA FIM ------------------------------------------
 
-#! -------------------------------------- PEDIDO SAIDA ------------------------------------------
+# -------------------------------------- PEDIDO SAIDA ------------------------------------------
 # GET FORM TELA CADASTRO DE PEDIDOS ===========
 def get_pedido_saida_form():
     data_campo = request.form.get("data_pedido")
@@ -1087,7 +1084,7 @@ def processar_saida(id):
         flash(f"Erro ao processar pedido: {e}", "erro")
     return redirect(url_for("tela_movimentacao"))
 
-@app.route("/saida/cancelar/<int:id>") #! errrrrrrrrrrrrrrrrrrrrrrrrrr
+@app.route("/saida/cancelar/<int:id>")
 def cancelar_saida(id):
     try:
         mensagem = PedidoSaida.deletar_saida(id)

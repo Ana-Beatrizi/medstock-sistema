@@ -101,6 +101,7 @@
     #table_titulo{
         background: #002D81;
         color: white;
+
     }
 
     #table_titulo th{
@@ -114,6 +115,7 @@
     thead{
         background: #00C4C0;
         color: white;
+
     }
 
     th{
@@ -471,3 +473,73 @@
     overflow-x: auto;
 }
 
+/**/
+.linha-produto{
+    cursor:pointer;
+}
+
+.detalhes-row td{
+    padding:0;
+    border:none;
+}
+
+.detalhes-produto{
+    max-height:0;
+    overflow:hidden;
+
+    transition:
+        max-height .45s ease,
+        padding .45s ease;
+
+    background:#f8fafc;
+}
+
+.detalhes-produto.ativo{
+    max-height:400px;
+    padding:25px;
+}
+
+.detalhes-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:15px;
+}
+
+.card-info{
+    background:white;
+
+    border-radius:14px;
+
+    padding:18px;
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+
+.card-info i{
+    color:#00C4C0;
+    font-size:20px;
+}
+
+/**/
+.imagem-produto{
+    text-align: left;
+    margin: 1px 1px;
+    margin-left: 10px;
+    position: relative;
+    top: -25px;
+}
+
+.imagem-produto i{
+    font-size: 50px;
+    color: #00C4C0;
+}
+
+#linha-mais{
+    display: flex;
+    flex-direction: row;
+    height: 45px;
+}

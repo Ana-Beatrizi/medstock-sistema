@@ -73,7 +73,6 @@
         {% endfor %}
         {% endif %}
         {% endwith %}
-
         <table>
             <thead>
                 <tr>
@@ -81,7 +80,7 @@
 
 
                 </tr>
-                <tr>
+                <tr >
                     <th>Id</th>
                     <th>Nome</th>
                     <th>Fornecedor</th>
@@ -96,11 +95,19 @@
             {% for produto in produtos %}
             <tbody id="tabelaDados">
 
-                <tr>
+                <tr class="linha-produto"
+                data-id="{{ produto.id }}"
+                data-nome="{{ produto.nome }}"
+                data-fornecedor="{{ produto.fornecedor.nome_fornecedor }}"
+                data-categoria="{{ produto.categoria }}"
+                data-estoque="{{ produto.quantidade_estoque }}"
+                data-minimo="{{ produto.estoque_minimo }}"
+                data-preco="{{ '%.2f'|format(produto.preco_venda) }}">
                     <td>{{ produto.id }}</td>
+
                     <td>{{ produto.nome }}</td>
                     <td>{{ produto.fornecedor.nome_fornecedor.split()[:2] | join(' ') }}</td>
-                    
+                
                     <td>{{ produto.categoria }}</td>
                     <td id="quantidade" class="{% if produto.quantidade_estoque <= produto.estoque_minimo %}estoque-baixo{% endif %}"> {% if produto.quantidade_estoque <= produto.estoque_minimo %}
                     <i class="bi bi-exclamation-triangle-fill text-danger" title="Estoque baixo"></i> {% endif %}{{ produto.quantidade_estoque }}</td>
@@ -137,9 +144,79 @@
                     </td>
 
                 </tr>
+                <tr class="detalhes-row">
+                    <td colspan="9">
+                
+                        <div class="detalhes-produto">
+                
+                            <div class="produto-header">
+                                
+                
+                                <i class="bi bi-box-seam icone-categoria"><span>  {{ produto.categoria }}</span>
+                
+                                <div id="linha-mais">
+                                    <h3>{{ produto.nome }}</h3>
+                                    <div class="imagem-produto">
+
+                                        {% if produto.categoria == "Respiratórios" %}
+                                            <i class="bi bi-lungs-fill"></i>
+                                    
+                                        {% elif produto.categoria == "Analgésicos" %}
+                                            <i class="bi bi-capsule-pill"></i>
+                                    
+                                        {% elif produto.categoria == "Materiais Hospitalares" %}
+                                            <i class="bi bi-hospital"></i>
+                                    
+                                        {% else %}
+                                            <i class="bi bi-capsule"></i>
+                                        {% endif %}
+                                    
+                                    </div>
+                                </div>
+                                </i>
+                                
+                
+                            </div>
+                
+                            <div class="detalhes-grid">
+                
+                                <div class="card-info">
+                                    <i class="bi bi-truck"></i>
+                                    <span>{{ produto.fornecedor.nome_fornecedor }}</span>
+                                </div>
+                
+                                <div class="card-info">
+                                    <i class="bi bi-tags"></i>
+                                    <span>{{ produto.categoria }}</span>
+                                </div>
+                
+                                <div class="card-info">
+                                    <i class="bi bi-box-seam"></i>
+                                    <span>{{ produto.quantidade_estoque }} unidades</span>
+                                </div>
+                
+                                <div class="card-info">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    <span>Mínimo: {{ produto.estoque_minimo }}</span>
+                                </div>
+                
+                                <div class="card-info">
+                                    <i class="bi bi-currency-dollar"></i>
+                                    <span>R$ {{ '%.2f'|format(produto.preco_venda) }}</span>
+                                </div>
+                
+                            </div>
+                
+                        </div>
+                
+                    </td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
+
+       
+
     </main>
 </div>
 
@@ -162,4 +239,103 @@
 
     });
 </script>
+
+
+<script>
+
+    document.querySelectorAll(".linha-produto").forEach(linha => {
+    
+        linha.addEventListener("click", function(e){
+    
+            if(e.target.closest("a")){
+                return;
+            }
+    
+            const detalhes =
+                this.nextElementSibling.querySelector(".detalhes-produto");
+    
+            const icone =
+                detalhes.querySelector(".icone-categoria");
+    
+            const categoria = this.dataset.categoria;
+    
+            let classe = "bi-box-seam";
+    
+            switch(categoria){
+    
+                case "Analgésicos":
+                    classe = "bi-capsule-pill";
+                    break;
+    
+                case "Anti-inflamatórios":
+                    classe = "bi-capsule";
+                    break;
+    
+                case "Antibióticos":
+                    classe = "bi-virus";
+                    break;
+    
+                case "Antialérgicos":
+                    classe = "bi-bandaid";
+                    break;
+    
+                case "Gastrointestinais":
+                    classe = "bi-cup-hot";
+                    break;
+    
+                case "Cardiovasculares":
+                    classe = "bi-heart-pulse";
+                    break;
+    
+                case "Antidiabéticos":
+                    classe = "bi-droplet";
+                    break;
+    
+                case "Respiratórios":
+                    classe = "bi-lungs";
+                    break;
+    
+                case "Dermatológicos":
+                    classe = "bi-eyedropper";
+                    break;
+    
+                case "Vitaminas e Suplementos":
+                    classe = "bi-heart";
+                    break;
+    
+                case "Medicamentos Controlados":
+                    classe = "bi-shield-lock";
+                    break;
+    
+                case "Vacinas":
+                    classe = "bi-shield-check";
+                    break;
+    
+                case "Materiais Hospitalares":
+                    classe = "bi-hospital";
+                    break;
+    
+                case "EPIs":
+                    classe = "bi-person-badge";
+                    break;
+    
+                default:
+                    classe = "bi-box-seam";
+            }
+    
+            icone.className = "bi " + classe + " icone-categoria";
+    
+            document.querySelectorAll(".detalhes-produto").forEach(item => {
+                if(item !== detalhes){
+                    item.classList.remove("ativo");
+                }
+            });
+    
+            detalhes.classList.toggle("ativo");
+    
+        });
+    
+    });
+    
+    </script>
 {% endblock %}
