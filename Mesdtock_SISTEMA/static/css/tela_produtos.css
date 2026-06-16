@@ -543,3 +543,10 @@
     flex-direction: row;
     height: 45px;
 }
+
+#icon{
+    position: relative;
+    left: 20px;
+    font-size: 50px;
+    color: #00C4C0;
+}
