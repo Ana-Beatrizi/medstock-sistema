@@ -84,7 +84,8 @@
 
     table{
         width: 100%;
-        white-space: nowrap;
+        max-width: 100%;
+        
         border-collapse: collapse;
 
         background: white;
