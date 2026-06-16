@@ -131,6 +131,7 @@ body {
 
 table {
     width: 100%;
+    min-height: 30px;
     border-collapse: collapse;
     background: white;
     border-radius: 10px;
@@ -160,7 +161,7 @@ th {
 /* ================= LINHAS ================= */
 
 td {
-    padding: 16px 14px;
+    padding: 16px 16px;
     font-size: 15px;
     color: #333;
     border-bottom: 1px solid #eeeeee;
@@ -235,6 +236,7 @@ tbody tr:hover {
 /* SEPARAÇÃO*/
 .acoes{
     text-align: center;
+    padding: 5px;
 }
 
 /* BOTÃO BASE */
@@ -247,15 +249,16 @@ tbody tr:hover {
     padding: 9px 8px;
     border-radius: 16px;
 
-    font-size: 16px;
+    
     font-weight: 600;
     text-decoration: none;
 
     transition: 0.25s ease;
     border: 1px solid transparent;
 
-    min-width: 150px;
-    max-width: 150px;
+    min-width: 120px;
+    max-width: 120px;
+    font-size: 16px;
 }
 
 /* HOVER */
@@ -301,3 +304,4 @@ tbody tr:hover {
     color: #4F46E5;
     border: 1px solid #C7D2FE;
 }
+

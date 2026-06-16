@@ -267,13 +267,13 @@ th, td {
     gap: 10px;
 }
 
+
 .filtros-form select{
+    width: 220px;
     height: 45px;
-    min-width: 190px;
 
     border: 1px solid #d1d5db;
     border-radius: 12px;
-
     padding: 0 14px;
 
     background: #fff;

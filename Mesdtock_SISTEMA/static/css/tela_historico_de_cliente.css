@@ -170,6 +170,8 @@ tbody tr:hover {
     background: #f8ffff;
 }
 
+
+
 /* ================= BOTÕES INTERNOS DA TABELA ================= */
 
 .btn-tabela {
@@ -233,6 +235,7 @@ tbody tr:hover {
 }
 .acoes{
     text-align: center;
+    padding: 5px;
 }
 
 /* BOTÃO BASE */

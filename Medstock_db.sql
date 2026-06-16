@@ -5,7 +5,7 @@
 	USE Medstock_db ;
 
 	-- ================= CLIENTE =================
-	CREATE TABLE IF NOT EXISTS cliente (
+	CREATE TABLE cliente (
 	  id INT NOT NULL AUTO_INCREMENT,
 	  nome VARCHAR(100) NOT NULL,
 	  email VARCHAR(45) NOT NULL,
@@ -16,31 +16,32 @@
 	  UNIQUE (email),
 	  UNIQUE (cpf)
 	) ENGINE = InnoDB;
-    
 
 	-- ================= CLIENTE CADASTRADOS =================
-	CREATE TABLE IF NOT EXISTS clientes_cadastro (
+	CREATE TABLE clientes_cadastro (
 	 id INT NOT NULL AUTO_INCREMENT,
 	 nome VARCHAR(100) NOT NULL,
 	 cpf CHAR(11) UNIQUE,
 	 telefone VARCHAR(20),
 	 cidade VARCHAR(50),
 	 estado CHAR(2),
-	 cep CHAR(8), 
+	 cep CHAR(8),
+     ativo BOOLEAN DEFAULT TRUE,	
 	 PRIMARY KEY (id)
 	) ENGINE=InnoDB;
     
 	-- ================= FORNECEDOR =================
-	CREATE TABLE IF NOT EXISTS fornecedor (
+     CREATE TABLE fornecedor (
 	  id INT NOT NULL AUTO_INCREMENT,
 	  nome_fornecedor VARCHAR(100) NOT NULL,
 	  cnpj CHAR(14) NOT NULL,
 	  email VARCHAR(50) NOT NULL,
+      ativo BOOLEAN DEFAULT TRUE,
 	  PRIMARY KEY (id)
 	) ENGINE = InnoDB;
-
+    
 	-- ================= PRODUTO =================
-	CREATE TABLE IF NOT EXISTS produto (
+	CREATE TABLE produto (
 	  id INT NOT NULL AUTO_INCREMENT,
 	  fornecedor_id INT NOT NULL,
 	  nome VARCHAR(100) NOT NULL,
@@ -49,12 +50,13 @@
 	  estoque_minimo INT NOT NULL DEFAULT 0,
 	  preco_custo DECIMAL(10,2) NOT NULL DEFAULT 0,
 	  preco_venda DECIMAL(10,2) NOT NULL DEFAULT 0,
+      ativo BOOLEAN DEFAULT TRUE,
 	  PRIMARY KEY (id),
 	  CONSTRAINT fk_produto_fornecedor FOREIGN KEY (fornecedor_id) REFERENCES fornecedor (id)
 	) ENGINE = InnoDB;
 
 	-- ================= PEDIDO FORNECEDOR =================
-	CREATE TABLE IF NOT EXISTS entrada (
+	CREATE TABLE entrada (
 	  id INT NOT NULL AUTO_INCREMENT,
 	  data_pedido DATETIME NULL,
 	  valor_total INT NOT NULL DEFAULT 0,
@@ -70,7 +72,7 @@
 	) ENGINE = InnoDB;
     
 	-- ================= PEDIDO CLIENTE =================
-	CREATE TABLE IF NOT EXISTS saida (
+	CREATE TABLE saida (
 	  id INT NOT NULL AUTO_INCREMENT,
 	  data_pedido DATETIME NULL,
 	  valor_total INT NOT NULL DEFAULT 0,
@@ -86,7 +88,7 @@
 	) ENGINE = InnoDB;
     
 	-- ================= MOVIMENTACAO =================
-CREATE TABLE IF NOT EXISTS movimentacao (
+CREATE TABLE movimentacao (
     id INT NOT NULL AUTO_INCREMENT,
     tipo ENUM('ENTRADA', 'SAIDA') NOT NULL,
     quantidade INT NOT NULL,

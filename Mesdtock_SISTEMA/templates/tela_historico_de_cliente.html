@@ -64,7 +64,7 @@
                 <tr>
                     <td>{{ cliente.nome }}</td>
                     <td>{{ cliente.cpf }}</td>
-                    <td>{{ cliente.telefone }}</td>
+                    <td id="td_telefone">({{ cliente.telefone[:2] }}) {{ cliente.telefone[2:11] }}</td>
                     <td>{{ cliente.estado }}</td>
                     <td>{{ cliente.cidade }}</td>
                     <td>{{ cliente.cep }}</td>

@@ -99,7 +99,8 @@
                 <tr>
                     <td>{{ produto.id }}</td>
                     <td>{{ produto.nome }}</td>
-                    <td>{{ produto.fornecedor.nome_fornecedor }}</td>
+                    <td>{{ produto.fornecedor.nome_fornecedor.split()[:2] | join(' ') }}</td>
+                    
                     <td>{{ produto.categoria }}</td>
                     <td id="quantidade" class="{% if produto.quantidade_estoque <= produto.estoque_minimo %}estoque-baixo{% endif %}"> {% if produto.quantidade_estoque <= produto.estoque_minimo %}
                     <i class="bi bi-exclamation-triangle-fill text-danger" title="Estoque baixo"></i> {% endif %}{{ produto.quantidade_estoque }}</td>
@@ -121,7 +122,7 @@
                         </a>
                     </td>
 
-                    <td>
+                    <td class="solicitar">
                         <a class="btn-acao btn-entrada"
                             href="{{ url_for('novo_pedido', tipo='entrada', id=produto.id) }}">
                             <i class="bi bi-box-arrow-in-down"></i>

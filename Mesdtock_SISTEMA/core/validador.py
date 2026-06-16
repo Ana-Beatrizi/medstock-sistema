@@ -109,8 +109,6 @@ class Validador:
             return f"O campo {field_name} é obrigatório"
         return None
 
-
-
 #=================VALIDAÇÃO EXTERNA=========================
     #Valida email externamente==============================
     # token = "22558|TvTq03AbZrLvC2Db5SLfeCW67P49qnQ3"

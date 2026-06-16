@@ -2,10 +2,11 @@
 from flask import Flask, jsonify, request, url_for, render_template, redirect, flash, session
 #============================
 
-#! ver
+# Importações Criptografia ===
 import os
 from werkzeug.utils import secure_filename
 from core.seguranca import login_obrigatorio
+#============================
 
 # Importações CLASSES =======
 from models.cliente import Cliente
@@ -27,12 +28,17 @@ import smtplib #Simple Mail Transfer Protocol - protocolo para enviar e-mail pel
 # OUTRAS Importações ========
 import random
 from datetime import datetime
+import re
+#re.sub() → substitui partes de um texto.
+#r'\D' - "qualquer caractere que NÃO seja número".
+#'' - substitui por vazio (remove).
+#"123.456.789-01" - texto original.
 #============================
 
 app = Flask(__name__)
 app.secret_key = "Medstock_programa_de_estoque_123456"
 
-#! = Feito pela -- Ana Beatriz // linha 1 a 762 𖹭.ᐟ
+#! = Feito pela -- Ana Beatriz // linha 1 a 1096 𖹭.ᐟ
 
 # TRANSFORMA DADOS ============
 # inteiro
@@ -96,7 +102,7 @@ def carregar_cliente():
 @app.context_processor
 def carregar_notificacoes():
 
-    produtos = Produto.seleciona_tudo()
+    produtos = Produto.seleciona_todos_produtos()
 
     notificacoes = []
 
@@ -195,14 +201,14 @@ def tela_dashboard():
 @app.route("/historico/fornecedor")
 def tela_historico_de_fornecedor():
     cliente_id = session.get("cliente_id")
-    return render_template("tela_historico_de_fornecedor.html", fornecedores = Fornecedor.seleciona_tudo(order_by="nome_fornecedor"), cliente = Cliente.seleciona_por_id(cliente_id)) 
+    return render_template("tela_historico_de_fornecedor.html", fornecedores = Fornecedor.seleciona_todos_fornecedores(), cliente = Cliente.seleciona_por_id(cliente_id)) 
 #==============================================
 
 # TELA HISTORICO DE CLIENTE ===============
 @app.route("/historico/cliente")
 def tela_historico_de_cliente():
     cliente_id = session.get("cliente_id")
-    return render_template("tela_historico_de_cliente.html", clientes = ClientesCadastro.seleciona_tudo(order_by="nome"), cliente = Cliente.seleciona_por_id(cliente_id)) 
+    return render_template("tela_historico_de_cliente.html", clientes = ClientesCadastro.seleciona_todos_clientescadastro(), cliente = Cliente.seleciona_por_id(cliente_id)) 
 #==============================================
 
 # TELA CADASTRO DE FORNECEDOR ===============
@@ -223,7 +229,7 @@ def tela_clientes_cadastro():
 @app.route("/cadastro/produto")
 def tela_cadastro_produto():
     cliente_id = session.get("cliente_id")
-    return render_template("tela_cadastro_produto.html", fornecedores = Fornecedor.seleciona_tudo(order_by="nome_fornecedor") , cliente = Cliente.seleciona_por_id(cliente_id), produto = None)
+    return render_template("tela_cadastro_produto.html", fornecedores = Fornecedor.seleciona_todos_fornecedores() , cliente = Cliente.seleciona_por_id(cliente_id), produto = None)
 #==============================================
 
 # TELA PRODUTO==============
@@ -233,12 +239,12 @@ def tela_produtos():
     fornecedor_id = request.args.get("fornecedor_id")
     estoque = request.args.get("estoque")
     # LISTA DE FORNECEDORES
-    fornecedores = Fornecedor.seleciona_tudo(order_by="nome_fornecedor")
+    fornecedores = Fornecedor.seleciona_tudo()
     # FILTRO
     if fornecedor_id:
         produtos = Produto.seleciona_por_fornecedor(fornecedor_id)
     else:
-        produtos = Produto.seleciona_tudo(order_by="nome")
+        produtos = Produto.seleciona_todos_produtos()
     # ADICIONA O FORNECEDOR EM CADA PRODUTO
     for produto in produtos:
         if "fornecedor_id" in produto and produto["fornecedor_id"]:
@@ -443,7 +449,7 @@ def tela_cadastro_pedidos():
 @app.route("/cadastro/pedido/saida")
 def tela_cadastro_pedidos_saida():
     cliente_id = session.get("cliente_id")
-    return render_template("tela_cadastro_pedidos_saida.html",  clientes_cadastro = ClientesCadastro.seleciona_tudo(order_by="nome"), cliente = Cliente.seleciona_por_id(cliente_id))
+    return render_template("tela_cadastro_pedidos_saida.html",  clientes_cadastro = ClientesCadastro.seleciona_todos_clientescadastro(), cliente = Cliente.seleciona_por_id(cliente_id))
 # TELA PERFIL DO USUARIO==============
 @app.route("/perfil")
 def tela_perfil_do_usuario():
@@ -568,7 +574,7 @@ def logout2():
 def get_fornecedor_form_cadastro():
     return {
         "nome_fornecedor": request.form.get("nome_fornecedor").strip(),
-        "cnpj": request.form.get("cnpj").strip(),
+        "cnpj": re.sub(r'\D', '', request.form.get("cnpj").strip()),
         "email": request.form.get("email").strip(),
     }
 #==============================================
@@ -655,11 +661,11 @@ def excluir_fornecedor(id):
 def get_form_cliente_cadastro():
     return {
         "nome": request.form.get("nome").strip(),
-        "cpf": request.form.get("cpf").strip(),
-        "telefone": request.form.get("telefone").strip(),
+        "cpf": re.sub(r'\D', '', request.form.get("cpf").strip()),
+        "telefone": re.sub(r'\D', '', request.form.get("telefone").strip()),
         "cidade": request.form.get("cidade").strip(),
         "estado": request.form.get("estado").strip(),
-        "cep": request.form.get("cep").strip(),
+        "cep": re.sub(r'\D', '', request.form.get("cep").strip()),
     }
 #==============================================
 
@@ -709,9 +715,9 @@ def atualizar_clientes_cadastro(id):
 
     if erros:
         for erro in erros:
-            flash(erro[0], "erro")
+            flash(erro, "erro")
         dados["id"] = id
-        return render_template("tela_historico_de_cliente.html", clientes=dados) 
+        return render_template("tela_clientes_cadastro.html", clientes = ClientesCadastro.seleciona_tudo(order_by="nome")) 
 
     try:
         if not ClientesCadastro.seleciona_por_id(id):
@@ -818,8 +824,8 @@ def get_produto_form_cadastro():
         "quantidade_estoque": to_int(request.form.get("quantidade_estoque")),
         "categoria": request.form.get("categoria", "").strip(),
         "estoque_minimo": to_int(request.form.get("estoque_minimo")),
-        "preco_custo": to_float(request.form.get("preco_custo")),
-        "preco_venda": to_float(request.form.get("preco_venda")),   
+        "preco_custo": to_float(request.form.get("preco_custo").replace(",", ".")),
+        "preco_venda": to_float(request.form.get("preco_venda").replace(",", ".")),   
     }
 # ===============================
 
@@ -892,7 +898,7 @@ def excluir_produto(id):
     try:
         Produto.deletar_produto(id)
         flash("Produto excluído com sucesso.", "success")
-    except ValueError as e:
+    except ValueError as e: 
         flash(str(e), "danger")
     except Exception as e:
         flash(f"Erro ao excluir produto: {e}", "danger")
@@ -924,7 +930,7 @@ def get_pedido_form():
 
 @app.route("/pedido/entrada/<tipo>/<int:id>")
 def novo_pedido(tipo, id):
-    produto = Produto.seleciona_por_id(id)
+    produto = Produto.seleciona_por_id_com_fornecedor(id)
     tipo = tipo.upper()
     cliente_id = session.get("cliente_id")
 
@@ -946,7 +952,7 @@ def novo_pedido(tipo, id):
 def salvar_pedido(produto_id):
     dados = get_pedido_form()
     #print("pedido", dados)
-    produto = Produto.seleciona_por_id(produto_id)
+    produto = Produto.seleciona_por_id_com_fornecedor(produto_id)
 
     dados["valor_total"] = (float(produto["preco_custo"]) * int(dados["quantidade_pedido"]))
     dados["status"] = "PENDENTE"
@@ -1019,7 +1025,7 @@ def get_pedido_saida_form():
 
 @app.route("/pedido/saida/<tipo>/<int:id>")
 def novo_pedido_saida(tipo, id):
-    produto = Produto.seleciona_por_id(id)
+    produto = Produto.seleciona_por_id_com_fornecedor(id)
     tipo = tipo.upper()
     cliente_id = session.get("cliente_id")
 
@@ -1035,12 +1041,12 @@ def novo_pedido_saida(tipo, id):
         "data_pedido": datetime.now().strftime("%Y-%m-%dT%H:%M") # Formato correto para input do tipo datetime-local
     }
 
-    return render_template("tela_cadastro_pedidos_saida.html", produto=produto, tipo=tipo, pedido=pedido_padrao, cliente = Cliente.seleciona_por_id(cliente_id), clientes_cadastro = ClientesCadastro.seleciona_tudo(order_by="nome"))
+    return render_template("tela_cadastro_pedidos_saida.html", produto=produto, tipo=tipo, pedido=pedido_padrao, cliente = Cliente.seleciona_por_id(cliente_id), clientes_cadastro = ClientesCadastro.seleciona_todos_clientescadastro())
 
 @app.route("/pedido/salvar/saida/<int:produto_id>", methods=["POST"])
 def salvar_pedido_saida(produto_id):
     dados = get_pedido_saida_form()
-    produto = Produto.seleciona_por_id(produto_id)
+    produto = Produto.seleciona_por_id_com_fornecedor(produto_id)
     cliente_id = session.get("cliente_id")
 
     if not produto:
@@ -1093,7 +1099,7 @@ def cancelar_saida(id):
     return redirect(url_for("tela_saida"))
 
 
-#! = Feito pela -- Ana Beatriz // linha 1 a 765 𖹭.ᐟ
+#! = Feito pela -- Ana Beatriz // linha 1 a 1105 𖹭.ᐟ
 
 if __name__ == "__main__":
     app.run(debug=True)

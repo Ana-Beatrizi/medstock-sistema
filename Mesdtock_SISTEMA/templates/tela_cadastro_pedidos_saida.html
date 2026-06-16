@@ -13,11 +13,40 @@
         <input type="hidden" name="produto_id" value="{{ produto.id }}">
        <!-- <input type="hidden" name="fornecedor_id" value="{{ produto.fornecedor_id }}">-->
         <input type="hidden" name="tipo" value="{{ tipo }}">
-        <div class="conteudo">
+        <div class="conteudo_c">
 
             <div class="card">
 
                 <h1>Pedido Cliente</h1>
+                <div class="produto-info">
+
+                    <div class="info-item">
+                        <span class="titulo">Produto</span>
+                        <span class="valor">{{ produto.nome }}</span>
+                    </div>
+                
+                    <div class="info-item">
+                        <span class="titulo">Fornecedor</span>
+                        <span class="valor">
+                            {{ produto.nome_fornecedor }}
+                        </span>
+                    </div>
+                
+                    <div class="info-item {% if produto.quantidade_estoque <= produto.estoque_minimo %}estoque-baixo{% endif %}">
+                        <span class="titulo">Estoque Atual</span>
+                        <span class="valor">{% if produto.quantidade_estoque <= produto.estoque_minimo %}
+                            ⚠ {{ produto.quantidade_estoque }}
+                        {% else %}
+                            {{ produto.quantidade_estoque }}
+                        {% endif %}</span>
+                    </div>
+                
+                    <div class="info-item">
+                        <span class="titulo">Estoque Mínimo</span>
+                        <span class="valor">{{ produto.estoque_minimo }}</span>
+                    </div>
+                
+                </div>
 
 
                 <div class="linha">

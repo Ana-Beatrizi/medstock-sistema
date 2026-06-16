@@ -35,7 +35,7 @@
                     <label class="form-label text-dark">Nome</label>
                     <div class="input-group">
 
-                        <input type="text" name="nome_fornecedor" id="nome" class="form-control" value="{{ fornecedor.nome_fornecedor if fornecedor else '' }}" required>
+                        <input placeholder="Ex: Distribuidora Farmacêutica ABC" type="text" name="nome_fornecedor" id="nome" class="form-control" value="{{ fornecedor.nome_fornecedor if fornecedor else '' }}" required>
                     </div>
                 </div>
 
@@ -43,7 +43,7 @@
                     <label class="form-label text-dark">Email</label>
                     <div class="input-group">
 
-                        <input type="email" name="email" id="email" class="form-control" value="{{ fornecedor.email if fornecedor else '' }}" required>
+                        <input placeholder="contato@empresa.com.br" type="email" name="email" id="email" class="form-control" value="{{ fornecedor.email if fornecedor else '' }}" required>
                     </div>
                 </div>
 
@@ -53,7 +53,7 @@
                     <div class="input-group">
 
                         <!--implementar api externa para validar cnpj posteriormente-->
-                        <input type="text" name="cnpj" id="cnpj" class="form-control" value="{{ fornecedor.cnpj if fornecedor else '' }}" required>
+                        <input placeholder="00.000.000/0000-00" type="text" name="cnpj" id="cnpj" class="form-control" value="{{ fornecedor.cnpj if fornecedor else '' }}" required>
                     </div>
                 </div>
 
@@ -83,6 +83,22 @@
         </div>
     </div>
 
+<script>
+    // CNPJ ================================================
+const cnpj = document.getElementById('cnpj');
 
-    
+if (cnpj) {
+    cnpj.addEventListener('input', function (e) {
+        let valor = e.target.value.replace(/\D/g, '');
+
+        valor = valor.replace(/^(\d{2})(\d)/, '$1.$2');
+        valor = valor.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+        valor = valor.replace(/\.(\d{3})(\d)/, '.$1/$2');
+        valor = valor.replace(/(\d{4})(\d)/, '$1-$2');
+
+        e.target.value = valor;
+    });
+}
+</script>
+
     {% endblock %}

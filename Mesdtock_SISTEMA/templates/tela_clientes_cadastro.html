@@ -33,7 +33,7 @@
                     <label class="form-label text-dark">Nome</label>
                     <div class="input-group">
 
-                        <input type="text" name="nome" id="nome" class="form-control" value="{{ clientes_cadastro.nome if clientes_cadastro else '' }}" required>
+                        <input placeholder="Ex: João da Silva" type="text" name="nome" id="nome" class="form-control" value="{{ clientes_cadastro.nome if clientes_cadastro else '' }}" required>
                     </div>
                 </div>
 
@@ -42,7 +42,7 @@
                     <div class="input-group">
 
                         <!--implementar api externa para validar cnpj posteriormente-->
-                        <input type="text" name="cpf" id="cpf" class="form-control" value="{{ clientes_cadastro.cpf if clientes_cadastro else '' }}" required>
+                        <input placeholder="000.000.000-00" type="text" name="cpf" id="cpf" class="form-control" value="{{ clientes_cadastro.cpf if clientes_cadastro else '' }}" maxlength="14" required>
                     </div>
                 </div>
             </div>
@@ -52,7 +52,7 @@
                     <label class="form-label text-dark">telefone</label>
                     <div class="input-group">
 
-                        <input type="tel" name="telefone" id="telefone" class="form-control" value="{{ clientes_cadastro.telefone if clientes_cadastro else '' }}" required>
+                        <input placeholder="(11) 99999-9999" type="tel" name="telefone" id="telefone" class="form-control" value="{{ clientes_cadastro.telefone if clientes_cadastro else '' }}" maxlength="15" required>
                     </div>
                 </div>
 
@@ -60,7 +60,7 @@
                     <label class="form-label text-dark">Cidade</label>
                     <div class="input-group">
 
-                        <input type="text" name="cidade" id="cidade" class="form-control" value="{{ clientes_cadastro.cidade if clientes_cadastro else '' }}" required>
+                        <input placeholder="Ex: São Paulo" type="text" name="cidade" id="cidade" class="form-control" value="{{ clientes_cadastro.cidade if clientes_cadastro else '' }}" required>
                     </div>
                 </div>
             </div>
@@ -107,7 +107,7 @@
                     <label class="form-label text-dark">CEP</label>
                     <div class="input-group">
 
-                        <input type="text" name="cep" id="cep" class="form-control" value="{{ clientes_cadastro.cep if clientes_cadastro else '' }}" required>
+                        <input placeholder="00000-000" type="text" name="cep" id="cep" class="form-control" value="{{ clientes_cadastro.cep if clientes_cadastro else '' }}" required>
                     </div>
                 </div>
             </div>
@@ -137,4 +137,48 @@
 
         </div>
     </div>
+
+    <script>
+// CPF ==================================================
+const cpf = document.getElementById('cpf');
+
+if (cpf) {
+    cpf.addEventListener('input', function (e) {
+        let valor = e.target.value.replace(/\D/g, '');
+
+        valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
+        valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
+        valor = valor.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+
+        e.target.value = valor;
+    });
+}
+
+// TELEFONE =============================================
+const telefone = document.getElementById('telefone');
+
+if (telefone) {
+    telefone.addEventListener('input', function (e) {
+        let valor = e.target.value.replace(/\D/g, '');
+
+        valor = valor.replace(/^(\d{2})(\d)/, '($1) $2');
+        valor = valor.replace(/(\d{5})(\d)/, '$1-$2');
+
+        e.target.value = valor;
+    });
+}
+
+// CEP ==================================================
+const cep = document.getElementById('cep');
+
+if (cep) {
+    cep.addEventListener('input', function (e) {
+        let valor = e.target.value.replace(/\D/g, '');
+
+        valor = valor.replace(/^(\d{5})(\d)/, '$1-$2');
+
+        e.target.value = valor;
+    });
+}
+        </script>
     {% endblock %}

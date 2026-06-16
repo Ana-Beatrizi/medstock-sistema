@@ -5,32 +5,43 @@
 	USE Medstock_db ;
 
 	-- ================= CLIENTE =================
-	CREATE TABLE IF NOT EXISTS cliente (
+	CREATE TABLE cliente (
 	  id INT NOT NULL AUTO_INCREMENT,
 	  nome VARCHAR(100) NOT NULL,
 	  email VARCHAR(45) NOT NULL,
 	  cpf CHAR(11) NOT NULL,
-	  senha varchar(45) NOT NULL,
-	  status VARCHAR(20) DEFAULT 'ativo',
+	  senha varchar(250) NOT NULL,
+      status VARCHAR(20) DEFAULT 'ativo',
 	  PRIMARY KEY (id),
 	  UNIQUE (email),
 	  UNIQUE (cpf)
 	) ENGINE = InnoDB;
 
 	-- ================= CLIENTE CADASTRADOS =================
-	CREATE TABLE IF NOT EXISTS clientes_cadastro (
+	CREATE TABLE clientes_cadastro (
 	 id INT NOT NULL AUTO_INCREMENT,
 	 nome VARCHAR(100) NOT NULL,
 	 cpf CHAR(11) UNIQUE,
 	 telefone VARCHAR(20),
 	 cidade VARCHAR(50),
 	 estado CHAR(2),
-	 cep CHAR(8), 
+	 cep CHAR(8),
+     ativo BOOLEAN DEFAULT TRUE,	
 	 PRIMARY KEY (id)
 	) ENGINE=InnoDB;
-
+    
+	-- ================= FORNECEDOR =================
+     CREATE TABLE fornecedor (
+	  id INT NOT NULL AUTO_INCREMENT,
+	  nome_fornecedor VARCHAR(100) NOT NULL,
+	  cnpj CHAR(14) NOT NULL,
+	  email VARCHAR(50) NOT NULL,
+      ativo BOOLEAN DEFAULT TRUE,
+	  PRIMARY KEY (id)
+	) ENGINE = InnoDB;
+    
 	-- ================= PRODUTO =================
-	CREATE TABLE IF NOT EXISTS produto (
+	CREATE TABLE produto (
 	  id INT NOT NULL AUTO_INCREMENT,
 	  fornecedor_id INT NOT NULL,
 	  nome VARCHAR(100) NOT NULL,
@@ -39,22 +50,45 @@
 	  estoque_minimo INT NOT NULL DEFAULT 0,
 	  preco_custo DECIMAL(10,2) NOT NULL DEFAULT 0,
 	  preco_venda DECIMAL(10,2) NOT NULL DEFAULT 0,
+      ativo BOOLEAN DEFAULT TRUE,
 	  PRIMARY KEY (id),
 	  CONSTRAINT fk_produto_fornecedor FOREIGN KEY (fornecedor_id) REFERENCES fornecedor (id)
 	) ENGINE = InnoDB;
 
-
-	-- ================= FORNECEDOR =================
-	CREATE TABLE IF NOT EXISTS fornecedor (
+	-- ================= PEDIDO FORNECEDOR =================
+	CREATE TABLE entrada (
 	  id INT NOT NULL AUTO_INCREMENT,
-	  nome_fornecedor VARCHAR(100) NOT NULL,
-	  cnpj CHAR(14) NOT NULL,
-	  email VARCHAR(50) NOT NULL,
-	  PRIMARY KEY (id)
+	  data_pedido DATETIME NULL,
+	  valor_total INT NOT NULL DEFAULT 0,
+	  observacao VARCHAR(255),
+      quantidade_pedido INT NOT NULL DEFAULT 0,
+	  data_processamento DATETIME NULL,
+      status ENUM('PENDENTE','PROCESSADO','CANCELADO') NOT NULL DEFAULT 'PENDENTE',
+	  fornecedor_id INT NOT NULL,
+      produto_id INT NOT NULL,
+	  PRIMARY KEY (id),
+      FOREIGN KEY (produto_id) REFERENCES produto (id),
+	  FOREIGN KEY (fornecedor_id) REFERENCES fornecedor (id)
 	) ENGINE = InnoDB;
-
+    
+	-- ================= PEDIDO CLIENTE =================
+	CREATE TABLE saida (
+	  id INT NOT NULL AUTO_INCREMENT,
+	  data_pedido DATETIME NULL,
+	  valor_total INT NOT NULL DEFAULT 0,
+	  observacao VARCHAR(255),
+      quantidade_pedido INT NOT NULL DEFAULT 0,
+	  data_processamento DATETIME NULL,
+      status ENUM('PENDENTE','PROCESSADO','CANCELADO') NOT NULL DEFAULT 'PENDENTE',
+	  produto_id INT NOT NULL,
+      clientes_cadastro_id INT NOT NULL,
+	  PRIMARY KEY (id),
+      FOREIGN KEY (produto_id) REFERENCES produto (id),
+	  FOREIGN KEY (clientes_cadastro_id) REFERENCES clientes_cadastro (id)
+	) ENGINE = InnoDB;
+    
 	-- ================= MOVIMENTACAO =================
-CREATE TABLE IF NOT EXISTS movimentacao (
+CREATE TABLE movimentacao (
     id INT NOT NULL AUTO_INCREMENT,
     tipo ENUM('ENTRADA', 'SAIDA') NOT NULL,
     quantidade INT NOT NULL,
@@ -72,66 +106,6 @@ CREATE TABLE IF NOT EXISTS movimentacao (
     FOREIGN KEY (entrada_id) REFERENCES entrada(id),
     FOREIGN KEY (saida_id) REFERENCES saida(id)
 ) ENGINE = InnoDB;
-
-	-- ================= PEDIDO FORNECEDOR =================
-	CREATE TABLE IF NOT EXISTS entrada (
-	  id INT NOT NULL AUTO_INCREMENT,
-	  data_pedido DATETIME NULL,
-	  valor_total INT NOT NULL DEFAULT 0,
-	  observacao VARCHAR(255),
-      quantidade_pedido INT NOT NULL DEFAULT 0,
-	  data_processamento DATETIME NULL,
-	  fornecedor_id INT NOT NULL,
-      produto_id INT NOT NULL,
-	  PRIMARY KEY (id),
-      FOREIGN KEY (produto_id) REFERENCES produto (id),
-	  FOREIGN KEY (fornecedor_id) REFERENCES fornecedor (id)
-	) ENGINE = InnoDB;
-    
-ALTER TABLE entrada
-ADD COLUMN produto_id INT,
-ADD CONSTRAINT fk_entrada_produto
-FOREIGN KEY (produto_id) REFERENCES produto(id);
-
-	-- ================= ITEM PEDIDO FORNECEDOR =================
-	CREATE TABLE IF NOT EXISTS item_pedido_fornecedor (
-	  id INT NOT NULL AUTO_INCREMENT,
-	  quantidade INT NULL,
-	  valor_unitario DECIMAL(10,2) NULL,
-	  entrada_id INT NOT NULL,
-	  produto_id INT NOT NULL,
-	  PRIMARY KEY (id),
-	  FOREIGN KEY (entrada_id) REFERENCES entrada (id),
-	  FOREIGN KEY (produto_id) REFERENCES produto (id)
-	) ENGINE = InnoDB;
-
-	-- ================= PEDIDO CLIENTE =================
-	CREATE TABLE IF NOT EXISTS saida (
-	  id INT NOT NULL AUTO_INCREMENT,
-	  data_pedido DATETIME NULL,
-	  valor_total INT NOT NULL DEFAULT 0,
-	  observacao VARCHAR(255),
-      quantidade_pedido INT NOT NULL DEFAULT 0,
-	  data_processamento DATETIME NULL,
-	  produto_id INT NOT NULL,
-      clientes_cadastro_id INT NOT NULL,
-	  PRIMARY KEY (id),
-      FOREIGN KEY (produto_id) REFERENCES produto (id),
-	  FOREIGN KEY (clientes_cadastro_id) REFERENCES clientes_cadastro (id)
-	) ENGINE = InnoDB;
-
-
-	-- ================= ITEM PEDIDO CLIENTE =================
-	CREATE TABLE IF NOT EXISTS item_pedido_cliente (
-	  id INT NOT NULL AUTO_INCREMENT,
-	  quantidade INT NULL,
-	  valor_unitario DECIMAL(10,2) NULL,
-	  saida_id INT NOT NULL,
-	  produto_id INT NOT NULL,
-	  PRIMARY KEY (id),
-	  FOREIGN KEY (saida_id) REFERENCES saida (id),
-	  FOREIGN KEY (produto_id) REFERENCES produto (id)
-	) ENGINE = InnoDB;
 
 
 	SHOW WARNINGS;

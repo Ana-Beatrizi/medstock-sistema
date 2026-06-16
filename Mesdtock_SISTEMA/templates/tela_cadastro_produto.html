@@ -22,7 +22,7 @@
                     
                     <div class="col-md-6">
                         <label class="form-label">Nome do Produto</label>
-                        <input type="text" name="nome" id="nome" class="form-control"
+                        <input placeholder="Ex: Dipirona 500mg" type="text" name="nome" id="nome" class="form-control"
                             value="{{ produto.nome if produto else '' }}" required>
                     </div>
 
@@ -40,28 +40,104 @@
 
                     <div class="col-md-6">
                         <label class="form-label">Quantidade em Estoque</label>
-                        <input type="number" id="quantidade" class="form-control" name="quantidade_estoque"
-                            value="{{ produto.quantidade_estoque if produto else 0 }}" required>
+                        <input placeholder="Ex: 150" type="number" id="quantidade" class="form-control" name="quantidade_estoque"
+                            value="{{ produto.quantidade_estoque if produto else '' }}" required>
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label">Categoria</label>
-                        <input type="text" name="categoria" id="categoria" class="form-control"
-                            value="{{ produto.categoria if produto else '' }}" required>
+                        <select name="categoria" id="categoria" class="form-select" required>
+                            <option value="">Selecione uma categoria</option>
+                    
+                            <option value="Analgésicos"
+                                {% if produto and produto.categoria == 'Analgésicos' %}selected{% endif %}>
+                                Analgésicos
+                            </option>
+                    
+                            <option value="Anti-inflamatórios"
+                                {% if produto and produto.categoria == 'Anti-inflamatórios' %}selected{% endif %}>
+                                Anti-inflamatórios
+                            </option>
+                    
+                            <option value="Antibióticos"
+                                {% if produto and produto.categoria == 'Antibióticos' %}selected{% endif %}>
+                                Antibióticos
+                            </option>
+                    
+                            <option value="Antialérgicos"
+                                {% if produto and produto.categoria == 'Antialérgicos' %}selected{% endif %}>
+                                Antialérgicos
+                            </option>
+                    
+                            <option value="Gastrointestinais"
+                                {% if produto and produto.categoria == 'Gastrointestinais' %}selected{% endif %}>
+                                Gastrointestinais
+                            </option>
+                    
+                            <option value="Cardiovasculares"
+                                {% if produto and produto.categoria == 'Cardiovasculares' %}selected{% endif %}>
+                                Cardiovasculares
+                            </option>
+                    
+                            <option value="Antidiabéticos"
+                                {% if produto and produto.categoria == 'Antidiabéticos' %}selected{% endif %}>
+                                Antidiabéticos
+                            </option>
+                    
+                            <option value="Respiratórios"
+                                {% if produto and produto.categoria == 'Respiratórios' %}selected{% endif %}>
+                                Respiratórios
+                            </option>
+                    
+                            <option value="Dermatológicos"
+                                {% if produto and produto.categoria == 'Dermatológicos' %}selected{% endif %}>
+                                Dermatológicos
+                            </option>
+                    
+                            <option value="Vitaminas e Suplementos"
+                                {% if produto and produto.categoria == 'Vitaminas e Suplementos' %}selected{% endif %}>
+                                Vitaminas e Suplementos
+                            </option>
+                    
+                            <option value="Medicamentos Controlados"
+                                {% if produto and produto.categoria == 'Medicamentos Controlados' %}selected{% endif %}>
+                                Medicamentos Controlados
+                            </option>
+                    
+                            <option value="Vacinas"
+                                {% if produto and produto.categoria == 'Vacinas' %}selected{% endif %}>
+                                Vacinas
+                            </option>
+                    
+                            <option value="Materiais Hospitalares"
+                                {% if produto and produto.categoria == 'Materiais Hospitalares' %}selected{% endif %}>
+                                Materiais Hospitalares
+                            </option>
+                    
+                            <option value="EPIs"
+                                {% if produto and produto.categoria == 'EPIs' %}selected{% endif %}>
+                                EPIs
+                            </option>
+                    
+                            <option value="Outros"
+                                {% if produto and produto.categoria == 'Outros' %}selected{% endif %}>
+                                Outros
+                            </option>
+                        </select>
                     </div>
 
                     <div class="col-md-12">
                         <label class="form-label">Estoque Mínimo</label>
-                        <input type="number" id="estoque-min" class="form-control" name="estoque_minimo"
-                            value="{{ produto.estoque_minimo if produto else 0 }}" required>
+                        <input placeholder="Ex: 20" type="number" id="estoque-min" class="form-control" name="estoque_minimo"
+                            value="{{ produto.estoque_minimo if produto else '' }}" required>
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label">Preço de Custo</label>
                         <div class="input-group">
                             <span class="input-group-text">R$</span>
-                            <input type="text" class="form-control" name="preco_custo" 
-                                value="{{ produto.preco_custo if produto else '0.00' }}" required>
+                            <input placeholder="0,00" type="text" class="form-control" name="preco_custo" 
+                                value="{{ produto.preco_custo if produto else '' }}" required>
                         </div>
                     </div>
 
@@ -69,8 +145,8 @@
                         <label class="form-label">Preço de Venda</label>
                         <div class="input-group">
                             <span class="input-group-text">R$</span>
-                            <input type="text" class="form-control" name="preco_venda" 
-                                value="{{ produto.preco_venda if produto else '0.00' }}" required>
+                            <input placeholder="0,00" type="text" class="form-control" name="preco_venda" 
+                                value="{{ produto.preco_venda if produto else '' }}" required>
                         </div>
                     </div>
 
@@ -103,4 +179,17 @@
         </div>
     </div>
 </div>
+
+<script>
+    const precoCusto = document.getElementById('preco_custo');
+    const precoVenda = document.getElementById('preco_venda');
+    
+    function mascaraDecimal(input) {
+        input.addEventListener('input', function() {
+            this.value = this.value.replace(',', '.');
+        });
+    }
+    
+    if (precoCusto) mascaraDecimal(precoCusto);
+    if (precoVenda) mascaraDecimal(precoVenda);</script>
 {% endblock %}

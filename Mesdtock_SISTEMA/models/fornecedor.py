@@ -12,12 +12,14 @@ class Fornecedor(Crudmedstock):
         "nome_fornecedor",
         "cnpj",
         "email",
+        "ativo"
     ]
 
-    def __init__(self, nome_fornecedor, cnpj, email):
+    def __init__(self, nome_fornecedor, cnpj, email, ativo=True):
         self.nome_fornecedor = nome_fornecedor
         self.cnpj = cnpj
         self.email = email
+        self.ativo = ativo
 
 #=============================VALIDAÇÃO==============================
     def validate(self):
@@ -31,12 +33,42 @@ class Fornecedor(Crudmedstock):
 #===========================================================
     @classmethod
     def deletar_fornecedor(cls, id):
-        fornecedor = cls.seleciona_por_id(id)
-        if not fornecedor:
-            raise ValueError("Fornecedor não encontrado.")
-        '''if cls.has_related_records(id): #! atencao
-            raise ValueError("Não é possível excluir o produto porque ele possui pedidos ou movimentações vinculadas.")'''
-        cls.delete(id)
+        conexao = conectar_banco.connect()
+        cursor = conexao.cursor()
+
+        try:
+            sql = """
+            UPDATE fornecedor
+            SET ativo = FALSE
+            WHERE id = %s
+            """
+
+            cursor.execute(sql, (id,))
+            conexao.commit()
+
+        finally:
+            cursor.close()
+            conexao.close()
+
+    @classmethod
+    def seleciona_todos_fornecedores(cls):
+        conexao = conectar_banco.connect()
+        cursor = conexao.cursor(dictionary=True)
+
+        try:
+            sql = """
+            SELECT *
+            FROM fornecedor
+            WHERE ativo = TRUE
+            ORDER BY nome_fornecedor
+            """
+
+            cursor.execute(sql)
+            return cursor.fetchall()
+
+        finally:
+            cursor.close()
+            conexao.close()
 
 
 #! = Feito pela -- Ana Beatriz // linha 1 a 41 𖹭.ᐟ
