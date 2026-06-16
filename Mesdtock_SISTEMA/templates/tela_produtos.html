@@ -222,22 +222,32 @@
 
 
 <script>
-    document.getElementById("inputBusca").addEventListener("keyup", function () {
-        let filtro = this.value.toLowerCase();
-        let linhas = document.querySelectorAll("#tabelaDados tr");
-        linhas.forEach(function (linha) {
-            let nomeProduto = linha.cells[1].textContent.toLowerCase();
-            let nomeFornecedor = linha.cells[2].textContent.toLowerCase();
-            if (nomeProduto.includes(filtro) ||
-            nomeFornecedor.includes(filtro)) {
-            linha.style.display = "";
-        } else {
-            linha.style.display = "none";
+document.getElementById("inputBusca").addEventListener("keyup", function () {
+
+let filtro = this.value.toLowerCase();
+
+document.querySelectorAll(".linha-produto").forEach(function(linha){
+
+    let nomeProduto = linha.cells[1].textContent.toLowerCase();
+    let nomeFornecedor = linha.cells[2].textContent.toLowerCase();
+
+    let detalhes = linha.nextElementSibling;
+
+    if(nomeProduto.includes(filtro) || nomeFornecedor.includes(filtro)){
+        linha.style.display = "";
+        if(detalhes){
+            detalhes.style.display = "";
         }
+    }else{
+        linha.style.display = "none";
+        if(detalhes){
+            detalhes.style.display = "none";
+        }
+    }
 
-    });
+});
 
-    });
+});
 </script>
 
 
