@@ -81,7 +81,7 @@ VALUES
 	  PRIMARY KEY (id),
 	  CONSTRAINT fk_produto_fornecedor FOREIGN KEY (fornecedor_id) REFERENCES fornecedor (id)
 	) ENGINE = InnoDB;
-    
+
 INSERT INTO produto
 (fornecedor_id, nome, quantidade_estoque, categoria, estoque_minimo, preco_custo, preco_venda, ativo)
 VALUES
@@ -164,6 +164,7 @@ CREATE TABLE movimentacao (
 	SHOW WARNINGS;
 
 	select * from cliente;
+    select * from fornecedor;
 	select * from produto;
 	select * from entrada;
 
