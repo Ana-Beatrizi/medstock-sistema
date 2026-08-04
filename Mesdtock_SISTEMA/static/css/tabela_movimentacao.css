@@ -1,0 +1,180 @@
+:root {
+    --mov-teal: #17a2a2;
+    --mov-teal-dark: #128d8d;
+    --mov-verde: #1a8754;
+    --mov-verde-bg: #e3f7ec;
+    --mov-vermelho: #dc3545;
+    --mov-vermelho-bg: #fdeaec;
+    --mov-texto: #2f3b45;
+    --mov-texto-suave: #6b7a86;
+    --mov-borda: #edf1f4;
+}
+
+/* CARD */
+.tabela-card {
+    background: #fff;
+    border: 1px solid var(--mov-borda);
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(20, 40, 60, .06);
+    overflow: hidden;
+    margin-top: 18px;
+}
+
+.tabela-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--mov-borda);
+    background: #fbfdfd;
+}
+
+.tabela-titulo {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--mov-texto);
+    letter-spacing: .2px;
+}
+
+.tabela-titulo i { color: var(--mov-teal); font-size: 16px; }
+
+.tabela-contador {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--mov-teal-dark);
+    background: rgba(23, 162, 162, .10);
+    border: 1px solid rgba(23, 162, 162, .18);
+    padding: 5px 12px;
+    border-radius: 999px;
+}
+
+.tabela-scroll { overflow-x: auto; }
+
+/* TABELA */
+.tabela-mov {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 14px;
+    color: var(--mov-texto);
+    min-width: 820px;
+}
+
+.tabela-mov thead th {
+    background: var(--mov-teal);
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    text-align: left;
+    padding: 14px 18px;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.tabela-mov tbody td {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--mov-borda);
+    vertical-align: middle;
+}
+
+.tabela-mov tbody tr:last-child td { border-bottom: none; }
+.tabela-mov tbody tr:nth-child(even) { background: #fcfdfe; }
+.tabela-mov tbody tr { transition: background .15s ease; }
+.tabela-mov tbody tr:hover { background: rgba(23, 162, 162, .06); }
+
+.celula-forte { font-weight: 600; }
+.celula-suave { color: var(--mov-texto-suave); }
+
+.col-num { text-align: right; white-space: nowrap; }
+.col-data { text-align: right; white-space: nowrap; }
+.tabela-mov th.col-num, .tabela-mov th.col-data { text-align: right; }
+
+.valor {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
+
+/* BADGE TIPO */
+.tipo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 104px;
+    justify-content: center;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 15.5px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.tipo i { font-size: 13px; }
+
+.tipo-entrada {
+    color: var(--mov-verde);
+    background: var(--mov-verde-bg);
+    border: 1px solid rgba(26, 135, 84, .18);
+}
+
+.tipo-saida {
+    color: var(--mov-vermelho);
+    background: var(--mov-vermelho-bg);
+    border: 1px solid rgba(220, 53, 69, .18);
+}
+
+/* QUANTIDADE */
+.qtd {
+    display: inline-block;
+    min-width: 68px;
+    text-align: center;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.qtd-entrada { color: var(--mov-verde); background: var(--mov-verde-bg); }
+.qtd-saida { color: var(--mov-vermelho); background: var(--mov-vermelho-bg); }
+
+/* DATA */
+.data {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 8px;
+    background: #f2f5f8;
+    color: var(--mov-texto-suave);
+    font-size: 16.5px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+/* VAZIO */
+.linha-vazia td {
+    text-align: center;
+    padding: 44px 18px;
+    color: var(--mov-texto-suave);
+}
+
+.linha-vazia i {
+    display: block;
+    font-size: 26px;
+    margin-bottom: 8px;
+    color: #c3cdd6;
+}
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+    .tabela-mov { font-size: 13px; }
+    .tabela-mov thead th,
+    .tabela-mov tbody td { padding: 11px 14px; }
+    .tabela-card-head { flex-direction: column; align-items: flex-start; }
+}
