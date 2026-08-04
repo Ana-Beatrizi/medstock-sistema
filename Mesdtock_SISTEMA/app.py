@@ -124,7 +124,7 @@ def carregar_notificacoes():
 def tela_inicial():
     cliente_id = session.get("cliente_id")
 
-    produtos = Produto.seleciona_tudo()
+    produtos = Produto.seleciona_todos_produtos()
     slc_prod = len(produtos)
 
     entradas = PedidoEntrada.historico_entrada()
@@ -153,59 +153,122 @@ def tela_inicial():
 # TELA DASHBOARD ===============
 @app.route("/dashboard")
 def tela_dashboard():
+
     cliente_id = session.get("cliente_id")
-    produtos = Produto.seleciona_tudo()
+    cliente = Cliente.seleciona_por_id(cliente_id)
+
+    # ==========================
+    # PRODUTOS
+    # ==========================
+
+    produtos = Produto.seleciona_todos_produtos()
+    produtos_baixos = Produto.seleciona_produtos_estoque_baixo()
+
     total_produtos = len(produtos)
+    estoque_baixo = len(produtos_baixos)
+    estoque_normal = total_produtos - estoque_baixo
+
+    total_estoque = estoque_baixo + estoque_normal
+
+    if total_estoque > 0:
+        percentual_baixo = round((estoque_baixo / total_estoque) * 100)
+    else:
+        percentual_baixo = 0
+
+    # ==========================
+    # PEDIDOS DE ENTRADA
+    # ==========================
+
     entradas = PedidoEntrada.historico_entrada()
+
+    total_entradas = len(entradas)
 
     processados = 0
     pendentes = 0
     cancelados = 0
-    estoque_baixo = 0
-    estoque_normal = 0
 
     for pedido in entradas:
+
         if pedido["status"] == "PROCESSADO":
             processados += 1
+
         elif pedido["status"] == "PENDENTE":
             pendentes += 1
+
         elif pedido["status"] == "CANCELADO":
             cancelados += 1
 
-    total = processados + pendentes + cancelados
+    total_status = processados + pendentes + cancelados
 
-    if total > 0:
-        percentual_processado = round((processados / total) * 100)
-        percentual_pendente = round((pendentes / total) * 100)
-        percentual_cancelado = round((cancelados / total) * 100)
+    if total_status > 0:
+
+        percentual_processado = round(processados * 100 / total_status)
+        percentual_pendente = round(pendentes * 100 / total_status)
+        percentual_cancelado = round(cancelados * 100 / total_status)
+
     else:
+
         percentual_processado = 0
         percentual_pendente = 0
         percentual_cancelado = 0
 
-    for produto in produtos:
-        if produto["quantidade_estoque"] <= produto["estoque_minimo"]:
-            estoque_baixo += 1
-        else:
-            estoque_normal += 1
+    # ==========================
+    # SAÍDAS
+    # ==========================
 
-    total = estoque_baixo + estoque_normal
+    try:
+        total_saidas = len(PedidoSaida.historico_saida())
+    except:
+        total_saidas = 0
 
-    if total > 0:
-        percentual_baixo = round((estoque_baixo / total) * 100)
-    else:
-        percentual_baixo = 0
-    
+    # ==========================
+    # ÚLTIMAS MOVIMENTAÇÕES
+    # ==========================
+
+    movimentacoes = Movimentacao.movimentar_tudo()
+
+    # apenas as 10 últimas
+    movimentacoes = movimentacoes[:10]
+
+    # ==========================
+    # GRÁFICOS (provisório)
+    # ==========================
+
+    dados_entradas = [0, 0, 0, 0, 0, 0, 0]
+    dados_saidas = [0, 0, 0, 0, 0, 0, 0]
+
+    # ==========================
+    # RENDER
+    # ==========================
+
     return render_template(
+
         "tela_dashboard.html",
-        cliente=Cliente.seleciona_por_id(cliente_id),
+
+        cliente=cliente,
+
+        total_produtos=total_produtos,
         estoque_baixo=estoque_baixo,
         estoque_normal=estoque_normal,
         percentual_baixo=percentual_baixo,
-        total_produtos=total_produtos,
+
+        total_entradas=total_entradas,
+        total_saidas=total_saidas,
+
         percentual_processado=percentual_processado,
         percentual_pendente=percentual_pendente,
         percentual_cancelado=percentual_cancelado,
+
+        perc_processados=percentual_processado,
+        perc_pendentes=percentual_pendente,
+        perc_cancelados=percentual_cancelado,
+
+        produtos_baixos=produtos_baixos,
+
+        movimentacoes=movimentacoes,
+
+        dados_entradas=dados_entradas,
+        dados_saidas=dados_saidas
     )
 
 #==============================================

@@ -99,6 +99,18 @@
 
         <div class="welcome-buttons-grid">
 
+            <a href="{{ url_for('tela_dashboard') }}"
+            class="welcome-card-btn reveal" style="--delay: .32s">
+             <span class="card-icon-wrapper"><i class="bi bi-speedometer2"></i></span>
+             <span class="card-text-wrapper">
+                 <span class="card-title">DashBoard</span>
+                 <span class="card-description">
+                     Informações Uteis e rápidas sobre o Estoque.
+                 </span>
+             </span>
+             <i class="bi bi-arrow-right arrow-action"></i>
+         </a>
+
             <a href="{{ url_for('tela_historico_de_fornecedor') }}"
                class="welcome-card-btn reveal" style="--delay: .32s">
                 <span class="card-icon-wrapper"><i class="bi bi-truck"></i></span>

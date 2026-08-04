@@ -154,3 +154,23 @@ AND p.ativo = TRUE
         finally:
             cursor.close()
             conexao.close()
+
+    @classmethod
+    def seleciona_produtos_estoque_baixo(cls):
+        conexao = conectar_banco.connect()
+        cursor = conexao.cursor(dictionary=True)
+
+        try:
+            cursor.execute("""
+                SELECT *
+                FROM produto
+                WHERE ativo = TRUE
+                AND quantidade_estoque <= estoque_minimo
+                ORDER BY nome
+            """)
+
+            return cursor.fetchall()
+
+        finally:
+            cursor.close()
+            conexao.close()
