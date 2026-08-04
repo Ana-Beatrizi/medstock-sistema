@@ -90,8 +90,8 @@
                     <th>Quantidade</th>
                     <th>Estoque Mínimo</th>
                     <th>Preço Venda</th>
-                    <th colspan="">Ações</th>
-                    <th colpsan="">Solicitar</th>
+                    <th colspan="">Solicitar</th>
+                    <th colpsan="">Ações</th>
                 </tr>
             </thead>
             {% for produto in produtos %}
@@ -118,18 +118,6 @@
                         <span class="moeda">R$</span>
                         <span>{{ '%.2f'|format(produto.preco_venda) }}</span>
                     </td>
-                    <td class="acoes">
-
-                        <a class="btn-acao btn-editar" href="{{ url_for('editar_produto', id=produto.id) }}">
-                            <i class="bi bi-pencil-square"></i>
-                            Editar
-                        </a>
-
-                        <a class="btn-acao btn-excluir" href="{{ url_for('excluir_produto', id=produto.id) }}">
-                            <i class="bi bi-trash3-fill"></i>
-                            Excluir
-                        </a>
-                    </td>
 
                     <td class="solicitar">
                         <a class="btn-acao btn-entrada"
@@ -144,6 +132,21 @@
                             Saída
                         </a>
                     </td>
+
+                    <td class="acoes">
+
+                        <a class="btn-acao btn-editar" href="{{ url_for('editar_produto', id=produto.id) }}">
+                            <i class="bi bi-pencil-square"></i>
+                            Editar
+                        </a>
+
+                        <a class="btn-acao btn-excluir" href="{{ url_for('excluir_produto', id=produto.id) }}">
+                            <i class="bi bi-trash3-fill"></i>
+                            Excluir
+                        </a>
+                    </td>
+
+
 
                 </tr>
                 <tr class="detalhes-row">

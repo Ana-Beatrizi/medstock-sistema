@@ -162,7 +162,7 @@
                     <td>
                         {% if item.status == 'PENDENTE' %}
                             <a class="btn-tabela btn-cancelar"
-                               href="{{ url_for('cancelar_entrada', id=item.id) }}">
+                               href="{{ url_for('cancelar_saida', id=item.id) }}">
                                 Cancelar
                             </a>
                         {% endif %}
@@ -171,7 +171,7 @@
                     <td>
                         {% if item.status == 'PENDENTE' %}
                             <a class="btn-tabela btn-processar"
-                               href="{{ url_for('processar_entrada', id=item.id) }}">
+                               href="{{ url_for('processar_saida', id=item.id) }}">
                                 Processar
                             </a>
                         {% endif %}
