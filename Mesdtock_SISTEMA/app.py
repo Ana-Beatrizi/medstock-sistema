@@ -124,9 +124,29 @@ def carregar_notificacoes():
 def tela_inicial():
     cliente_id = session.get("cliente_id")
 
+    produtos = Produto.seleciona_tudo()
+    slc_prod = len(produtos)
+
+    entradas = PedidoEntrada.historico_entrada()
+    saidas = PedidoSaida.historico_saida()
+
+    entradas_pendentes = 0
+    saidas_pendentes = 0
+
+    for entrada in entradas:
+        if entrada["status"] == "PENDENTE":
+            entradas_pendentes += 1
+
+    for saida in saidas:
+        if saida["status"] == "PENDENTE":
+            saidas_pendentes += 1
+
     return render_template(
         "tela_inicial.html",
         cliente=Cliente.seleciona_por_id(cliente_id),
+        slc_prod=slc_prod,
+        entradas_pendentes=entradas_pendentes,
+        saidas_pendentes=saidas_pendentes
     )
 #==============================================
 
