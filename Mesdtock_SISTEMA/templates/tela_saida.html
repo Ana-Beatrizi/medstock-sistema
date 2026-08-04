@@ -160,17 +160,21 @@
                     </td>
                     <td><span class="data">{{ item.data_pedido.strftime('%d/%m/%Y') }}</span></td>
                     <td>
-                        <a class="btn-tabela btn-cancelar"
-                           href="{{ url_for('cancelar_saida', id=item.id) }}">
-                            Cancelar
-                        </a>
+                        {% if item.status == 'PENDENTE' %}
+                            <a class="btn-tabela btn-cancelar"
+                               href="{{ url_for('cancelar_entrada', id=item.id) }}">
+                                Cancelar
+                            </a>
+                        {% endif %}
                     </td>
                     
                     <td>
-                        <a class="btn-tabela btn-processar"
-                           href="{{ url_for('processar_saida', id=item.id) }}">
-                            Processar
-                        </a>
+                        {% if item.status == 'PENDENTE' %}
+                            <a class="btn-tabela btn-processar"
+                               href="{{ url_for('processar_entrada', id=item.id) }}">
+                                Processar
+                            </a>
+                        {% endif %}
                     </td>
                 </tr>
                
