@@ -323,3 +323,84 @@ class PedidoSaida(Crudmedstock):
 
             cursor.close()
             conexao.close()
+
+
+    @classmethod
+    def status_pedido_saida(cls):
+        conexao = conectar_banco.connect()
+        cursor = conexao.cursor(dictionary=True)
+
+        try:
+            sql = """
+                SELECT
+                    SUM(status = 'PROCESSADO') AS processados,
+                    SUM(status = 'PENDENTE') AS pendentes,
+                    SUM(status = 'CANCELADO') AS cancelados,
+
+                    (
+                        SUM(status = 'PROCESSADO') +
+                        SUM(status = 'PENDENTE') +
+                        SUM(status = 'CANCELADO')
+                    ) AS total_status,
+
+                    CASE
+                        WHEN (
+                            SUM(status = 'PROCESSADO') +
+                            SUM(status = 'PENDENTE') +
+                            SUM(status = 'CANCELADO')
+                        ) > 0
+                        THEN ROUND(
+                            SUM(status = 'PROCESSADO') * 100 /
+                            (
+                                SUM(status = 'PROCESSADO') +
+                                SUM(status = 'PENDENTE') +
+                                SUM(status = 'CANCELADO')
+                            )
+                        )
+                        ELSE 0
+                    END AS percentual_processado,
+
+                    CASE
+                        WHEN (
+                            SUM(status = 'PROCESSADO') +
+                            SUM(status = 'PENDENTE') +
+                            SUM(status = 'CANCELADO')
+                        ) > 0
+                        THEN ROUND(
+                            SUM(status = 'PENDENTE') * 100 /
+                            (
+                                SUM(status = 'PROCESSADO') +
+                                SUM(status = 'PENDENTE') +
+                                SUM(status = 'CANCELADO')
+                            )
+                        )
+                        ELSE 0
+                    END AS percentual_pendente,
+
+                    CASE
+                        WHEN (
+                            SUM(status = 'PROCESSADO') +
+                            SUM(status = 'PENDENTE') +
+                            SUM(status = 'CANCELADO')
+                        ) > 0
+                        THEN ROUND(
+                            SUM(status = 'CANCELADO') * 100 /
+                            (
+                                SUM(status = 'PROCESSADO') +
+                                SUM(status = 'PENDENTE') +
+                                SUM(status = 'CANCELADO')
+                            )
+                        )
+                        ELSE 0
+                    END AS percentual_cancelado
+
+                FROM saida;
+            """
+
+            cursor.execute(sql)
+
+            return cursor.fetchone()
+
+        finally:
+            cursor.close()
+            conexao.close()

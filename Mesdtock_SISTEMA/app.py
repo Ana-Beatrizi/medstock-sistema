@@ -85,6 +85,7 @@ def tela_home():
     return render_template("tela_home.html", cliente=Cliente.seleciona_por_id(cliente_id))
 #==============================================
 
+# LOGIN DO USUÁRIO ===============
 @app.context_processor
 def carregar_cliente():
     cliente_id = session.get("cliente_id")
@@ -93,6 +94,7 @@ def carregar_cliente():
     else:
         cliente = None
     return dict(cliente=cliente)
+#==============================================
 
 @app.context_processor
 def carregar_notificacoes():
@@ -153,10 +155,6 @@ def tela_inicial():
 # TELA DASHBOARD ===============
 @app.route("/dashboard")
 def tela_dashboard():
-
-    cliente_id = session.get("cliente_id")
-    cliente = Cliente.seleciona_por_id(cliente_id)
-
     # ==========================
     # PRODUTOS
     # ==========================
@@ -175,100 +173,66 @@ def tela_dashboard():
     else:
         percentual_baixo = 0
 
-    # ==========================
-    # PEDIDOS DE ENTRADA
-    # ==========================
 
-    entradas = PedidoEntrada.historico_entrada()
+# PEDIDOS DE ENTRADAS ====================================
+    status_entrada = PedidoEntrada.status_pedido_entrada()
+    if not status_entrada:
+        status_entrada = {
+            "processados": 0,
+            "pendentes": 0,
+            "cancelados": 0,
+            "total_status": 0,
+            "percentual_processado": 0,
+            "percentual_pendente": 0,
+            "percentual_cancelado": 0
+        }
+# =====================================================
 
-    total_entradas = len(entradas)
+# PEDIDOS DE SAIDA SAÍDAS ==============================================
+    status_saida = PedidoSaida.status_pedido_saida()
+    if not status_saida:
+        status_saida = {
+            "processados": 0,
+            "pendentes": 0,
+            "cancelados": 0,
+            "total_status": 0,
+            "percentual_processado": 0,
+            "percentual_pendente": 0,
+            "percentual_cancelado": 0
+        }
 
-    processados = 0
-    pendentes = 0
-    cancelados = 0
+# ESTOQUE CRITICO ========================================
+    estoque_critico = Produto.estoque_critico()
 
-    for pedido in entradas:
-
-        if pedido["status"] == "PROCESSADO":
-            processados += 1
-
-        elif pedido["status"] == "PENDENTE":
-            pendentes += 1
-
-        elif pedido["status"] == "CANCELADO":
-            cancelados += 1
-
-    total_status = processados + pendentes + cancelados
-
-    if total_status > 0:
-
-        percentual_processado = round(processados * 100 / total_status)
-        percentual_pendente = round(pendentes * 100 / total_status)
-        percentual_cancelado = round(cancelados * 100 / total_status)
-
+    if estoque_critico:
+        total_criticos = estoque_critico[0]["total_criticos"]
     else:
+        total_criticos = 0
+# =======================================================
 
-        percentual_processado = 0
-        percentual_pendente = 0
-        percentual_cancelado = 0
+# ================= VALOR FINANCEIRO DO ESTOQUE =================
+    valores_financeiros = Produto.valores_financeiros_estoque()
 
-    # ==========================
-    # SAÍDAS
-    # ==========================
+    if not valores_financeiros:
+        valores_financeiros = {
+            "valor_custo": 0,
+            "valor_venda": 0,
+            "lucro_potencial": 0
+        }
 
-    try:
-        total_saidas = len(PedidoSaida.historico_saida())
-    except:
-        total_saidas = 0
 
-    # ==========================
-    # ÚLTIMAS MOVIMENTAÇÕES
-    # ==========================
-
-    movimentacoes = Movimentacao.movimentar_tudo()
-
-    # apenas as 10 últimas
-    movimentacoes = movimentacoes[:10]
-
-    # ==========================
-    # GRÁFICOS (provisório)
-    # ==========================
-
-    dados_entradas = [0, 0, 0, 0, 0, 0, 0]
-    dados_saidas = [0, 0, 0, 0, 0, 0, 0]
-
-    # ==========================
-    # RENDER
-    # ==========================
-
-    return render_template(
-
-        "tela_dashboard.html",
-
-        cliente=cliente,
+    return render_template( "tela_dashboard.html",
 
         total_produtos=total_produtos,
         estoque_baixo=estoque_baixo,
         estoque_normal=estoque_normal,
         percentual_baixo=percentual_baixo,
-
-        total_entradas=total_entradas,
-        total_saidas=total_saidas,
-
-        percentual_processado=percentual_processado,
-        percentual_pendente=percentual_pendente,
-        percentual_cancelado=percentual_cancelado,
-
-        perc_processados=percentual_processado,
-        perc_pendentes=percentual_pendente,
-        perc_cancelados=percentual_cancelado,
-
+        status_entrada=status_entrada,
+        status_saida=status_saida,
         produtos_baixos=produtos_baixos,
-
-        movimentacoes=movimentacoes,
-
-        dados_entradas=dados_entradas,
-        dados_saidas=dados_saidas
+        estoque_critico=estoque_critico,
+        total_criticos=total_criticos,
+        valores_financeiros=valores_financeiros,
     )
 
 #==============================================

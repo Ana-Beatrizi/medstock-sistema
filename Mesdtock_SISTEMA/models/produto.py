@@ -157,19 +157,103 @@ AND p.ativo = TRUE
 
     @classmethod
     def seleciona_produtos_estoque_baixo(cls):
+
         conexao = conectar_banco.connect()
         cursor = conexao.cursor(dictionary=True)
 
         try:
-            cursor.execute("""
-                SELECT *
+            sql = """
+                SELECT
+                    id,
+                    nome,
+                    quantidade_estoque AS quantidade,
+                    estoque_minimo,
+                    categoria
+
                 FROM produto
-                WHERE ativo = TRUE
+
+                WHERE ativo = 1
                 AND quantidade_estoque <= estoque_minimo
-                ORDER BY nome
-            """)
+
+                ORDER BY quantidade_estoque ASC
+            """
+
+            cursor.execute(sql)
 
             return cursor.fetchall()
+
+        finally:
+            cursor.close()
+            conexao.close()
+
+
+    @classmethod
+    def estoque_critico(cls):
+
+        conexao = conectar_banco.connect()
+        cursor = conexao.cursor(dictionary=True)
+
+        try:
+            sql = """
+    SELECT
+        COUNT(*) OVER() AS total_criticos,
+        id,
+        nome,
+        quantidade_estoque AS quantidade,
+        estoque_minimo,
+        categoria
+
+    FROM produto
+
+    WHERE ativo = 1
+      AND quantidade_estoque <= estoque_minimo / 2
+
+    ORDER BY quantidade_estoque ASC
+"""
+
+            cursor.execute(sql)
+
+            return cursor.fetchall()
+
+        finally:
+            cursor.close()
+            conexao.close()
+
+
+    @classmethod
+    def valores_financeiros_estoque(cls):
+        conexao = conectar_banco.connect()
+        cursor = conexao.cursor(dictionary=True)
+
+        try:
+            sql = """
+                SELECT
+                    COALESCE(
+                        SUM(quantidade_estoque * preco_custo),
+                        0
+                    ) AS valor_custo,
+
+                    COALESCE(
+                        SUM(quantidade_estoque * preco_venda),
+                        0
+                    ) AS valor_venda,
+
+                    COALESCE(
+                        SUM(
+                            quantidade_estoque *
+                            (preco_venda - preco_custo)
+                        ),
+                        0
+                    ) AS lucro_potencial
+
+                FROM produto
+
+                WHERE ativo = TRUE;
+            """
+
+            cursor.execute(sql)
+
+            return cursor.fetchone()
 
         finally:
             cursor.close()

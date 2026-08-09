@@ -527,3 +527,57 @@
     }
 
 }
+
+/* ================= DASHBOARD LINK ================= */
+
+.dashboard-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    bottom: 20px;
+
+    color: #0056b3;
+    font-size: 17px;
+    font-weight: 600;
+    text-decoration: none;
+
+    padding: 9px 16px;
+    border-radius: 10px;
+
+    transition:
+        color 0.25s ease,
+        background 0.25s ease,
+        transform 0.25s ease;
+}
+
+/* Ícone/seta */
+.dashboard-link::after {
+    content: "→";
+    font-size: 20px;
+    font-weight: 400;
+
+    transition: transform 0.25s ease;
+}
+
+/* Hover */
+.dashboard-link:hover {
+    color: #008fa3;
+    background: rgba(0, 174, 190, 0.08);
+    transform: translateX(3px);
+}
+
+.dashboard-link:hover::after {
+    transform: translateX(4px);
+}
+
+/* Clique */
+.dashboard-link:active {
+    transform: translateX(3px) scale(0.98);
+}
+
+/* Foco */
+.dashboard-link:focus-visible {
+    outline: 3px solid rgba(0, 174, 190, 0.25);
+    outline-offset: 3px;
+}

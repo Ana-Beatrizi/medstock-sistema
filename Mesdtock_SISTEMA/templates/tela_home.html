@@ -114,73 +114,119 @@
             
             </div>
         
-            <a href="{{ url_for('tela_perfil_do_usuario', id=cliente.id) }}"
-               class="btn-perfil-nav">
-                <i class="bi bi-person-fill"></i>
-            </a>
-        
+    <a href="{{ url_for('tela_perfil_do_usuario') }}" class="user-nav" title="Meu perfil">
+        <div class="user-nav-info">
+            <span class="user-nav-hello">Olá,</span>
+            <span class="user-nav-name">
+                {{ session.get('cliente_nome', 'Usuário') }}
+            </span>
         </div>
+        <div class="user-nav-avatar">
+            {% if session.get('usuario_foto') %}
+                <img src="{{ url_for('static', filename='img/' ~ session['usuario_foto']) }}" alt="">
+            {% else %}
+                <i class="bi bi-person-fill"></i>
+            {% endif %}
+        </div>
+    </a>
+</div>
 
     </header>
 
     <!-- SIDEBAR -->
 
-    <nav class="sidebar close" id="sidebar">
+    <aside class="sidebar close" id="sidebar">
 
-        <ul>
+  <!-- Marca interna da sidebar -->
+  <div class="sb-brand">
+    <img src="{{ url_for('static', filename='img/favicon.png') }}" alt="MEDSTOCK">
+    <span class="sb-brand-text">MEDSTOCK</span>
+  </div>
 
-            <li>
-                <a href="{{ url_for('tela_inicial') }}">
-                    <i class="bi bi-house"></i>
-                    <span>Home</span>
-                </a>
-            </li>
+  <p class="sb-section">PRINCIPAL</p>
 
-            <li>
-                <a href="{{ url_for('tela_dashboard') }}">
-                    <i class="bi bi-speedometer2"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li>
+  <ul class="sb-menu">
+    <li>
+      <a href="{{ url_for('tela_inicial') }}"
+         class="{{ 'active' if request.path == url_for('tela_inicial') }}"
+         data-tip="Home">
+        <i class="bi bi-house-door"></i>
+        <span>Home</span>
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('tela_dashboard') }}"
+         class="{{ 'active' if request.path == url_for('tela_dashboard') }}"
+         data-tip="Dashboard">
+        <i class="bi bi-speedometer2"></i>
+        <span>Dashboard</span>
+      </a>
+    </li>
+  </ul>
 
-            <li>
-                <a href="{{ url_for('tela_produtos') }}">
-                    <i class="bi bi-box-seam"></i>
-                    <span>Gestão de Estoque</span>
-                </a>
-            </li>
+  <p class="sb-section">ESTOQUE</p>
 
-            <li>
-                <a href="{{ url_for('tela_cadastro_produto') }}">
-                    <i class="bi bi-plus-square"></i>
-                    <span>Cadastro de Produtos</span>
-                </a>
-            </li>
+  <ul class="sb-menu">
+    <li>
+      <a href="{{ url_for('tela_produtos') }}"
+         class="{{ 'active' if request.path == url_for('tela_produtos') }}"
+         data-tip="Gestão de Produtos">
+        <i class="bi bi-box-seam"></i>
+        <span>Gestão de Estoque</span>
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('tela_cadastro_produto') }}"
+         class="{{ 'active' if request.path == url_for('tela_cadastro_produto') }}"
+         data-tip="Cadastro de Produtos">
+        <i class="bi bi-plus-square"></i>
+        <span>Cadastro de Produtos</span>
+      </a>
+    </li>
+  </ul>
 
-            <li>
-                <a href="{{ url_for('tela_entrada') }}">
-                    <i class="bi bi-arrow-down-circle"></i>
-                    <span>Entrada</span>
-                </a>
-            </li>
+  <p class="sb-section">MOVIMENTAÇÕES</p>
 
-            <li>
-                <a href="{{ url_for('tela_saida') }}"">
-                    <i class="bi bi-arrow-up-circle"></i>
-                    <span>Saída</span>
-                </a>
-            </li>
+  <ul class="sb-menu">
+    <li>
+      <a href="{{ url_for('tela_entrada') }}"
+         class="{{ 'active' if request.path == url_for('tela_entrada') }}"
+         data-tip="Entrada">
+        <i class="bi bi-arrow-down-circle"></i>
+        <span>Entrada</span>
+        <em class="sb-dot in"></em>
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('tela_saida') }}"
+         class="{{ 'active' if request.path == url_for('tela_saida') }}"
+         data-tip="Saída">
+        <i class="bi bi-arrow-up-circle"></i>
+        <span>Saída</span>
+        <em class="sb-dot out"></em>
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('tela_movimentacao') }}"
+         class="{{ 'active' if request.path == url_for('tela_movimentacao') }}"
+         data-tip="Movimentações">
+        <i class="bi bi-clock-history"></i>
+        <span>Movimentações</span>
+      </a>
+    </li>
+  </ul>
 
-            <li>
-                <a href="{{ url_for('tela_movimentacao') }}">
-                    <i class="bi bi-clock-history"></i>
-                    <span>Histórico</span>
-                </a>
-            </li>
+  <!-- Rodapé da sidebar -->
+  <div class="sb-footer">
+    <a href="{{ url_for('logout') }}" class="sb-logout" data-tip="Sair">
+      <i class="bi bi-box-arrow-right"></i>
+      <span>Sair</span>
+    </a>
+    <span class="sb-version">v1.0</span>
+  </div>
 
-        </ul>
+</aside>
 
-    </nav>
 
     <!-- CONTEÚDO -->
 
