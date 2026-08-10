@@ -20,14 +20,21 @@
   <!-- ===== KPIs PRINCIPAIS ===== -->
   <section class="kpi-grid">
 
-    <article class="card kpi fade-up d-1">
-      <div class="kpi-icon ic-blue"><i class="bi bi-box-seam"></i></div>
-      <div class="kpi-body">
-        <span class="kpi-label">Total de Produtos</span>
-        <strong class="kpi-value" data-count="{{ total_produtos }}">0</strong>
-        <span class="kpi-foot">Itens cadastrados</span>
-      </div>
-    </article>
+<article class="card kpi fade-up d-1 kpi-hover">
+  <div class="kpi-icon ic-blue"><i class="bi bi-box-seam"></i></div>
+
+  <div class="kpi-body">
+    <span class="kpi-label">Total de Produtos</span>
+    <strong class="kpi-value" data-count="{{ total_produtos }}">0</strong>
+    <span class="kpi-foot">Itens cadastrados</span>
+  </div>
+
+  <a href="{{ url_for('tela_produtos') }}" class="kpi-action">
+    Ver todos os produtos <i class="bi bi-arrow-right"></i>
+  </a>
+</article>
+
+
 
     <article class="card kpi fade-up d-2">
       <div class="kpi-icon ic-green"><i class="bi bi-check2-circle"></i></div>
@@ -91,11 +98,11 @@
   <section class="pedidos-grid">
 
     <!-- ENTRADAS -->
-    <article class="card panel fade-up d-2">
-      <header class="panel-head">
-        <h2><i class="bi bi-box-arrow-in-down ic-txt-green"></i> Pedidos de Entrada</h2>
-        <span class="badge-total">{{ status_entrada["total_status"] }} pedidos</span>
-      </header>
+  <article class="card panel fade-up d-2 kpi-hover">
+    <header class="panel-head">
+      <h2><i class="bi bi-box-arrow-in-down ic-txt-green"></i> Pedidos de Entrada</h2>
+      <span class="badge-total">{{ status_entrada["total_status"] }} pedidos</span>
+    </header>
 
       <div class="panel-body">
         <div class="donut" style="--p:{{ status_entrada['percentual_processado'] }};--c:var(--ok)">
@@ -123,14 +130,18 @@
           </li>
         </ul>
       </div>
+
+          <a href="{{ url_for('tela_entrada') }}" class="kpi-action act-green">
+      Ver pedidos de entrada <i class="bi bi-arrow-right"></i>
+    </a>
     </article>
 
     <!-- SAÍDAS -->
-    <article class="card panel fade-up d-3">
-      <header class="panel-head">
-        <h2><i class="bi bi-box-arrow-up ic-txt-blue"></i> Pedidos de Saída</h2>
-        <span class="badge-total">{{ status_saida["total_status"] }} pedidos</span>
-      </header>
+  <article class="card panel fade-up d-3 kpi-hover">
+    <header class="panel-head">
+      <h2><i class="bi bi-box-arrow-up ic-txt-blue"></i> Pedidos de Saída</h2>
+      <span class="badge-total">{{ status_saida["total_status"] }} pedidos</span>
+    </header>
 
       <div class="panel-body">
         <div class="donut" style="--p:{{ status_saida['percentual_processado'] }};--c:var(--brand)">
@@ -158,6 +169,10 @@
           </li>
         </ul>
       </div>
+
+          <a href="{{ url_for('tela_saida') }}" class="kpi-action act-blue">
+      Ver pedidos de saída <i class="bi bi-arrow-right"></i>
+    </a>
     </article>
 
   </section>
