@@ -1,0 +1,716 @@
+.reveal {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.6s ease;
+}
+
+/* quando aparecer */
+.reveal.ativo {
+    opacity: 1;
+    transform: translateY(0);
+}
+/*HEADER*/
+*{
+    margin:0;
+    padding:0;
+   font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+
+#header{
+    display:flex;
+    position: sticky;
+    top: 0;
+    justify-content:space-between;
+    align-items:center;
+    background: linear-gradient(90deg,#002d81b7 0%, #00829fc8 50%, #00c4c1dd 100%);
+    padding:0px 40px;
+    
+    z-index: 1000;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+
+
+.logo img{
+    width:70px;
+}
+
+
+
+.menu a{
+    text-decoration:none;
+    color:rgb(255, 255, 255);
+    margin:0 40px;
+    font-size:16px;
+
+}
+
+
+
+.menu a:hover{
+    color: #A6FDCF;
+}
+
+
+.botoes button{
+    padding:8px 15px;
+    margin-left:10px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+.botoes button{
+
+    position: relative;
+    overflow: hidden;
+}
+.botoes a{
+    text-decoration: none;
+    color: inherit;
+}
+
+.botoes button::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: 0.5s;
+}
+
+.botoes button:hover::after {
+    left: 100%;
+}
+
+
+.login{
+    background:white;
+    color:#2c3e50;
+}
+
+.login:hover{
+    background:#b3d3e4;
+}
+
+.contrate{
+    background:#00819F;
+    color: white;
+}
+
+
+.contrate:hover{
+    background:#00C4C0;
+}
+/*==============HEADER FIM==============*/
+
+/* ==============MAIN============= */
+/* BANNER */
+
+.conteudo-banner_main{
+height:360px;
+background: #2A7B9B;
+background: linear-gradient(90deg,#002D81 0%, #00819F 50%, #00C4C0 100%);
+display:flex;
+justify-content:center;
+align-items:center;
+padding:10px 15px;
+
+}
+
+
+/* MAIN DENTRO DO BANNER */
+
+.banner_main{
+display:flex;
+gap: 30px;
+}
+
+
+/* LADO ESQUERDO */
+
+.lado-esquerdo_main{
+margin-left: 75px;
+display:flex;
+flex-direction:column;
+}
+
+
+/* CAIXA  */
+
+.botoes_main{
+width: 80%;
+max-width: 120px; 
+min-width: 300px;
+height:20px;
+color:#02569b;
+padding:5px;
+border-radius:15px;
+}
+
+
+/* TEXTO */
+
+.caixa1_main{
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+
+    border-radius: 20px;
+    padding: 20px;
+    margin-right: 40px;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.caixa1_main h1{
+font-family:'Times New Roman', Times, serif;
+color:#00819F;
+margin-top: 20px;
+
+}
+
+.caixa1_main p{
+    font-size:17px;
+    line-height:1.6;
+    margin: 10px 0;
+}
+
+
+/* INPUT E BOTÃO */
+
+.botoes_main{
+width:360px;
+display:flex;
+margin-top:10px;
+gap:10px; /* separa os botões */
+}
+
+
+.botoes_main input{
+width:48%;
+padding:20px;
+border-radius:20px;
+border:1px solid rgb(20, 232, 236);
+}
+
+.botoes_main button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+width:48%;
+padding:20px;
+border-radius:20px;
+border:1px solid rgb(111, 255, 238);
+cursor:pointer;
+transition:0.25s;
+
+
+}
+
+
+.botoes_main button:hover{
+background: #b3f8d3;
+color:#002D81;
+transform:translateY(-3px); /* vai para frente */
+box-shadow:0 5px 10px rgba(0,0,0,0.2);
+}
+
+.botoes_main button {
+    position: relative;
+    overflow: hidden;
+}
+
+.botoes_main button::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: 0.5s;
+}
+
+.botoes_main button:hover::after {
+    left: 100%;
+}
+
+/* IMAGEM */
+
+.imagem_main img{
+    height: 340px;
+    border-radius: 20px;
+
+    margin-right: 80px;
+
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+
+    transition: 0.3s;
+}
+
+/*===============MAIN FIM===============*/
+
+/*============SOLUÇÕES==================*/
+
+.box1_solu{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    width: 30%;
+}
+
+.box1_solu h2{
+    margin-bottom: 10px;
+    margin-top: 20px;
+}
+
+.box2_solu h2{
+    margin-bottom: 5px;
+    margin-top: 20px;
+}
+
+.box2_solu{
+    width: 30%;
+    margin: 10px;
+}
+
+#img_solucoes img{
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    display: block;
+    margin: 0 auto;
+    align-items: center;
+    margin-top: 40px;
+}
+
+#img_solucoes{
+    width: 20%;
+    background: linear-gradient(270deg, #0f3c88, #1bb3a9);
+    background-size: 400% 400%;
+    border-radius: 30px;
+
+    animation: moverGradiente 5s ease infinite;
+}
+
+@keyframes moverGradiente {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+body{
+    background-color:#f1f1f1;
+}
+
+#solucoes h1{
+    color: #00819F;
+    margin-left: 40%;
+    margin-top: 20px;
+}
+
+#card-solu{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin-top: 30px;
+    margin: 30px;
+}
+/*===============SOLUÇÕES FIM================*/
+
+/*=============DEPOIMENTOS===================*/
+#depoimentos{
+    background: linear-gradient(90deg,#002D81 0%, #00819F 50%, #00C4C0 100%);
+    margin-top: 20px;
+    
+}
+#espaco_depo{
+    margin-bottom: 20px;
+}
+
+.card-depo{
+  text-align: center;
+  align-items: center;
+  width: 250px;
+  background-color: #f1f1f1;
+  margin: 20px;
+  border-radius: 10%;
+}
+
+.depoimento{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin-top: 30px;
+    margin: 30px;
+    
+}
+
+.usuario img{
+    display: flex;
+    justify-content: center;
+    display: block;
+    margin: 0 auto;
+    align-items: center;
+    width: 75px;
+    margin-top: 20px;
+}
+
+.estrelas img{
+    display: flex;
+    justify-content: center;
+    display: block;
+    margin: 0 auto;
+    align-items: center;
+    width: 150px;
+    margin-block-end: 15px;
+}
+
+h1{
+    color: #A6FDCF;
+    margin-left: 40px;
+    margin-top: 50px;
+}
+
+.card-depo h3{
+    color: #00819F;
+}
+
+.card-depo p{
+    color: rgb(125, 124, 124);
+}
+/*=========DEPOIMENTOS FIM===============*/
+
+/*=============PLANOS===================*/
+
+
+.comeco{
+    margin: 30px;
+    color:#00819F;  
+}
+
+.nossosplanos-container{
+text-align:center;
+}
+
+.cards{
+display:flex;
+gap:40px;
+justify-content:center;
+margin-bottom:30px;
+}
+
+.card:hover{
+    transform: scale(1.03);
+    transition: 0.3s;
+}
+
+.card{
+
+padding:40px;
+width:340px;
+border-radius:25px;
+text-align:left;
+box-shadow:0 5px 20px rgba(0,0,0,0.1);
+background: linear-gradient(90deg,#002D81 0%, #00819F 50%, #00C4C0 100%);
+transition: 0.3s;
+
+}
+
+
+
+.card h2{
+
+color: #A6FDCF;
+font-size:32px;
+margin-bottom:20px;
+
+
+}
+
+.descricao{
+font-size:18px;
+margin-bottom:20px;
+
+
+}
+
+hr{
+border:none;
+border-top:1px solid #999;
+margin:20px 0;
+}
+
+.preco-texto{
+margin-bottom:10px;
+}
+
+.preco{
+
+color: #A6FDCF;
+font-size:32px;
+margin-bottom:20px;
+}
+
+#botao-planos{
+width:100%;
+border: 1px solid rgba(255, 255, 255, 0.3);
+
+
+font-size:16px;
+cursor:pointer;
+margin-top: 20px;
+
+background: rgba(255, 255, 255, 0.7);
+color: #000;
+padding: 12px 30px;
+border-radius: 30px;
+border: none;
+backdrop-filter: blur(5px);
+transition: all 0.3s ease;
+}
+
+#botao-planos{
+    position: relative;
+    overflow: hidden;
+    
+}
+
+#botao-planos::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: 0.5s;
+}
+
+#botao-planos:hover::after {
+    left: 100%;
+}
+
+#botao-planos:hover{
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    transform: scale(1.03);
+}
+
+.descricao,.testetexto,.preco-texto{
+    color: #f1f1f1;
+}
+/*=================PLANOS FIM================*/
+    /*BODY*/
+    body{
+        margin: 0;
+    }
+    /*BODY FIM*/
+    /*================FOOTER==================*/
+    /*        Feito por Ana Beatriz           s*/
+    #footer{
+        bottom: 0;
+    }
+    /*CONTAINER FOOTER*/
+    #container-footer{
+        background-color: rgb(244, 244, 244);
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        padding-top: 15px;
+    }
+
+    /* FOOTER 1 */
+    #footer1{
+        margin-left: 20%;
+        margin-right: 20%;
+        height: 100px;
+
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 90px;
+    }
+    #footer1 img{
+        width: 100px;
+        height: auto;
+    }
+
+    /*DIVISAO*/
+    #divisao-footer1{
+        margin-left: 20%;
+        margin-right: 20%;
+        height: 2px;
+        width: 60%;
+        background-color: lightgrey;
+        margin-top: 10px;
+        border-radius: 100%;
+    }
+    /*DIVISAO FIM*/
+
+     /* FOOTER 2 */
+    /* NAVEGACAO FOOTER*/
+    #navegacao-footer{
+        margin-top: 15px;
+        margin-bottom: px;
+
+        height: 150px;
+        display: flex;
+        flex-direction: row;
+        
+    }
+    #footer2{
+        margin-left: 10%;
+
+    }
+
+    #lista-footer{
+        display: flex;
+        flex-direction: row;
+        list-style: none;
+        gap: 25px;
+        font-size: 17px;
+        width: 30%;
+    }
+    #primeira-linha-footer{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    #segunda-linha-footer{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+           
+    }
+    #lista-footer a{
+        transition: 0.1s;
+        transform: scale(1.0);
+        color: inherit;
+        text-decoration: none;
+    }
+
+    #lista-footer a:hover{
+        cursor: pointer;
+        transition: 0.2s;
+        transform: scale(1.1);
+    }
+
+    #lista2-footer{
+        display: flex;
+        flex-direction: column;
+        list-style: none;
+        gap: 14px;
+        font-size: 17px;
+        width: 30%;
+    }
+    #lista2-footer a{
+        color: rgb(1, 147, 113);
+    }
+    #form-footer{
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+
+    }
+    #caixa-texto-footer{
+        align-items: center;
+        margin-left:25px;
+        margin-top: 20px;
+
+    }
+    #input-footer{
+        text-align: center;
+        border-radius: 20px;
+        border: none;
+        height: 40px;
+        width: 250px;
+    }
+
+    /*formulário*/
+
+    #form-footer button{
+        border-radius: 20px;
+        border: none;
+        height: 40px;
+        width: 80px;
+        background-color: rgb(61, 203, 170);
+        transition: 0.2s;
+        transform: scale(1.0);
+        cursor: pointer;
+        margin-left: 10px;
+    }
+    #h1-footer{
+        display: flex;
+        color: #00819F;
+        justify-content: center;
+        margin-left: 0;
+    }
+    #form-footer button:hover{
+        transition: 0.2s;
+        transform: scale(1.1);
+        color: #fff;
+    }
+    /*formulario fim*/
+
+
+    #home-footer{
+        font-weight: bold;
+        color: rgb(61, 203, 170);
+        font-size: 18px;
+        list-style: none;
+       text-decoration: none;
+    }
+
+    /* FOOTER 3 */
+    #footer3{
+        display: flex;
+
+        margin-left: 20%;
+        margin-right: 20%;
+        margin-bottom: 8px;
+        align-items: center;
+        justify-content: center;
+        gap: 60px;
+        
+    }
+    #footer-apps{
+        display: flex;
+        align-items: center;
+        gap: 10px;    
+    }
+    #footer-contorno{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height:30px;
+        border-radius: 50%;
+        transition: 0.3s;
+        transform: scale(1.0);
+    }
+    /*HOVER*/
+    #footer-contorno:hover{
+        transition: 0.3s;
+        transform: scale(1.2);
+        background-color: rgb(61, 203, 170);
+        cursor: pointer;
+    }
+
+    #footer3 img{
+        width: 25px;
+        height: auto;
+    }
+    /*==============FOOTER FIM===============*/

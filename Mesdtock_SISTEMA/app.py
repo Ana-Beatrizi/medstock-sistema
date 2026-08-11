@@ -58,12 +58,17 @@ def to_float(value, default=0.0):
 
 # ======================= ROTAS =====================
 
+@app.route("/lp")
+def lp():
+    return render_template("index.html")
+#==============================================
+
 # TELA DE CADASTRO ===============
 @app.route("/")
 def index():
     if "cliente_id" in session:
         return redirect(url_for("tela_inicial"))
-    return redirect(url_for("tela_login"))
+    return render_template("index.html")
 #==============================================
 
 # TELA DE CADASTRO ===============
