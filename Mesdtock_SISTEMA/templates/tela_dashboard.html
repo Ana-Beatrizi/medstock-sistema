@@ -216,7 +216,7 @@
         </thead>
         <tbody>
           {% for p in produtos_baixos %}
-          <tr class="row-in" style="animation-delay: {{ loop.index0 * 0.04 }}s">
+          <tr class="" style="animation-delay: {{ loop.index0 * 0.04 }}s">
             <td class="muted">{{ loop.index }}</td>
             <td class="strong">{{ p["nome"] }}</td>
             <td class="ta-c">{{ p["quantidade"] }}</td>
@@ -258,7 +258,7 @@
         </thead>
         <tbody>
           {% for c in estoque_critico %}
-          <tr class="row-in" style="animation-delay: {{ loop.index0 * 0.04 }}s">
+          <tr class="" style="animation-delay: {{ loop.index0 * 0.04 }}s">
             <td class="muted">{{ loop.index }}</td>
             <td class="strong">{{ c["nome"] if c["nome"] is defined else "—" }}</td>
             <td class="ta-c">{{ c["quantidade"] if c["quantidade"] is defined else "—" }}</td>
