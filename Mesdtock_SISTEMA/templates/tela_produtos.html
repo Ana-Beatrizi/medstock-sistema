@@ -95,7 +95,7 @@
                 </tr>
             </thead>
             {% for produto in produtos %}
-            <tbody id="tabelaDados">
+            <tbody class="produto-grupo" data-produto-id="{{ produto.id }}">
 
                 <tr class="linha-produto"
                 data-id="{{ produto.id }}"

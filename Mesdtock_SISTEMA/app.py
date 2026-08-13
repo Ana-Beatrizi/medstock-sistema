@@ -9,6 +9,7 @@ from core.seguranca import login_obrigatorio
 #============================
 
 # Importações CLASSES =======
+from core.database import conectar_banco
 from models.cliente import Cliente
 from models.produto import Produto
 from models.entrada import PedidoEntrada
@@ -35,10 +36,15 @@ import re
 #"123.456.789-01" - texto original.
 #============================
 
+from flask_cors import CORS
+
 app = Flask(__name__)
+CORS(app)
 app.secret_key = "Medstock_programa_de_estoque_123456"
 
-#! = Feito pela -- Ana Beatriz // linha 1 a 1105 𖹭.ᐟ
+#! = Feito pela -- Ana Beatriz // linha 1 a 1154 𖹭.ᐟ
+
+
 
 # TRANSFORMA DADOS ============
 # inteiro
@@ -55,6 +61,357 @@ def to_float(value, default=0.0):
     except (TypeError, ValueError):
         return default
 # ===============================
+
+# ======================= API MOBILE =====================
+@app.route("/api/dashboard", methods=["GET"])
+def api_dashboard():
+
+    try:
+        conn = conectar_banco.connect()
+        cursor = conn.cursor(dictionary=True)
+
+        # ==========================================================
+        # PRODUTOS
+        # ==========================================================
+
+        cursor.execute("""
+            SELECT
+                COUNT(*) AS total_produtos,
+
+                SUM(
+                    CASE
+                        WHEN quantidade_estoque > estoque_minimo
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS estoque_normal,
+
+                SUM(
+                    CASE
+                        WHEN quantidade_estoque > 0
+                         AND quantidade_estoque <= estoque_minimo
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS estoque_baixo,
+
+                SUM(
+                    CASE
+                        WHEN quantidade_estoque <= 0
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS estoque_critico,
+
+                COALESCE(
+                    SUM(quantidade_estoque * preco_custo),
+                    0
+                ) AS valor_custo,
+
+                COALESCE(
+                    SUM(quantidade_estoque * preco_venda),
+                    0
+                ) AS valor_venda
+
+            FROM produto
+            WHERE ativo = TRUE
+        """)
+
+        estoque = cursor.fetchone()
+
+        total_produtos = int(estoque["total_produtos"] or 0)
+        estoque_normal = int(estoque["estoque_normal"] or 0)
+        estoque_baixo = int(estoque["estoque_baixo"] or 0)
+        estoque_critico = int(estoque["estoque_critico"] or 0)
+
+        valor_custo = float(estoque["valor_custo"] or 0)
+        valor_venda = float(estoque["valor_venda"] or 0)
+
+        lucro_potencial = valor_venda - valor_custo
+
+        # ==========================================================
+        # PEDIDOS DE ENTRADA
+        # ==========================================================
+
+        cursor.execute("""
+            SELECT
+                COUNT(*) AS total,
+
+                SUM(
+                    CASE
+                        WHEN status = 'PROCESSADO'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS processados,
+
+                SUM(
+                    CASE
+                        WHEN status = 'PENDENTE'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS pendentes,
+
+                SUM(
+                    CASE
+                        WHEN status = 'CANCELADO'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS cancelados
+
+            FROM entrada
+        """)
+
+        entrada = cursor.fetchone()
+
+        pedidos_entrada = {
+            "total": int(entrada["total"] or 0),
+            "processados": int(entrada["processados"] or 0),
+            "pendentes": int(entrada["pendentes"] or 0),
+            "cancelados": int(entrada["cancelados"] or 0)
+        }
+
+        # ==========================================================
+        # PEDIDOS DE SAÍDA
+        # ==========================================================
+
+        cursor.execute("""
+            SELECT
+                COUNT(*) AS total,
+
+                SUM(
+                    CASE
+                        WHEN status = 'PROCESSADO'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS processados,
+
+                SUM(
+                    CASE
+                        WHEN status = 'PENDENTE'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS pendentes,
+
+                SUM(
+                    CASE
+                        WHEN status = 'CANCELADO'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS cancelados
+
+            FROM saida
+        """)
+
+        saida = cursor.fetchone()
+
+        pedidos_saida = {
+            "total": int(saida["total"] or 0),
+            "processados": int(saida["processados"] or 0),
+            "pendentes": int(saida["pendentes"] or 0),
+            "cancelados": int(saida["cancelados"] or 0)
+        }
+
+        # ==========================================================
+        # PRODUTOS COM ESTOQUE BAIXO
+        # ==========================================================
+
+        cursor.execute("""
+            SELECT
+                id,
+                nome,
+                quantidade_estoque,
+                estoque_minimo
+            FROM produto
+            WHERE ativo = TRUE
+              AND quantidade_estoque > 0
+              AND quantidade_estoque <= estoque_minimo
+            ORDER BY quantidade_estoque ASC
+        """)
+
+        produtos_baixo_db = cursor.fetchall()
+
+        produtos_baixo = []
+
+        for p in produtos_baixo_db:
+
+            quantidade = int(p["quantidade_estoque"] or 0)
+            minimo = int(p["estoque_minimo"] or 0)
+
+            if quantidade <= 0:
+                situacao = "Sem estoque"
+            else:
+                situacao = "Estoque baixo"
+
+            produtos_baixo.append({
+                "id": p["id"],
+                "produto": p["nome"],
+                "quantidade": quantidade,
+                "minimo": minimo,
+                "situacao": situacao
+            })
+
+        # ==========================================================
+        # PRODUTOS CRÍTICOS
+        # ==========================================================
+
+        cursor.execute("""
+            SELECT
+                id,
+                nome,
+                quantidade_estoque,
+                estoque_minimo
+            FROM produto
+            WHERE ativo = TRUE
+              AND quantidade_estoque <= 0
+            ORDER BY nome ASC
+        """)
+
+        produtos_criticos_db = cursor.fetchall()
+
+        produtos_criticos = []
+
+        for p in produtos_criticos_db:
+            produtos_criticos.append({
+                "id": p["id"],
+                "produto": p["nome"],
+                "quantidade": int(p["quantidade_estoque"] or 0),
+                "minimo": int(p["estoque_minimo"] or 0)
+            })
+
+        # ==========================================================
+        # FECHAR BANCO
+        # ==========================================================
+
+        cursor.close()
+        conn.close()
+
+        # ==========================================================
+        # RESPOSTA
+        # ==========================================================
+
+        return jsonify({
+            "sucesso": True,
+
+            "totalProdutos": total_produtos,
+
+            "estoqueNormal": estoque_normal,
+
+            "estoqueBaixo": estoque_baixo,
+
+            "estoqueCritico": estoque_critico,
+
+            "valorCusto": valor_custo,
+
+            "valorVenda": valor_venda,
+
+            "lucroPotencial": lucro_potencial,
+
+            "pedidosEntrada": pedidos_entrada,
+
+            "pedidosSaida": pedidos_saida,
+
+            "produtosBaixo": produtos_baixo,
+
+            "produtosCriticos": produtos_criticos
+        })
+
+    except Exception as e:
+
+        print("ERRO API DASHBOARD:", e)
+
+        return jsonify({
+            "sucesso": False,
+            "erro": str(e)
+        }), 500
+
+
+@app.route("/api/movimentacoes", methods=["GET"])
+def api_movimentacoes():
+
+    try:
+        conn = conectar_banco.connect()
+        cursor = conn.cursor(dictionary=True)
+
+        sql = """
+            SELECT
+                m.id,
+                m.tipo,
+                m.quantidade,
+                m.valor_total,
+                m.data_mov,
+
+                p.nome AS produto,
+
+                f.nome_fornecedor AS fornecedor,
+
+                c.nome AS cliente
+
+            FROM movimentacao m
+
+            LEFT JOIN produto p
+                ON m.produto_id = p.id
+
+            LEFT JOIN fornecedor f
+                ON m.fornecedor_id = f.id
+
+            LEFT JOIN clientes_cadastro c
+                ON m.cliente_id = c.id
+
+            ORDER BY m.data_mov DESC
+        """
+
+        cursor.execute(sql)
+
+        movimentacoes = cursor.fetchall()
+
+        resultado = []
+
+        for item in movimentacoes:
+
+            # Entrada → fornecedor
+            if item["tipo"] == "Entrada":
+                parceiro = item["fornecedor"]
+
+            # Saída → cliente
+            else:
+                parceiro = item["cliente"]
+
+            resultado.append({
+                "id": item["id"],
+                "tipo": item["tipo"],
+                "produto": item["produto"] or "Produto não encontrado",
+                "parceiro": parceiro or "Não informado",
+                "quantidade": item["quantidade"],
+                "valor": float(item["valor_total"] or 0),
+                "data": (
+                    item["data_mov"].strftime("%d/%m/%Y")
+                    if item["data_mov"]
+                    else ""
+                )
+            })
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "sucesso": True,
+            "movimentacoes": resultado
+        })
+
+    except Exception as e:
+
+        return jsonify({
+            "sucesso": False,
+            "erro": str(e)
+        }), 500
+#=========================================================
+
 
 # ======================= ROTAS =====================
 
@@ -245,8 +602,7 @@ def tela_dashboard():
 # TELA HISTORICO DE FORNECEDOR ===============
 @app.route("/historico/fornecedor")
 def tela_historico_de_fornecedor():
-    cliente_id = session.get("cliente_id")
-    return render_template("tela_historico_de_fornecedor.html", fornecedores = Fornecedor.seleciona_todos_fornecedores(), cliente = Cliente.seleciona_por_id(cliente_id)) 
+    return render_template("tela_historico_de_fornecedor.html", fornecedores = Fornecedor.seleciona_todos_fornecedores()) 
 #==============================================
 
 # TELA HISTORICO DE CLIENTE ===============
@@ -1148,7 +1504,11 @@ def cancelar_saida(id):
     return redirect(url_for("tela_saida"))
 
 
-#! = Feito pela -- Ana Beatriz // linha 1 a 1105 𖹭.ᐟ
+#! = Feito pela -- Ana Beatriz // linha 1 a 1154 𖹭.ᐟ
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(
+    host="0.0.0.0",
+    port=5000,
+    debug=True
+)

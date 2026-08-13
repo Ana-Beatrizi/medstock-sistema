@@ -553,3 +553,32 @@
     font-size: 50px;
     color: #00C4C0;
 }
+
+/* =========================================================
+   OTIMIZAÇÃO DE PRODUTOS - RENDERIZAÇÃO FORA DA TELA
+   ========================================================= */
+
+/* Cada grupo representa um produto + sua linha de detalhes */
+tbody.produto-grupo {
+    content-visibility: auto;
+    contain-intrinsic-size: 130px;
+}
+
+/*
+   O navegador não precisa pintar/renderizar o conteúdo
+   que está muito distante da área visível.
+*/
+.linha-produto,
+.detalhes-row {
+    contain: layout paint style;
+}
+
+/* Mantém as linhas estáveis durante a rolagem */
+.tabela-produtos {
+    contain: layout style;
+}
+
+/* Evita que a tabela fique recalculando tudo */
+#tabelaDados {
+    contain: content;
+}
