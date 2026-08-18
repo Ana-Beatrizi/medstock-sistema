@@ -62,7 +62,112 @@ def to_float(value, default=0.0):
         return default
 # ===============================
 
-# ======================= API MOBILE =====================
+# ======================= API LOGIN =====================
+@app.route("/api/cliente/login", methods=["POST"])
+def api_cliente_login():
+
+    try:
+        dados = request.get_json()
+
+        if not dados:
+            return jsonify({
+                "sucesso": False,
+                "erro": "Nenhum dado foi enviado."
+            }), 400
+
+        email = dados.get("email")
+        senha = dados.get("senha")
+
+        if not email or not senha:
+            return jsonify({
+                "sucesso": False,
+                "erro": "Informe o email e a senha."
+            }), 400
+
+        # Usa a mesma autenticação do Desktop
+        cliente = Cliente.autenticar(email, senha)
+
+        if cliente:
+
+            return jsonify({
+                "sucesso": True,
+                "mensagem": "Login realizado com sucesso!",
+
+                "cliente": {
+                    "id": cliente["id"],
+                    "nome": cliente["nome"],
+                    "email": cliente.get("email")
+                }
+            }), 200
+
+        return jsonify({
+            "sucesso": False,
+            "erro": "Email ou senha inválidos!"
+        }), 401
+
+    except Exception as e:
+
+        print("ERRO API LOGIN:", e)
+
+        return jsonify({
+            "sucesso": False,
+            "erro": "Erro interno do servidor."
+        }), 500
+
+
+# ==========================================================
+# API - PERFIL DO CLIENTE
+# ==========================================================
+
+@app.route("/api/cliente/perfil", methods=["GET"])
+def api_cliente_perfil():
+
+    try:
+
+        cliente_id = request.args.get("id")
+
+        if not cliente_id:
+            return jsonify({
+                "sucesso": False,
+                "erro": "ID do cliente não informado."
+            }), 400
+
+        try:
+            cliente_id = int(cliente_id)
+        except ValueError:
+            return jsonify({
+                "sucesso": False,
+                "erro": "ID do cliente inválido."
+            }), 400
+
+        cliente = Cliente.seleciona_por_id(cliente_id)
+
+        if not cliente:
+            return jsonify({
+                "sucesso": False,
+                "erro": "Cliente não encontrado."
+            }), 404
+
+        return jsonify({
+            "sucesso": True,
+            "cliente": {
+                "id": cliente["id"],
+                "nome": cliente.get("nome"),
+                "email": cliente.get("email"),
+                "cpf": cliente.get("cpf")
+            }
+        }), 200
+
+    except Exception as e:
+
+        print("ERRO API PERFIL:", e)
+
+        return jsonify({
+            "sucesso": False,
+            "erro": "Erro interno do servidor."
+        }), 500
+
+# ======================= API DASHBOARD =====================
 @app.route("/api/dashboard", methods=["GET"])
 def api_dashboard():
 
