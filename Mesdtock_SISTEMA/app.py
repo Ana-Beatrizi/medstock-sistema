@@ -520,6 +520,13 @@ def api_movimentacoes():
 
 # ======================= ROTAS =====================
 
+# TELA DE ERRO 404 ===============
+@app.errorhandler(404)
+def pagina_nao_encontrada(error):
+    return render_template("404.html"), 404
+#==============================================
+
+# LANDING PAGE ===============
 @app.route("/lp")
 def lp():
     return render_template("index.html")
@@ -1259,35 +1266,281 @@ def excluir_clientes_cadastro(id):
 # -------------------------------------- CLIENTES CADASTRO FIM ------------------------------------------
 
 # -------------------------------------- ESQUECI A SENHA ------------------------------------------
-#  Esqueci a senha ROTA===============
+
+
+# ==========================================================
+# ESQUECI A SENHA
+# ==========================================================
+
 @app.route("/esqueci_a_senha", methods=["GET", "POST"])
 def tela_esqueci_a_senha():
+
     if request.method == "POST":
-        email = request.form.get("email")
+
+        email = request.form.get("email", "").strip()
+
+        if not email:
+            flash("Digite seu e-mail.", "danger")
+            return render_template("tela_esqueci_a_senha.html")
+
+        # Verifica se o cliente existe
+        cliente = Cliente.seleciona_por_email(email)
+
+        if not cliente:
+            flash("E-mail não encontrado.", "danger")
+            return render_template("tela_esqueci_a_senha.html")
+
+        # Gera código de 6 dígitos
         codigo = random.randint(100000, 999999)
+
+        # Salva os dados na sessão
         session["codigo_recuperacao"] = str(codigo)
-        enviar_codigo_email(email, codigo)
-        return redirect(url_for("verificar_codigo"))
+        session["email_recuperacao"] = email
+        session["cliente_recuperacao_id"] = cliente["id"]
 
-    return render_template("tela_esqueci_a_senha.html")
+        try:
 
-# Verificar código ROTA=================
+            enviar_codigo_email(email, codigo)
+
+            flash(
+                "Código de recuperação enviado para seu e-mail.",
+                "success"
+            )
+
+            return redirect(
+                url_for("verificar_codigo")
+            )
+
+        except Exception as e:
+
+            # Limpa a sessão caso o envio falhe
+            session.pop("codigo_recuperacao", None)
+            session.pop("email_recuperacao", None)
+            session.pop("cliente_recuperacao_id", None)
+
+            flash(
+                f"Erro ao enviar o código: {e}",
+                "danger"
+            )
+
+            return render_template(
+                "tela_esqueci_a_senha.html"
+            )
+
+    return render_template(
+        "tela_esqueci_a_senha.html"
+    )
+
+
+# ==========================================================
+# VERIFICAR CÓDIGO
+# ==========================================================
+
 @app.route("/verificar_codigo", methods=["GET", "POST"])
 def verificar_codigo():
 
-    if request.method == "POST":
-        codigo_digitado = request.form.get("codigo")
-        codigo_salvo = session.get("codigo_recuperacao")
-        if codigo_digitado == codigo_salvo:
-            return "Código correto"
-        else:
-            return "Código inválido"
-    return render_template("tela_verificar_codigo.html")
+    # Verifica se existe uma recuperação iniciada
+    if "codigo_recuperacao" not in session:
 
-# Enviar Codigo E-MAIL =============
+        flash(
+            "Solicite novamente a recuperação de senha.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("tela_esqueci_a_senha")
+        )
+
+    if request.method == "POST":
+
+        codigo_digitado = request.form.get(
+            "codigo",
+            ""
+        ).strip()
+
+        codigo_salvo = session.get(
+            "codigo_recuperacao"
+        )
+
+        if codigo_digitado == codigo_salvo:
+
+            # Marca que o código foi validado
+            session["codigo_verificado"] = True
+
+            return redirect(
+                url_for("nova_senha")
+            )
+
+        else:
+
+            flash(
+                "Código inválido.",
+                "danger"
+            )
+
+            return render_template(
+                "tela_verificar_codigo.html"
+            )
+
+    return render_template(
+        "tela_verificar_codigo.html"
+    )
+
+
+# ==========================================================
+# TELA PARA DIGITAR A NOVA SENHA
+# ==========================================================
+
+@app.route("/nova_senha", methods=["GET"])
+def nova_senha():
+
+    # Só permite entrar se o código tiver sido validado
+    if not session.get("codigo_verificado"):
+
+        flash(
+            "Você precisa verificar o código primeiro.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("tela_esqueci_a_senha")
+        )
+
+    return render_template(
+        "tela_nova_senha.html"
+    )
+
+
+# ==========================================================
+# SALVAR NOVA SENHA
+# ==========================================================
+
+@app.route("/salvar_nova_senha", methods=["POST"])
+def salvar_nova_senha():
+
+    # Verifica se o código foi validado
+    if not session.get("codigo_verificado"):
+
+        flash(
+            "Código de recuperação não verificado.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("tela_esqueci_a_senha")
+        )
+
+    cliente_id = session.get(
+        "cliente_recuperacao_id"
+    )
+
+    nova_senha = request.form.get(
+        "nova_senha",
+        ""
+    ).strip()
+
+    confirmar_senha = request.form.get(
+        "confirmar_senha",
+        ""
+    ).strip()
+
+    # Verifica preenchimento
+    if not nova_senha or not confirmar_senha:
+
+        flash(
+            "Preencha todos os campos.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("nova_senha")
+        )
+
+    # Verifica se as senhas são iguais
+    if nova_senha != confirmar_senha:
+
+        flash(
+            "As senhas não coincidem.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("nova_senha")
+        )
+
+    try:
+
+        # Verifica se o cliente ainda existe
+        cliente = Cliente.seleciona_por_id(
+            cliente_id
+        )
+
+        if not cliente:
+
+            flash(
+                "Cliente não encontrado.",
+                "danger"
+            )
+
+            return redirect(
+                url_for("tela_esqueci_a_senha")
+            )
+
+        # Atualiza a senha
+        Cliente.atualizar_senha(
+            cliente_id,
+            nova_senha
+        )
+
+        # Limpa os dados da recuperação
+        session.pop(
+            "codigo_recuperacao",
+            None
+        )
+
+        session.pop(
+            "email_recuperacao",
+            None
+        )
+
+        session.pop(
+            "cliente_recuperacao_id",
+            None
+        )
+
+        session.pop(
+            "codigo_verificado",
+            None
+        )
+
+        flash(
+            "Senha redefinida com sucesso! Faça login com sua nova senha.",
+            "success"
+        )
+
+        return redirect(
+            url_for("tela_login")
+        )
+
+    except Exception as e:
+
+        flash(
+            f"Erro ao redefinir senha: {e}",
+            "danger"
+        )
+
+        return redirect(
+            url_for("nova_senha")
+        )
+
+
+# ==========================================================
+# ENVIAR CÓDIGO POR E-MAIL
+# ==========================================================
+
 def enviar_codigo_email(destinatario, codigo):
 
-    email_remetente = "medstock.sistema@gmail.com" 
+    email_remetente = "medstock.sistema@gmail.com"
     senha_app = "hahz uyzh eidq txts"
 
     mensagem = MIMEMultipart()
@@ -1306,25 +1559,57 @@ def enviar_codigo_email(destinatario, codigo):
 
             <h1>{codigo}</h1>
 
+            <p>
+                Use este código para redefinir sua senha.
+            </p>
+
         </body>
     </html>
     """
 
-    mensagem.attach(MIMEText(corpo, "html"))
+    mensagem.attach(
+        MIMEText(
+            corpo,
+            "html"
+        )
+    )
 
-    with open("static/img/medstock_logo_sf.png", "rb") as imagem:
-        img = MIMEImage(imagem.read())
-        img.add_header("Content-ID", "<logo_medstock>")
+    with open(
+        "static/img/medstock_logo_sf.png",
+        "rb"
+    ) as imagem:
+
+        img = MIMEImage(
+            imagem.read()
+        )
+
+        img.add_header(
+            "Content-ID",
+            "<logo_medstock>"
+        )
+
         mensagem.attach(img)
 
-    servidor = smtplib.SMTP("smtp.gmail.com", 587) #"smtp.gmail.com" = servidor do Gmail - 587 = porta SMTP
+    servidor = smtplib.SMTP(
+        "smtp.gmail.com",
+        587
+    )
 
     servidor.starttls()
-    servidor.login(email_remetente, senha_app)
-    servidor.send_message(mensagem)
-    servidor.quit()
-# -------------------------------------- ESQUECI A SENHA FIM ------------------------------------------
 
+    servidor.login(
+        email_remetente,
+        senha_app
+    )
+
+    servidor.send_message(
+        mensagem
+    )
+
+    servidor.quit()
+
+
+# -------------------------------------- ESQUECI A SENHA FIM ------------------------------------------
 # -------------------------------------- PRODUTO ------------------------------------------
 # GET FORM TELA CADASTRO DE PRODUTO ===========
 def get_produto_form_cadastro():
