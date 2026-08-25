@@ -113,3 +113,91 @@ class Cliente(Crudmedstock):
             return usuario
 
         return None
+
+
+    @classmethod
+    def seleciona_por_email(cls, email):
+
+        conn = conectar_banco.connect()
+        cursor = conn.cursor(dictionary=True)
+
+        try:
+
+            sql = """
+                SELECT
+                    id,
+                    nome,
+                    email,
+                    cpf,
+                    senha,
+                    status
+                FROM cliente
+                WHERE email = %s
+                LIMIT 1
+            """
+
+            cursor.execute(
+                sql,
+                (email,)
+            )
+
+            return cursor.fetchone()
+
+        finally:
+
+            cursor.close()
+            conn.close()
+
+    @classmethod
+    def atualizar_senha(cls, cliente_id, senha_hash):
+
+        conn = conectar_banco.connect()
+        cursor = conn.cursor()
+
+        try:
+
+            cursor.execute(
+                """
+                UPDATE cliente
+                SET senha = %s
+                WHERE id = %s
+                """,
+                (
+                    senha_hash,
+                    cliente_id
+                )
+            )
+
+            conn.commit()
+
+        finally:
+
+            cursor.close()
+            conn.close()
+'''
+    @classmethod
+    def atualizar_senha(cls, id, nova_senha):
+
+        conn = conectar_banco.connect()
+        cursor = conn.cursor()
+
+        try:
+
+            sql = """
+                UPDATE cliente
+                SET senha = %s
+                WHERE id = %s
+            """
+
+            cursor.execute(
+                sql,
+                (nova_senha, id)
+            )
+
+            conn.commit()
+
+        finally:
+
+            cursor.close()
+            conn.close()
+'''

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Nova senha - MEDSTOCK</title>
+
+</head>
+
+<body>
+
+    <h1>Redefinir senha</h1>
+
+    <p>
+        Digite sua nova senha.
+    </p>
+
+    <form
+        method="POST"
+        action="{{ url_for('salvar_nova_senha') }}"
+    >
+
+        <div>
+
+            <label>
+                Nova senha
+            </label>
+
+            <input
+                type="password"
+                name="nova_senha"
+                placeholder="Digite sua nova senha"
+                required
+            >
+
+        </div>
+
+        <br>
+
+        <div>
+
+            <label>
+                Confirmar nova senha
+            </label>
+
+            <input
+                type="password"
+                name="confirmar_senha"
+                placeholder="Confirme sua nova senha"
+                required
+            >
+
+        </div>
+
+        <br>
+
+        <button type="submit">
+            Redefinir senha
+        </button>
+
+    </form>
+
+</body>
+
+</html>
