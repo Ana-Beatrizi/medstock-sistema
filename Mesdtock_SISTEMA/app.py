@@ -5,7 +5,7 @@ from flask import Flask, jsonify, request, url_for, render_template, redirect, f
 # Importações Criptografia ===
 import os
 from werkzeug.utils import secure_filename
-from core.seguranca import login_obrigatorio
+from core.seguranca import login_obrigatorio, gerar_hash_senha
 #============================
 
 # Importações CLASSES =======
@@ -1267,7 +1267,6 @@ def excluir_clientes_cadastro(id):
 
 # -------------------------------------- ESQUECI A SENHA ------------------------------------------
 
-
 # ==========================================================
 # ESQUECI A SENHA
 # ==========================================================
@@ -1336,20 +1335,8 @@ def tela_esqueci_a_senha():
 # VERIFICAR CÓDIGO
 # ==========================================================
 
-@app.route("/verificar_codigo", methods=["GET", "POST"])
+@app.route("/verificar_codigo", methods=["GET","POST"])
 def verificar_codigo():
-
-    # Verifica se existe uma recuperação iniciada
-    if "codigo_recuperacao" not in session:
-
-        flash(
-            "Solicite novamente a recuperação de senha.",
-            "danger"
-        )
-
-        return redirect(
-            url_for("tela_esqueci_a_senha")
-        )
 
     if request.method == "POST":
 
@@ -1368,7 +1355,7 @@ def verificar_codigo():
             session["codigo_verificado"] = True
 
             return redirect(
-                url_for("nova_senha")
+                url_for("salvar_nova_senha")
             )
 
         else:
@@ -1390,37 +1377,14 @@ def verificar_codigo():
 # ==========================================================
 # TELA PARA DIGITAR A NOVA SENHA
 # ==========================================================
-
-@app.route("/nova_senha", methods=["GET"])
-def nova_senha():
-
-    # Só permite entrar se o código tiver sido validado
-    if not session.get("codigo_verificado"):
-
-        flash(
-            "Você precisa verificar o código primeiro.",
-            "danger"
-        )
-
-        return redirect(
-            url_for("tela_esqueci_a_senha")
-        )
-
-    return render_template(
-        "tela_nova_senha.html"
-    )
-
-
 # ==========================================================
 # SALVAR NOVA SENHA
 # ==========================================================
-
-@app.route("/salvar_nova_senha", methods=["POST"])
+@app.route("/salvar_nova_senha", methods=["GET","POST"])
 def salvar_nova_senha():
 
     # Verifica se o código foi validado
     if not session.get("codigo_verificado"):
-
         flash(
             "Código de recuperação não verificado.",
             "danger"
@@ -1429,10 +1393,6 @@ def salvar_nova_senha():
         return redirect(
             url_for("tela_esqueci_a_senha")
         )
-
-    cliente_id = session.get(
-        "cliente_recuperacao_id"
-    )
 
     nova_senha = request.form.get(
         "nova_senha",
@@ -1444,39 +1404,51 @@ def salvar_nova_senha():
         ""
     ).strip()
 
-    # Verifica preenchimento
+    # Verifica se os campos foram preenchidos
     if not nova_senha or not confirmar_senha:
-
         flash(
             "Preencha todos os campos.",
             "danger"
         )
 
-        return redirect(
-            url_for("nova_senha")
+        return render_template(
+            "tela_nova_senha.html"
         )
 
     # Verifica se as senhas são iguais
     if nova_senha != confirmar_senha:
-
         flash(
             "As senhas não coincidem.",
             "danger"
         )
 
+        return render_template(
+            "tela_nova_senha.html"
+        )
+
+    # Recupera o ID do cliente que solicitou a recuperação
+    cliente_id = session.get(
+        "cliente_recuperacao_id"
+    )
+
+    if not cliente_id:
+        flash(
+            "Sessão de recuperação inválida.",
+            "danger"
+        )
+
         return redirect(
-            url_for("nova_senha")
+            url_for("tela_esqueci_a_senha")
         )
 
     try:
 
-        # Verifica se o cliente ainda existe
+        # Busca o cliente
         cliente = Cliente.seleciona_por_id(
             cliente_id
         )
 
         if not cliente:
-
             flash(
                 "Cliente não encontrado.",
                 "danger"
@@ -1486,11 +1458,17 @@ def salvar_nova_senha():
                 url_for("tela_esqueci_a_senha")
             )
 
-        # Atualiza a senha
-        Cliente.atualizar_senha(
-            cliente_id,
+        # ==================================================
+        # GERA O HASH DA NOVA SENHA
+        # ==================================================
+        senha_hash = gerar_hash_senha(
             nova_senha
         )
+
+        # ==================================================
+        # ATUALIZA A SENHA NO BANCO
+        # ==================================================
+        Cliente.atualizar_senha(cliente_id, senha_hash)
 
         # Limpa os dados da recuperação
         session.pop(
@@ -1514,7 +1492,7 @@ def salvar_nova_senha():
         )
 
         flash(
-            "Senha redefinida com sucesso! Faça login com sua nova senha.",
+            "Senha alterada com sucesso! Faça login com sua nova senha.",
             "success"
         )
 
@@ -1524,14 +1502,19 @@ def salvar_nova_senha():
 
     except Exception as e:
 
+        print(
+            f"Erro ao alterar senha: {e}"
+        )
+
         flash(
-            f"Erro ao redefinir senha: {e}",
+            "Erro ao alterar a senha.",
             "danger"
         )
 
-        return redirect(
-            url_for("nova_senha")
+        return render_template(
+            "tela_nova_senha.html"
         )
+    
 
 
 # ==========================================================

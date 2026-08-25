@@ -149,6 +149,33 @@ class Cliente(Crudmedstock):
             conn.close()
 
     @classmethod
+    def atualizar_senha(cls, cliente_id, senha_hash):
+
+        conn = conectar_banco.connect()
+        cursor = conn.cursor()
+
+        try:
+
+            cursor.execute(
+                """
+                UPDATE cliente
+                SET senha = %s
+                WHERE id = %s
+                """,
+                (
+                    senha_hash,
+                    cliente_id
+                )
+            )
+
+            conn.commit()
+
+        finally:
+
+            cursor.close()
+            conn.close()
+'''
+    @classmethod
     def atualizar_senha(cls, id, nova_senha):
 
         conn = conectar_banco.connect()
@@ -173,3 +200,4 @@ class Cliente(Crudmedstock):
 
             cursor.close()
             conn.close()
+'''
