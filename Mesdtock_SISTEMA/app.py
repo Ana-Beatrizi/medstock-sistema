@@ -42,7 +42,7 @@ app = Flask(__name__)
 CORS(app)
 app.secret_key = "Medstock_programa_de_estoque_123456"
 
-#! = Feito pela -- Ana Beatriz // linha 1 a 1154 𖹭.ᐟ
+#! = Feito pela -- Ana Beatriz // linha 1 a 1880 𖹭.ᐟ
 
 
 
@@ -1444,19 +1444,12 @@ def salvar_nova_senha():
     try:
 
         # Busca o cliente
-        cliente = Cliente.seleciona_por_id(
-            cliente_id
-        )
+        cliente = Cliente.seleciona_por_id(cliente_id)
 
         if not cliente:
-            flash(
-                "Cliente não encontrado.",
-                "danger"
-            )
+            flash("Cliente não encontrado.","danger")
 
-            return redirect(
-                url_for("tela_esqueci_a_senha")
-            )
+            return redirect(url_for("tela_esqueci_a_senha"))
 
         # ==================================================
         # GERA O HASH DA NOVA SENHA
@@ -1877,7 +1870,7 @@ def cancelar_saida(id):
     return redirect(url_for("tela_saida"))
 
 
-#! = Feito pela -- Ana Beatriz // linha 1 a 1154 𖹭.ᐟ
+#! = Feito pela -- Ana Beatriz // linha 1 a 1880 𖹭.ᐟ
 
 if __name__ == "__main__":
     app.run(
