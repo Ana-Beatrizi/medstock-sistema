@@ -16,7 +16,8 @@
             
             <form method="POST"
                 action="{% if produto and produto.id %}{{ url_for('atualizar_produto', id=produto.id) }}{% else %}{{ url_for('salvar_produto') }}{% endif %}"
-                id="cadastro-form">
+                id="cadastro-form" method="POST"
+                enctype="multipart/form-data">
 
                 <div class="row g-3 text-start">
                     
@@ -25,6 +26,7 @@
                         <input placeholder="Ex: Dipirona 500mg" type="text" name="nome" id="nome" class="form-control"
                             value="{{ produto.nome if produto else '' }}" required>
                     </div>
+
 
                     <div class="col-md-6">
                         <label class="form-label">Fornecedor</label>
@@ -150,6 +152,28 @@
                         </div>
                     </div>
 
+                    <div class="campo foto-produto">
+                        <label for="imagem">Foto do Produto</label>
+                    
+                        <label class="upload-area" for="imagem">
+                            <i class="bi bi-cloud-arrow-up"></i>
+                    
+                            <span id="nome-arquivo">
+                                Clique para selecionar uma imagem
+                            </span>
+                    
+                            <small>PNG, JPG ou WEBP</small>
+                        </label>
+                    
+                        <input
+                            type="file"
+                            id="imagem"
+                            name="imagem"
+                            accept=".png,.jpg,.jpeg,.webp"
+                            hidden
+                        >
+                    </div>
+
                 </div>
 
                 {% with mensagens = get_flashed_messages(with_categories=true) %}
@@ -192,4 +216,18 @@
     
     if (precoCusto) mascaraDecimal(precoCusto);
     if (precoVenda) mascaraDecimal(precoVenda);</script>
+
+<script>
+    document.getElementById("imagem").addEventListener("change", function () {
+    
+        const nome = document.getElementById("nome-arquivo");
+    
+        if (this.files.length > 0) {
+            nome.textContent = this.files[0].name;
+        } else {
+            nome.textContent = "Clique para selecionar uma imagem";
+        }
+    
+    });
+    </script>
 {% endblock %}

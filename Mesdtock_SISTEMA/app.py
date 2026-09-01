@@ -27,6 +27,7 @@ import smtplib #Simple Mail Transfer Protocol - protocolo para enviar e-mail pel
 #============================
 
 # OUTRAS Importações ========
+import uuid
 import random
 from datetime import datetime
 import re
@@ -44,6 +45,11 @@ app.secret_key = "Medstock_programa_de_estoque_123456"
 
 #! = Feito pela -- Ana Beatriz // linha 1 a 1880 𖹭.ᐟ
 
+UPLOAD_FOLDER = "static/uploads/produtos"
+
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
 # TRANSFORMA DADOS ============
@@ -1604,6 +1610,69 @@ def get_produto_form_cadastro():
 @app.route("/produto/salvar", methods=["POST"])
 def salvar_produto():
     dados = get_produto_form_cadastro()
+
+        # ============================================
+    # PEGA A IMAGEM
+    # ============================================
+
+    imagem = request.files.get("imagem")
+
+    nome_imagem = None
+
+    if imagem and imagem.filename:
+
+        # Extensões permitidas
+        extensoes_permitidas = {
+            "png",
+            "jpg",
+            "jpeg",
+            "webp"
+        }
+
+        extensao = (
+            imagem.filename
+            .rsplit(".", 1)[-1]
+            .lower()
+        )
+
+        if extensao not in extensoes_permitidas:
+
+            flash(
+                "Formato de imagem inválido. "
+                "Use PNG, JPG, JPEG ou WEBP.",
+                "danger"
+            )
+
+            return render_template(
+                "tela_cadastro_produto.html",
+                produto=dados
+            )
+
+        # Limpa o nome original
+        nome_original = secure_filename(
+            imagem.filename
+        )
+
+        # Cria nome único
+        nome_imagem = (
+            f"{uuid.uuid4().hex}_"
+            f"{nome_original}"
+        )
+
+        # Caminho onde a imagem será salva
+        caminho_imagem = os.path.join(
+            UPLOAD_FOLDER,
+            nome_imagem
+        )
+
+        # Salva a imagem
+        imagem.save(caminho_imagem)
+
+    # ============================================
+    # ADICIONA A IMAGEM AOS DADOS DO PRODUTO
+    # ============================================
+
+    dados["imagem"] = nome_imagem
     produto = Produto(**dados)
     erros = produto.validate()
 
@@ -1626,31 +1695,226 @@ def salvar_produto():
 # ================================================
 
 # POST ATUALIZAR PRODUTO ======================
+# =========================================================
+# POST - ATUALIZAR PRODUTO
+# =========================================================
+
 @app.route("/produto/atualizar/<int:id>", methods=["POST"])
 def atualizar_produto(id):
+
+    # -----------------------------------------------------
+    # Verifica se o produto existe
+    # -----------------------------------------------------
+
+    produto_atual = Produto.seleciona_por_id(id)
+
+    if not produto_atual:
+
+        flash("Produto não encontrado.", "erro")
+
+        return redirect(
+            url_for("tela_produtos")
+        )
+
+
+    # -----------------------------------------------------
+    # Pega os dados do formulário
+    # -----------------------------------------------------
+
     dados = get_produto_form_cadastro()
-    produto = Produto(**dados)
+
+
+    # -----------------------------------------------------
+    # IMAGEM
+    # -----------------------------------------------------
+
+    arquivo = request.files.get("imagem")
+
+
+    # Se o usuário selecionou uma nova imagem
+    if arquivo and arquivo.filename:
+
+        nome_original = secure_filename(
+            arquivo.filename
+        )
+
+        # Extensão do arquivo
+        extensao = os.path.splitext(
+            nome_original
+        )[1].lower()
+
+
+        # Extensões permitidas
+        extensoes_permitidas = {
+            ".png",
+            ".jpg",
+            ".jpeg",
+            ".webp"
+        }
+
+
+        if extensao not in extensoes_permitidas:
+
+            flash(
+                "Formato de imagem inválido. "
+                "Use PNG, JPG, JPEG ou WEBP.",
+                "erro"
+            )
+
+            dados["id"] = id
+
+            return render_template(
+                "tela_cadastro_produto.html",
+                produto=dados,
+                fornecedores=Fornecedor.seleciona_tudo()
+            )
+
+
+        # -------------------------------------------------
+        # Cria um nome único para evitar conflito
+        # -------------------------------------------------
+
+        import uuid
+
+        nome_arquivo = (
+            f"{uuid.uuid4().hex}{extensao}"
+        )
+
+
+        # -------------------------------------------------
+        # Pasta onde as imagens serão salvas
+        # -------------------------------------------------
+
+        pasta_upload = os.path.join(
+            "static",
+            "uploads",
+            "produtos"
+        )
+
+
+        os.makedirs(
+            pasta_upload,
+            exist_ok=True
+        )
+
+
+        # -------------------------------------------------
+        # Caminho final
+        # -------------------------------------------------
+
+        caminho_arquivo = os.path.join(
+            pasta_upload,
+            nome_arquivo
+        )
+
+
+        # -------------------------------------------------
+        # Salva a imagem
+        # -------------------------------------------------
+
+        arquivo.save(
+            caminho_arquivo
+        )
+
+
+        # Salva somente o nome no banco
+        dados["imagem"] = nome_arquivo
+
+
+    else:
+
+        # -------------------------------------------------
+        # Nenhuma nova imagem foi escolhida
+        # Mantém a imagem atual
+        # -------------------------------------------------
+
+        if isinstance(produto_atual, dict):
+
+            dados["imagem"] = produto_atual.get(
+                "imagem"
+            )
+
+        else:
+
+            dados["imagem"] = getattr(
+                produto_atual,
+                "imagem",
+                None
+            )
+
+
+    # -----------------------------------------------------
+    # Cria objeto para validação
+    # -----------------------------------------------------
+
+    produto = Produto(
+        **dados
+    )
+
+
+    # -----------------------------------------------------
+    # VALIDAÇÃO
+    # -----------------------------------------------------
+
     erros = produto.validate()
 
+
     if erros:
+
         for erro in erros:
-            flash(erro[0], "erro")
+
+            flash(
+                erro[0],
+                "erro"
+            )
+
+
         dados["id"] = id
-        return render_template("tela_produtos.html", produto=dados) 
+
+
+        return render_template(
+            "tela_cadastro_produto.html",
+            produto=dados,
+            fornecedores=Fornecedor.seleciona_tudo()
+        )
+
+
+    # -----------------------------------------------------
+    # ATUALIZA
+    # -----------------------------------------------------
 
     try:
-        if not Produto.seleciona_por_id(id):
-            flash("Produto não encontrado.", "erro")
-            return redirect(url_for("tela_produtos"))
 
         produto.atualizar(id)
-        flash("Produto atualizado com sucesso.", "success")
-        return redirect(url_for("tela_produtos"))
+
+
+        flash(
+            "Produto atualizado com sucesso.",
+            "success"
+        )
+
+
+        return redirect(
+            url_for("tela_produtos")
+        )
+
+
     except Exception as e:
+
         dados["id"] = id
-        flash(f"Erro ao atualizar produto: {e}", "danger")
-        return render_template("tela_cadastro_produto.html", produto=dados)
-# =========================================
+
+
+        flash(
+            f"Erro ao atualizar produto: {e}",
+            "danger"
+        )
+
+
+        return render_template(
+            "tela_cadastro_produto.html",
+            produto=dados,
+            fornecedores=Fornecedor.seleciona_tudo()
+        )
 
 # PUT EDITAR PRODUTO ==================
 @app.route("/produto/editar/<int:id>")

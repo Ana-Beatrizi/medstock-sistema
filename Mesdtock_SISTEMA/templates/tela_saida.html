@@ -1,207 +1,711 @@
 {% extends 'tela_home.html' %}
 
 {% block conteudo %}
-    <title>Histórico</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tela_entrada.css') }}">
+
+<title>Pedidos de Saída</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/tela_entrada.css') }}">
 
 
 <div class="container">
 
-    <!-- Conteúdo -->
     <main class="content">
+
+        <!-- =====================================================
+             CABEÇALHO
+        ====================================================== -->
+
         <div class="header">
 
             <div class="header-left">
-                <h1>Pedidos</h1>
-                <p>de Saída</p>
-            </div>
-        
-            <div class="header-right">
-        
-                <div class="filtros-card">
-        
-                    <div class="filtro-item">
-                        <i class="bi bi-funnel-fill"></i>
-                        <span>Filtros:</span>
+
+                <div class="titulo-area">
+
+                    <div class="titulo-icon">
+                        <i class="bi bi-box-arrow-up"></i>
                     </div>
-        
+
+                    <div>
+                        <h1>Pedidos</h1>
+                        <p>de SAIDA</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="header-right">
+
+                <!-- FILTROS -->
+
+                <div class="filtros-card">
+
+                    <div class="filtro-item">
+
+                        <i class="bi bi-funnel-fill"></i>
+
+                        <span>Filtros:</span>
+
+                    </div>
+
+
                     <form method="GET"
                           action="{{ url_for('tela_saida') }}"
                           class="filtros-form">
-        
+
+
                         <!-- PRODUTO -->
-                        <select name="produto" onchange="this.form.submit()">
-                            <option value="">Todos os produtos</option>
-        
+
+                        <select name="produto"
+                                onchange="this.form.submit()">
+
+                            <option value="">
+                                Todos os produtos
+                            </option>
+
                             {% for produto in produtos_filtro %}
+
                             <option value="{{ produto.nome }}"
                                 {% if produto_selecionado == produto.nome %}
-                                selected
+                                    selected
                                 {% endif %}>
+
                                 {{ produto.nome }}
+
                             </option>
+
                             {% endfor %}
+
                         </select>
-        
+
+
                         <!-- CLIENTE -->
-                        <select name="cliente" onchange="this.form.submit()">
-                            <option value="">Todos os clientes</option>
-        
+
+                        <select name="cliente"
+                                onchange="this.form.submit()">
+
+                            <option value="">
+                                Todos os clientes
+                            </option>
+
                             {% for cliente in clientes_filtro %}
+
                             <option value="{{ cliente.cliente }}"
                                 {% if cliente_selecionado == cliente.cliente %}
-                                selected
+                                    selected
                                 {% endif %}>
+
                                 {{ cliente.cliente }}
+
                             </option>
+
                             {% endfor %}
+
                         </select>
-        
+
+
                         <!-- STATUS -->
-                        <select name="status" onchange="this.form.submit()">
-        
-                            <option value="">Todos os status</option>
-        
+
+                        <select name="status"
+                                onchange="this.form.submit()">
+
+                            <option value="">
+                                Todos os status
+                            </option>
+
+
                             <option value="PENDENTE"
                                 {% if status_selecionado == 'PENDENTE' %}
-                                selected
+                                    selected
                                 {% endif %}>
+
                                 ⏳ Pendente
+
                             </option>
-        
+
+
                             <option value="PROCESSADO"
                                 {% if status_selecionado == 'PROCESSADO' %}
-                                selected
+                                    selected
                                 {% endif %}>
+
                                 ✅ Processado
+
                             </option>
-        
+
+
                             <option value="CANCELADO"
                                 {% if status_selecionado == 'CANCELADO' %}
-                                selected
+                                    selected
                                 {% endif %}>
+
                                 ❌ Cancelado
+
                             </option>
-        
+
                         </select>
-        
+
                     </form>
-        
+
                 </div>
-        
-                <input type="text"
-                       id="inputBusca"
-                       placeholder="Buscar...">
-        
+
+
+                <!-- BUSCA -->
+
+                <div class="busca-wrapper">
+
+                    <i class="bi bi-search"></i>
+
+                    <input type="text"
+                           id="inputBusca"
+                           placeholder="Buscar...">
+
+                </div>
+
+
+                <!-- NOVO PEDIDO -->
+
                 <a href="{{ url_for('tela_produtos') }}"
                    class="btn btn-cadastro">
-                    <i class="bi bi-plus-lg me-2"></i>
+
+                    <i class="bi bi-plus-lg"></i>
+
                     Fazer Novo Pedido
+
                 </a>
-        
+
             </div>
-        
+
         </div>
 
+
+        <!-- =====================================================
+             ALERTAS
+        ====================================================== -->
+
         {% with mensagens = get_flashed_messages(with_categories=true) %}
-        {% if mensagens %}
-          {% for categoria, msg in mensagens %}
-            <div class="custom-alert alert-{{ categoria }} alert-flash animate__animated animate__fadeIn" role="alert">
-                <div class="alert-content">
-                    {% if categoria == 'success' %}
-                        <i class="bi bi-check-circle-fill alert-icon"></i>
-                    {% elif categoria == 'danger' or categoria == 'error' %}
-                        <i class="bi bi-exclamation-triangle-fill alert-icon"></i>
-                    {% else %}
-                        <i class="bi bi-info-circle-fill alert-icon"></i>
-                    {% endif %}
-                    <span class="alert-text">{{ msg }}</span>
+
+            {% if mensagens %}
+
+                <div class="alerts-container">
+
+                    {% for categoria, msg in mensagens %}
+
+                        <div class="custom-alert alert-{{ categoria }}"
+                             role="alert">
+
+                            <div class="alert-content">
+
+                                {% if categoria == 'success' %}
+
+                                    <i class="bi bi-check-circle-fill alert-icon"></i>
+
+                                {% elif categoria == 'danger' or categoria == 'error' %}
+
+                                    <i class="bi bi-exclamation-triangle-fill alert-icon"></i>
+
+                                {% else %}
+
+                                    <i class="bi bi-info-circle-fill alert-icon"></i>
+
+                                {% endif %}
+
+                                <span class="alert-text">
+                                    {{ msg }}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
                 </div>
-            </div>
-          {% endfor %}
-        {% endif %}
+
+            {% endif %}
+
         {% endwith %}
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Produto</th>
-                    <th>Cliente</th>
-                    <th>Quantidade</th>
-                    <th>Observação</th>
-                    <th>Valor Total</th>
-                    <th>Status</th>
-                    <th>Data</th>
-                    <th>Cancelar</th>
-                    <th>Processar</th>
-                </tr>
-            </thead>
-            <tbody id="tabelaDados">
+
+        <!-- =====================================================
+             TOPO DOS PEDIDOS
+        ====================================================== -->
+
+        <div class="pedidos-topo">
+
+            <div>
+
+                <h2>
+                    <i class="bi bi-list-check"></i>
+                    Pedidos de saída
+                </h2>
+
+                <p>
+                    Confira os produtos enviados aos clientes.
+                </p>
+
+            </div>
+
+
+            <div class="total-registros">
+
+                <i class="bi bi-box-arrow-up"></i>
+
+                <strong>
+                    {{ saidas|length }}
+                </strong>
+
+                <span>
+                    registros
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             GRID DOS CARDS
+        ====================================================== -->
+
+        <div class="pedidos-grid"
+             id="tabelaDados">
+
+
+            {% if saidas %}
+
+
                 {% for item in saidas %}
 
-                <tr>
-                    <td>{{ item.nome }}</td>
-                    <td>{{ item.cliente}}</td>
-                    <td>{{ item.quantidade_pedido }}</td>
-                    <td>{{ item.observacao }}</td>
-                    <td>R$ {{ item.valor_total }}</td>
-                    <td>
-                        <span class="status 
-                            {% if item.status == 'PENDENTE' %}
-                                status-pendente
-                            {% elif item.status == 'PROCESSADO' %}
-                                status-processado
-                            {% elif item.status == 'CANCELADO' %}
-                                status-cancelado
-                            {% endif %}
-                        ">
-                            {{ item.status }}
-                        </span>
-                    </td>
-                    <td><span class="data">{{ item.data_pedido.strftime('%d/%m/%Y') }}</span></td>
-                    <td>
-                        {% if item.status == 'PENDENTE' %}
-                            <a class="btn-tabela btn-cancelar"
-                               href="{{ url_for('cancelar_saida', id=item.id) }}">
-                                Cancelar
-                            </a>
-                        {% endif %}
-                    </td>
+                <article class="pedido-card"
+                         data-produto="{{ item.nome|lower }}"
+                         data-cliente="{{ item.cliente|lower }}">
+
+
+                    <!-- =================================================
+                         IMAGEM
+                    ================================================== -->
+
+                    <div class="pedido-imagem-area">
+           
+                        <!-- STATUS DO PEDIDO -->
                     
-                    <td>
-                        {% if item.status == 'PENDENTE' %}
-                            <a class="btn-tabela btn-processar"
-                               href="{{ url_for('processar_saida', id=item.id) }}">
-                                Processar
-                            </a>
+                        <div class="status-area">
+                    
+                            {% if item.status == 'PENDENTE' %}
+                    
+                                <span class="status status-pendente">
+                                    <span class="status-dot"></span>
+                                    Pendente
+                                </span>
+                    
+                            {% elif item.status == 'PROCESSADO' %}
+                    
+                                <span class="status status-processado">
+                                    <span class="status-dot"></span>
+                                    Processado
+                                </span>
+                    
+                            {% elif item.status == 'CANCELADO' %}
+                    
+                                <span class="status status-cancelado">
+                                    <span class="status-dot"></span>
+                                    Cancelado
+                                </span>
+                    
+                            {% else %}
+                    
+                                <span class="status">
+                                    <span class="status-dot"></span>
+                                    {{ item.status }}
+                                </span>
+                    
+                            {% endif %}
+                    
+                        </div>
+                    
+                    
+                        <!-- IMAGEM -->
+                    
+                        {% if item.imagem %}
+                    
+                            <div class="pedido-imagem">
+                    
+                                {% if item.imagem.startswith('http://') or item.imagem.startswith('https://') %}
+                    
+                                    <!-- IMAGEM EXTERNA -->
+                    
+                                    <img
+                                        src="{{ item.imagem }}"
+                                        alt="{{ item.nome }}"
+                                        loading="lazy"
+                                        onerror="
+                                            this.style.display='none';
+                                            this.parentElement.classList.add('sem-imagem');
+                                        "
+                                    >
+                    
+                                {% else %}
+                    
+                                    <!-- IMAGEM LOCAL -->
+                    
+                                    <img
+                                        src="{{ url_for('static', filename='uploads/produtos/' + item.imagem) }}"
+                                        alt="{{ item.nome }}"
+                                        loading="lazy"
+                                        onerror="
+                                            this.style.display='none';
+                                            this.parentElement.classList.add('sem-imagem');
+                                        "
+                                    >
+                    
+                                {% endif %}
+                    
+                    
+                                <div class="imagem-placeholder">
+                    
+                                    <i class="bi bi-capsule"></i>
+                    
+                                </div>
+                    
+                            </div>
+                    
+                        {% else %}
+                    
+                            <div class="pedido-imagem">
+                    
+                                <div class="imagem-placeholder sem-imagem">
+                    
+                                    <i class="bi bi-capsule"></i>
+                    
+                                </div>
+                    
+                            </div>
+                    
                         {% endif %}
-                    </td>
-                </tr>
-               
-                </tr>
+                    
+                    </div>
+
+
+                    <!-- =================================================
+                         CONTEÚDO
+                    ================================================== -->
+
+                    <div class="pedido-conteudo">
+
+
+                        <!-- PRODUTO -->
+
+                        <div class="pedido-titulo">
+
+                            <span class="pedido-label">
+                                PRODUTO
+                            </span>
+
+                            <h3>
+                                {{ item.nome }}
+                            </h3>
+
+                        </div>
+
+
+                        <!-- CLIENTE -->
+
+                        <div class="pedido-fornecedor">
+
+                            <div class="fornecedor-icon">
+
+                                <i class="bi bi-person-fill"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>
+                                    Cliente
+                                </span>
+
+                                <strong>
+                                    {{ item.cliente }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- INFORMAÇÕES -->
+
+                        <div class="pedido-informacoes">
+
+
+                            <!-- QUANTIDADE -->
+
+                            <div class="info-item">
+
+                                <div class="info-icon quantidade-icon">
+
+                                    <i class="bi bi-box-seam"></i>
+
+                                </div>
+
+
+                                <div>
+
+                                    <span>
+                                        Quantidade
+                                    </span>
+
+                                    <strong>
+                                        {{ item.quantidade_pedido }}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- VALOR -->
+
+                            <div class="info-item">
+
+                                <div class="info-icon valor-icon">
+
+                                    <i class="bi bi-cash-coin"></i>
+
+                                </div>
+
+
+                                <div>
+
+                                    <span>
+                                        Valor total
+                                    </span>
+
+                                    <strong class="valor-total">
+
+                                        R$
+
+                                        {{ "%.2f"|format(item.valor_total|float) }}
+
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- OBSERVAÇÃO -->
+
+                        <div class="observacao">
+
+                            <i class="bi bi-chat-left-text"></i>
+
+                            <span>
+
+                                {% if item.observacao %}
+
+                                    {{ item.observacao }}
+
+                                {% else %}
+
+                                    Nenhuma observação
+
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- RODAPÉ -->
+
+                        <div class="pedido-footer">
+
+
+                            <!-- DATA -->
+
+                            <span class="data">
+
+                                <i class="bi bi-calendar3"></i>
+
+                                {{ item.data_pedido.strftime('%d/%m/%Y') }}
+
+                            </span>
+
+
+                            <!-- AÇÕES -->
+
+                            <div class="pedido-acoes">
+
+
+                                {% if item.status == 'PENDENTE' %}
+
+
+                                    <!-- CANCELAR -->
+
+                                    <a class="btn-tabela btn-cancelar"
+                                       href="{{ url_for('cancelar_saida', id=item.id) }}">
+
+                                        <i class="bi bi-x-lg"></i>
+
+                                        Cancelar
+
+                                    </a>
+
+
+                                    <!-- PROCESSAR -->
+
+                                    <a class="btn-tabela btn-processar"
+                                       href="{{ url_for('processar_saida', id=item.id) }}">
+
+                                        <i class="bi bi-check-lg"></i>
+
+                                        Processar
+
+                                    </a>
+
+
+                                {% elif item.status == 'PROCESSADO' %}
+
+                                    <span class="acao-indisponivel">
+
+                                        <i class="bi bi-check-circle"></i>
+
+                                        Pedido processado
+
+                                    </span>
+
+
+                                {% elif item.status == 'CANCELADO' %}
+
+                                    <span class="acao-indisponivel">
+
+                                        <i class="bi bi-x-circle"></i>
+
+                                        Pedido cancelado
+
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
                 {% endfor %}
-            </tbody>
-        </table>
+
+
+            {% else %}
+
+
+                <!-- =================================================
+                     SEM REGISTROS
+                ================================================== -->
+
+                <div class="sem-registros">
+
+                    <div class="empty-icon">
+
+                        <i class="bi bi-box-arrow-up"></i>
+
+                    </div>
+
+
+                    <h3>
+                        Nenhum pedido de saída encontrado
+                    </h3>
+
+
+                    <p>
+                        Não existem pedidos de saída que correspondam
+                        aos filtros selecionados.
+                    </p>
+
+
+                    <a href="{{ url_for('tela_produtos') }}"
+                       class="empty-button">
+
+                        <i class="bi bi-plus-lg"></i>
+
+                        Fazer novo pedido
+
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        </div>
 
     </main>
+
 </div>
 
+
+<!-- =============================================================
+     BUSCA DOS CARDS
+============================================================= -->
+
 <script>
-    document.getElementById("inputBusca").addEventListener("keyup", function () {
-        let filtro = this.value.toLowerCase();
-        let linhas = document.querySelectorAll("#tabelaDados tr");
-        linhas.forEach(function (linha) {
-            let nomeProduto = linha.cells[0].textContent.toLowerCase();
-            let nomeCliente = linha.cells[1].textContent.toLowerCase();
-            if (nomeProduto.includes(filtro) ||
-            nomeCliente.includes(filtro)) {
-            linha.style.display = "";
-        } else {
-            linha.style.display = "none";
-        }
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const inputBusca = document.getElementById("inputBusca");
+
+    const cards = document.querySelectorAll(".pedido-card");
+
+
+    if (!inputBusca) {
+        return;
+    }
+
+
+    inputBusca.addEventListener("input", function () {
+
+        const filtro = this.value
+            .toLowerCase()
+            .trim();
+
+
+        cards.forEach(function (card) {
+
+            const produto =
+                card.dataset.produto || "";
+
+            const cliente =
+                card.dataset.cliente || "";
+
+
+            if (
+                produto.includes(filtro) ||
+                cliente.includes(filtro)
+            ) {
+
+                card.style.display = "";
+
+            } else {
+
+                card.style.display = "none";
+
+            }
+
+        });
 
     });
 
-    });
+});
+
 </script>
+
+
 {% endblock %}

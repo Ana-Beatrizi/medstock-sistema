@@ -56,14 +56,18 @@ class PedidoSaida(Crudmedstock):
 
     @classmethod
     def historico_saida(cls):
+
         conexao = conectar_banco.connect()
         cursor = conexao.cursor(dictionary=True)
+
         try:
+
             sql = """
             SELECT
                 e.id,
                 c.nome AS cliente,
                 p.nome,
+                p.imagem,
                 e.quantidade_pedido,
                 e.observacao,
                 e.valor_total,
@@ -80,9 +84,13 @@ class PedidoSaida(Crudmedstock):
 
             ORDER BY e.data_pedido DESC
             """
+
             cursor.execute(sql)
+
             return cursor.fetchall()
+
         finally:
+
             cursor.close()
             conexao.close()
 

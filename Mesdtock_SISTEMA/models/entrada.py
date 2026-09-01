@@ -64,26 +64,22 @@ class PedidoEntrada(Crudmedstock):
         cursor = conexao.cursor(dictionary=True)
 
         try:
-
             sql = """
             SELECT
                 e.id,
                 e.status,
                 f.nome_fornecedor,
                 p.nome,
+                p.imagem,
                 e.quantidade_pedido,
                 e.observacao,
                 e.valor_total,
                 e.data_pedido
-
             FROM entrada e
-
             JOIN fornecedor f
                 ON e.fornecedor_id = f.id
-
             JOIN produto p
                 ON e.produto_id = p.id
-
             ORDER BY e.data_pedido DESC
             """
 
@@ -92,7 +88,6 @@ class PedidoEntrada(Crudmedstock):
             return cursor.fetchall()
 
         finally:
-
             cursor.close()
             conexao.close()
 

@@ -78,6 +78,173 @@ body {
     display: flex;
     flex-direction: row;
 }
+/* =========================================================
+   FOTO DO PRODUTO
+========================================================= */
 
+.foto-produto {
+    width: 100%;
+    margin-top: 4px;
+}
+
+
+/* TÍTULO */
+
+.foto-produto > label:first-child {
+    display: block;
+    font-size: 16px;
+    font-weight: 500;
+    color: #27364a;
+    margin-bottom: 8px;
+}
+
+
+/* ÁREA DE UPLOAD */
+
+.upload-area {
+    width: 100%;
+    min-height: 105px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    padding: 18px 20px;
+
+    background: #ffffff;
+
+    border: 2px dashed #b8c9d8;
+    border-radius: 12px;
+
+    color: #64748b;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.25s ease,
+        background-color 0.25s ease,
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+
+    box-sizing: border-box;
+}
+
+
+/* ÍCONE */
+
+.upload-area i {
+    font-size: 28px;
+
+    color: #00819f;
+
+    transition:
+        color 0.25s ease,
+        transform 0.25s ease;
+}
+
+
+/* TEXTO PRINCIPAL */
+
+.upload-area span {
+    font-size: 14px;
+    font-weight: 500;
+
+    color: #334155;
+
+    text-align: center;
+
+    max-width: 100%;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* FORMATOS */
+
+.upload-area small {
+    font-size: 11px;
+
+    color: #94a3b8;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.5px;
+}
+
+
+/* HOVER */
+
+.upload-area:hover {
+    background: #f7fcfd;
+
+    border-color: #00a6b8;
+
+    box-shadow:
+        0 6px 18px rgba(0, 129, 159, 0.10);
+
+    transform: translateY(-1px);
+}
+
+
+.upload-area:hover i {
+    color: #00a6b8;
+
+    transform: translateY(-3px);
+}
+
+
+/* QUANDO O INPUT ESTÁ FOCADO */
+
+#imagem:focus + .upload-area {
+    border-color: #00819f;
+
+    box-shadow:
+        0 0 0 4px rgba(0, 129, 159, 0.12);
+}
+
+
+/* =========================================================
+   ARQUIVO SELECIONADO
+========================================================= */
+
+.upload-area.arquivo-selecionado {
+    border-color: #00a6b8;
+
+    border-style: solid;
+
+    background: #f0fbfc;
+}
+
+
+.upload-area.arquivo-selecionado i {
+    color: #00a6b8;
+}
+
+
+/* =========================================================
+   RESPONSIVO
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .upload-area {
+        min-height: 100px;
+        padding: 16px;
+    }
+
+    .upload-area i {
+        font-size: 25px;
+    }
+
+    .upload-area span {
+        font-size: 13px;
+    }
+
+}
 
 

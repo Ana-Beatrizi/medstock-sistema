@@ -16,11 +16,12 @@ class Produto(Crudmedstock):
         "estoque_minimo",
         "preco_custo",
         "preco_venda",
+        "imagem",
         "ativo"
     ]
 
     def __init__(self, fornecedor_id, nome, quantidade_estoque, categoria, estoque_minimo, preco_custo,
-                 preco_venda, ativo=True):
+                 preco_venda, imagem=None, ativo=True):
         self.fornecedor_id = fornecedor_id
         self.nome = nome
         self.quantidade_estoque = quantidade_estoque
@@ -28,6 +29,7 @@ class Produto(Crudmedstock):
         self.estoque_minimo = estoque_minimo
         self.preco_custo = preco_custo
         self.preco_venda = preco_venda
+        self.imagem = imagem
         self.ativo = ativo
 
 
