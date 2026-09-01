@@ -49,7 +49,7 @@
                 
                 </div>
 
-                <input type="text" id="inputBusca" placeholder="Buscar...">
+                <input type="text" id="inputBusca" placeholder="Pesquisar">
                 <a href="{{ url_for('tela_cadastro_produto') }}" class="btn btn-cadastro">
                     <i class="bi bi-plus-lg me-2"></i> Cadastrar Novo Produto
                 </a>
@@ -110,7 +110,7 @@
                     <td>{{ produto.nome }}</td>
                     <td>{{ produto.fornecedor.nome_fornecedor.split()[:2] | join(' ') }}</td>
                 
-                    <td>{{ produto.categoria }}</td>
+                    <td id="categoria">{{ produto.categoria }}</td>
                     <td id="quantidade" class="{% if produto.quantidade_estoque <= produto.estoque_minimo %}estoque-baixo{% endif %}"> {% if produto.quantidade_estoque <= produto.estoque_minimo %}
                     <i class="bi bi-exclamation-triangle-fill text-danger" title="Estoque baixo"></i> {% endif %}{{ produto.quantidade_estoque }}</td>
                     <td id="estoque_minimo">{{ produto.estoque_minimo }}</td>

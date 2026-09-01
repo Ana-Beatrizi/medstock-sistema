@@ -34,6 +34,7 @@
 #header {
     display: flex;
     position: sticky;
+    height: 60px;
     top: 0;
     justify-content: space-between;
     align-items: center;
@@ -56,21 +57,72 @@
 /* LOGO */
 
 .logo img {
-    width: 70px;
+    width: 200px;
+    position: absolute;
+    left: 10px;
+    top: -35px;
 }
 
 
 /* MENU */
 
 .menu a {
+    position: relative;
+    display: inline-block;
+
     text-decoration: none;
-    color: rgb(255, 255, 255);
-    margin: 0 40px;
+    color: #ffffff;
+
+    margin: 0 35px;
     font-size: 16px;
+    font-weight: 50;
+
+    padding: 10px 2px;
+
+    transition:
+        color 0.3s ease,
+        transform 0.3s ease;
 }
 
+/* Linha inferior animada */
+.menu a::after {
+    content: "";
+
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+
+    width: 0;
+    height: 2px;
+
+    background: #A6FDCF;
+    border-radius: 10px;
+
+    transform: translateX(-50%);
+
+    box-shadow: 0 0 8px rgba(166, 253, 207, 0.7);
+
+    transition:
+        width 0.35s ease,
+        box-shadow 0.35s ease;
+}
+
+/* Hover */
 .menu a:hover {
     color: #A6FDCF;
+
+    transform: translateY(-2px);
+
+    text-shadow:
+        0 0 8px rgba(166, 253, 207, 0.35);
+}
+
+.menu a:hover::after {
+    width: 100%;
+
+    box-shadow:
+        0 0 8px rgba(166, 253, 207, 0.7),
+        0 0 16px rgba(166, 253, 207, 0.35);
 }
 
 
@@ -79,6 +131,13 @@
 ========================================================= */
 
 .botoes button {
+    padding: 8px 15px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+#login{
     padding: 8px 15px;
     margin-left: 10px;
     border: none;
@@ -118,12 +177,12 @@
     left: 100%;
 }
 
-.login {
+#login {
     background: white;
     color: #2c3e50;
 }
 
-.login:hover {
+#login:hover {
     background: #b3d3e4;
 }
 
