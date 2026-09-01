@@ -1,180 +1,1098 @@
+/* ==========================================================
+   TELA DE MOVIMENTAÇÃO - MEDSTOCK
+   ========================================================== */
+
 :root {
     --mov-teal: #17a2a2;
     --mov-teal-dark: #128d8d;
+    --mov-teal-light: #e8f8f8;
+
     --mov-verde: #1a8754;
     --mov-verde-bg: #e3f7ec;
+
     --mov-vermelho: #dc3545;
     --mov-vermelho-bg: #fdeaec;
+
     --mov-texto: #2f3b45;
-    --mov-texto-suave: #6b7a86;
-    --mov-borda: #edf1f4;
+    --mov-texto-secundario: #52616d;
+    --mov-texto-suave: #7b8994;
+
+    --mov-borda: #e8edf1;
+    --mov-borda-hover: #dce4e9;
+
+    --mov-fundo: #ffffff;
+    --mov-fundo-suave: #f8fafb;
+
+    --mov-sombra: 0 8px 25px rgba(20, 40, 60, 0.06);
 }
 
-/* CARD */
-.tabela-card {
-    background: #fff;
-    border: 1px solid var(--mov-borda);
-    border-radius: 14px;
-    box-shadow: 0 6px 20px rgba(20, 40, 60, .06);
-    overflow: hidden;
-    margin-top: 18px;
+
+/* ==========================================================
+   RESET LOCAL
+   ========================================================== */
+
+.container {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
+
+.container *,
+.container *::before,
+.container *::after {
+    box-sizing: border-box;
+}
+
+
+/* ==========================================================
+   CONTEÚDO PRINCIPAL
+   ========================================================== */
+
+.content {
+    width: 100%;
+    max-width: 100%;
+    padding: 30px 38px 50px;
+    margin: 0 auto;
+    color: var(--mov-texto);
+}
+
+
+/* ==========================================================
+   CABEÇALHO
+   ========================================================== */
+
+.header {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 22px;
+    margin-bottom: 24px;
+}
+
+
+/* Título */
+
+.header > div:first-child {
+    width: 100%;
+}
+
+.header h1 {
+    margin: 0;
+    padding: 0;
+
+    color: #202a32;
+
+    font-size: 42px;
+    line-height: 1.15;
+    font-weight: 500;
+
+    letter-spacing: -1.2px;
+}
+
+.header p {
+    margin: 12px 0 0;
+
+    color: #3e4850;
+
+    font-size: 19px;
+    line-height: 1.4;
+    font-weight: 400;
+}
+
+
+/* ==========================================================
+   ÁREA DOS FILTROS
+   ========================================================== */
+
+.header-right {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: 8px;
+}
+
+
+/* Card dos filtros */
+
+.filtros-card {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 0;
+
+    background: transparent;
+    border: none;
+}
+
+
+/* Título "Filtros:" */
+
+.filtro-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    min-width: max-content;
+
+    color: var(--mov-texto);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.filtro-item i {
+    color: #222d35;
+    font-size: 17px;
+}
+
+
+/* Formulário */
+
+.filtros-form {
+    width: auto;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    flex-wrap: wrap;
+}
+
+
+/* ==========================================================
+   SELECTS
+   ========================================================== */
+
+.filtros-form select {
+    height: 38px;
+
+    min-width: 185px;
+
+    padding: 0 34px 0 12px;
+
+    border: 1px solid #d6dde2;
+    border-radius: 7px;
+
+    background-color: #ffffff;
+
+    color: #37434c;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}
+
+
+/* Tamanho específico */
+
+.filtros-form select[name="produto"] {
+    min-width: 205px;
+}
+
+.filtros-form select[name="tipo"] {
+    min-width: 165px;
+}
+
+.filtros-form select[name="fornecedor"] {
+    min-width: 330px;
+}
+
+
+/* Hover */
+
+.filtros-form select:hover {
+    border-color: #b8c5cd;
+    background-color: #fcfefe;
+}
+
+
+/* Focus */
+
+.filtros-form select:focus {
+    border-color: var(--mov-teal);
+
+    box-shadow:
+        0 0 0 3px rgba(23, 162, 162, 0.12);
+}
+
+
+/* ==========================================================
+   CAMPO DE BUSCA
+   ========================================================== */
+
+#inputBusca {
+    width: 270px;
+    height: 38px;
+
+    padding: 0 13px;
+
+    border: 1px solid #d6dde2;
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: var(--mov-texto);
+
+    font-family: inherit;
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+#inputBusca::placeholder {
+    color: #9aa6af;
+}
+
+#inputBusca:hover {
+    border-color: #b8c5cd;
+}
+
+#inputBusca:focus {
+    border-color: var(--mov-teal);
+
+    box-shadow:
+        0 0 0 3px rgba(23, 162, 162, 0.12);
+}
+
+
+/* ==========================================================
+   ALERTAS
+   ========================================================== */
+
+.custom-alert {
+    width: 100%;
+
+    margin: 0 0 18px;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
+    animation-duration: 0.35s;
+}
+
+.alert-content {
+    min-height: 48px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 12px 16px;
+}
+
+.alert-icon {
+    flex-shrink: 0;
+    font-size: 18px;
+}
+
+.alert-text {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+/* Sucesso */
+
+.alert-success {
+    color: #176b45;
+
+    background: #edf9f3;
+
+    border: 1px solid #cceedd;
+}
+
+.alert-success .alert-icon {
+    color: var(--mov-verde);
+}
+
+
+/* Erro */
+
+.alert-danger,
+.alert-error {
+    color: #a92d3b;
+
+    background: #fff0f2;
+
+    border: 1px solid #f4cdd2;
+}
+
+.alert-danger .alert-icon,
+.alert-error .alert-icon {
+    color: var(--mov-vermelho);
+}
+
+
+/* Informação */
+
+.alert-info {
+    color: #246b75;
+
+    background: #edf9fa;
+
+    border: 1px solid #ccebed;
+}
+
+.alert-info .alert-icon {
+    color: var(--mov-teal);
+}
+
+
+/* ==========================================================
+   CARD DA TABELA
+   ========================================================== */
+
+.tabela-card {
+    width: 100%;
+
+    margin-top: 18px;
+
+    background: var(--mov-fundo);
+
+    border: 1px solid var(--mov-borda);
+
+    border-radius: 16px;
+
+    box-shadow: var(--mov-sombra);
+
+    overflow: hidden;
+}
+
+
+/* ==========================================================
+   CABEÇALHO DA TABELA
+   ========================================================== */
 
 .tabela-card-head {
+    width: 100%;
+
+    min-height: 78px;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 16px 22px;
-    border-bottom: 1px solid var(--mov-borda);
+
+    gap: 15px;
+
+    padding: 17px 22px;
+
     background: #fbfdfd;
+
+    border-bottom: 1px solid var(--mov-borda);
 }
+
+
+/* Título */
 
 .tabela-titulo {
     display: flex;
     align-items: center;
-    gap: 9px;
-    font-size: 15px;
-    font-weight: 700;
+
+    gap: 10px;
+
     color: var(--mov-texto);
-    letter-spacing: .2px;
+
+    font-size: 16px;
+    font-weight: 700;
+
+    letter-spacing: 0.1px;
 }
 
-.tabela-titulo i { color: var(--mov-teal); font-size: 16px; }
+.tabela-titulo i {
+    color: var(--mov-teal);
+
+    font-size: 19px;
+}
+
+
+/* Contador */
 
 .tabela-contador {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--mov-teal-dark);
-    background: rgba(23, 162, 162, .10);
-    border: 1px solid rgba(23, 162, 162, .18);
-    padding: 5px 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 36px;
+
+    padding: 6px 14px;
+
     border-radius: 999px;
+
+    color: var(--mov-teal-dark);
+
+    background: rgba(23, 162, 162, 0.09);
+
+    border: 1px solid rgba(23, 162, 162, 0.18);
+
+    font-size: 13px;
+    font-weight: 700;
+
+    white-space: nowrap;
 }
 
-.tabela-scroll { overflow-x: auto; }
 
-/* TABELA */
+/* ==========================================================
+   SCROLL DA TABELA
+   ========================================================== */
+
+.tabela-scroll {
+    width: 100%;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scrollbar-width: thin;
+    scrollbar-color: #cbd6dc transparent;
+}
+
+
+/* Scrollbar Chrome */
+
+.tabela-scroll::-webkit-scrollbar {
+    height: 7px;
+}
+
+.tabela-scroll::-webkit-scrollbar-track {
+    background: #f5f7f8;
+}
+
+.tabela-scroll::-webkit-scrollbar-thumb {
+    background: #cbd6dc;
+    border-radius: 20px;
+}
+
+.tabela-scroll::-webkit-scrollbar-thumb:hover {
+    background: #aebbc3;
+}
+
+
+/* ==========================================================
+   TABELA
+   ========================================================== */
+
 .tabela-mov {
     width: 100%;
+
+    min-width: 900px;
+
     border-collapse: separate;
     border-spacing: 0;
-    font-size: 14px;
+
     color: var(--mov-texto);
-    min-width: 820px;
+
+    font-family: inherit;
+    font-size: 14px;
 }
+
+
+/* ==========================================================
+   CABEÇALHO DA TABELA
+   ========================================================== */
 
 .tabela-mov thead th {
+    height: 58px;
+
+    padding: 0 22px;
+
     background: var(--mov-teal);
-    color: #fff;
+
+    color: #ffffff;
+
     font-size: 12.5px;
-    font-weight: 700;
+    font-weight: 800;
+
     text-transform: uppercase;
-    letter-spacing: .8px;
+
+    letter-spacing: 0.75px;
+
     text-align: left;
-    padding: 14px 18px;
+
     white-space: nowrap;
-    position: sticky;
-    top: 0;
-    z-index: 2;
+
+    vertical-align: middle;
+
+    border: none;
 }
 
+
+/* Primeira coluna */
+
+.tabela-mov thead th:first-child {
+    padding-left: 22px;
+}
+
+
+/* Última coluna */
+
+.tabela-mov thead th:last-child {
+    padding-right: 22px;
+}
+
+
+/* ==========================================================
+   CORPO DA TABELA
+   ========================================================== */
+
 .tabela-mov tbody td {
-    padding: 14px 18px;
+    height: 78px;
+
+    padding: 13px 22px;
+
+    background: #ffffff;
+
     border-bottom: 1px solid var(--mov-borda);
+
+    color: var(--mov-texto);
+
     vertical-align: middle;
 }
 
-.tabela-mov tbody tr:last-child td { border-bottom: none; }
-.tabela-mov tbody tr:nth-child(even) { background: #fcfdfe; }
-.tabela-mov tbody tr { transition: background .15s ease; }
-.tabela-mov tbody tr:hover { background: rgba(23, 162, 162, .06); }
 
-.celula-forte { font-weight: 600; }
-.celula-suave { color: var(--mov-texto-suave); }
+/* Linhas alternadas */
 
-.col-num { text-align: right; white-space: nowrap; }
-.col-data { text-align: right; white-space: nowrap; }
-.tabela-mov th.col-num, .tabela-mov th.col-data { text-align: right; }
-
-.valor {
-    font-variant-numeric: tabular-nums;
-    font-weight: 600;
+.tabela-mov tbody tr:nth-child(even) td {
+    background: #fcfdfe;
 }
 
-/* BADGE TIPO */
+
+/* Hover */
+
+.tabela-mov tbody tr {
+    transition:
+        background-color 0.15s ease;
+}
+
+.tabela-mov tbody tr:hover td {
+    background: rgba(23, 162, 162, 0.045);
+}
+
+
+/* Última linha */
+
+.tabela-mov tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* ==========================================================
+   COLUNAS
+   ========================================================== */
+
+.tabela-mov th.col-num,
+.tabela-mov td.col-num {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.tabela-mov th.col-data,
+.tabela-mov td.col-data {
+    text-align: right;
+    white-space: nowrap;
+}
+
+
+/* ==========================================================
+   TEXTO DO PRODUTO
+   ========================================================== */
+
+.celula-forte {
+    color: #35434e;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* ==========================================================
+   FORNECEDOR / CLIENTE
+   ========================================================== */
+
+.celula-suave {
+    max-width: 350px;
+
+    color: var(--mov-texto-suave);
+
+    font-size: 14px;
+    font-weight: 500;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* ==========================================================
+   BADGE DE TIPO
+   ========================================================== */
+
 .tipo {
     display: inline-flex;
+
     align-items: center;
-    gap: 6px;
-    min-width: 104px;
     justify-content: center;
-    padding: 6px 14px;
+
+    gap: 7px;
+
+    min-width: 132px;
+
+    padding: 8px 14px;
+
     border-radius: 999px;
-    font-size: 15.5px;
+
+    font-size: 15px;
     font-weight: 700;
+
     line-height: 1;
+
+    white-space: nowrap;
 }
 
-.tipo i { font-size: 13px; }
+.tipo i {
+    font-size: 14px;
+}
+
+
+/* Entrada */
 
 .tipo-entrada {
     color: var(--mov-verde);
+
     background: var(--mov-verde-bg);
-    border: 1px solid rgba(26, 135, 84, .18);
+
+    border: 1px solid rgba(26, 135, 84, 0.16);
 }
+
+
+/* Saída */
 
 .tipo-saida {
     color: var(--mov-vermelho);
+
     background: var(--mov-vermelho-bg);
-    border: 1px solid rgba(220, 53, 69, .18);
+
+    border: 1px solid rgba(220, 53, 69, 0.16);
 }
 
-/* QUANTIDADE */
+
+/* ==========================================================
+   QUANTIDADE
+   ========================================================== */
+
 .qtd {
-    display: inline-block;
-    min-width: 68px;
-    text-align: center;
-    padding: 6px 12px;
-    border-radius: 8px;
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 72px;
+
+    padding: 8px 12px;
+
+    border-radius: 9px;
+
+    font-size: 15px;
+    font-weight: 800;
+
+    line-height: 1;
+
+    font-variant-numeric: tabular-nums;
+
+    white-space: nowrap;
+}
+
+
+/* Entrada */
+
+.qtd-entrada {
+    color: var(--mov-verde);
+
+    background: var(--mov-verde-bg);
+}
+
+
+/* Saída */
+
+.qtd-saida {
+    color: var(--mov-vermelho);
+
+    background: var(--mov-vermelho-bg);
+}
+
+
+/* ==========================================================
+   VALOR
+   ========================================================== */
+
+.valor {
+    color: #374650;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    font-variant-numeric: tabular-nums;
+
+    white-space: nowrap;
+}
+
+
+/* ==========================================================
+   DATA
+   ========================================================== */
+
+.data {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-height: 36px;
+
+    padding: 7px 14px;
+
+    border-radius: 9px;
+
+    background: #f2f5f8;
+
+    color: var(--mov-texto-suave);
+
     font-size: 15px;
     font-weight: 700;
+
     font-variant-numeric: tabular-nums;
+
+    white-space: nowrap;
 }
 
-.qtd-entrada { color: var(--mov-verde); background: var(--mov-verde-bg); }
-.qtd-saida { color: var(--mov-vermelho); background: var(--mov-vermelho-bg); }
 
-/* DATA */
-.data {
-    display: inline-block;
-    padding: 5px 12px;
-    border-radius: 8px;
-    background: #f2f5f8;
-    color: var(--mov-texto-suave);
-    font-size: 16.5px;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-}
+/* ==========================================================
+   LINHA VAZIA
+   ========================================================== */
 
-/* VAZIO */
 .linha-vazia td {
-    text-align: center;
-    padding: 44px 18px;
+    height: 220px;
+
+    padding: 45px 18px !important;
+
     color: var(--mov-texto-suave);
+
+    text-align: center !important;
+
+    background: #ffffff !important;
 }
 
-.linha-vazia i {
+.linha-vazia td i {
     display: block;
-    font-size: 26px;
-    margin-bottom: 8px;
+
+    margin-bottom: 10px;
+
     color: #c3cdd6;
+
+    font-size: 34px;
 }
 
-/* RESPONSIVO */
+.linha-vazia td span {
+    display: block;
+
+    color: #87949e;
+
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+/* ==========================================================
+   ANIMAÇÕES
+   ========================================================== */
+
+@keyframes movFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert-flash {
+    animation: movFadeIn 0.35s ease;
+}
+
+
+/* ==========================================================
+   RESPONSIVIDADE - ATÉ 1100PX
+   ========================================================== */
+
+@media (max-width: 1100px) {
+
+    .content {
+        padding: 25px 25px 40px;
+    }
+
+    .header h1 {
+        font-size: 36px;
+    }
+
+    .filtros-card {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .filtros-form {
+        width: 100%;
+    }
+
+    .filtros-form select {
+        flex: 1;
+    }
+
+    .filtros-form select[name="fornecedor"] {
+        min-width: 250px;
+    }
+
+    #inputBusca {
+        width: 300px;
+    }
+}
+
+
+/* ==========================================================
+   RESPONSIVIDADE - TABLET
+   ========================================================== */
+
 @media (max-width: 768px) {
-    .tabela-mov { font-size: 13px; }
-    .tabela-mov thead th,
-    .tabela-mov tbody td { padding: 11px 14px; }
-    .tabela-card-head { flex-direction: column; align-items: flex-start; }
+
+    .content {
+        padding: 22px 16px 35px;
+    }
+
+
+    /* Cabeçalho */
+
+    .header {
+        gap: 18px;
+        margin-bottom: 20px;
+    }
+
+    .header h1 {
+        font-size: 32px;
+        letter-spacing: -0.8px;
+    }
+
+    .header p {
+        margin-top: 8px;
+        font-size: 17px;
+    }
+
+
+    /* Filtros */
+
+    .filtros-card {
+        width: 100%;
+    }
+
+    .filtro-item {
+        font-size: 15px;
+    }
+
+    .filtros-form {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .filtros-form select,
+    .filtros-form select[name="produto"],
+    .filtros-form select[name="tipo"],
+    .filtros-form select[name="fornecedor"] {
+        width: 100%;
+        min-width: 100%;
+    }
+
+
+    /* Busca */
+
+    #inputBusca {
+        width: 100%;
+        max-width: 100%;
+    }
+
+
+    /* Card */
+
+    .tabela-card {
+        margin-top: 16px;
+
+        border-radius: 13px;
+    }
+
+
+    /* Cabeçalho da tabela */
+
+    .tabela-card-head {
+        min-height: auto;
+
+        padding: 15px 17px;
+
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .tabela-titulo {
+        font-size: 15px;
+    }
+
+    .tabela-contador {
+        min-height: 32px;
+        font-size: 12px;
+    }
+
+
+    /* Tabela */
+
+    .tabela-mov {
+        min-width: 850px;
+        font-size: 13px;
+    }
+
+    .tabela-mov thead th {
+        height: 52px;
+
+        padding: 0 15px;
+
+        font-size: 11.5px;
+    }
+
+    .tabela-mov tbody td {
+        height: 70px;
+
+        padding: 11px 15px;
+    }
+
+
+    /* Badges */
+
+    .tipo {
+        min-width: 115px;
+
+        padding: 7px 11px;
+
+        font-size: 13px;
+    }
+
+    .qtd {
+        min-width: 62px;
+
+        padding: 7px 10px;
+
+        font-size: 13px;
+    }
+
+    .data {
+        min-height: 32px;
+
+        padding: 6px 10px;
+
+        font-size: 13px;
+    }
+
+    .celula-forte,
+    .celula-suave,
+    .valor {
+        font-size: 13px;
+    }
+}
+
+
+/* ==========================================================
+   RESPONSIVIDADE - CELULAR
+   ========================================================== */
+
+@media (max-width: 480px) {
+
+    .content {
+        padding: 18px 10px 30px;
+    }
+
+    .header h1 {
+        font-size: 28px;
+    }
+
+    .header p {
+        font-size: 16px;
+    }
+
+    .tabela-card {
+        border-radius: 11px;
+    }
+
+    .tabela-card-head {
+        padding: 14px;
+    }
+
+    .tabela-titulo {
+        font-size: 14px;
+    }
+
+    .tabela-contador {
+        font-size: 11px;
+    }
+}
+
+
+/* ==========================================================
+   ACESSIBILIDADE
+   ========================================================== */
+
+.filtros-form select:focus-visible,
+#inputBusca:focus-visible {
+    outline: 2px solid rgba(23, 162, 162, 0.45);
+
+    outline-offset: 2px;
+}
+
+
+/* ==========================================================
+   REDUÇÃO DE MOVIMENTO
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .tabela-mov tbody tr,
+    .filtros-form select,
+    #inputBusca,
+    .alert-flash {
+        transition: none;
+        animation: none;
+    }
 }
