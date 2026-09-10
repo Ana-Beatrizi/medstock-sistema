@@ -1,588 +1,1446 @@
-    *{
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'Inter', sans-serif;
-    }
+/* ============================================================
+   MEDSTOCK - TELA DE PRODUTOS
+============================================================ */
 
-    body{
-        background: #f5f5f5;
-        overflow-x: hidden;
-    }
 
-    /* ================= CONTAINER ================= */
+/* ============================================================
+   RESET
+============================================================ */
 
-    #container{
-        display: flex;
-    }
-
-    /* ================= CONTEÚDO ================= */
-
-    #content{
-        flex: 1;
-        padding: 30px 40px;
-    }
-
-    /* ================= HEADER ================= */
-    /* ================= HEADER ================= */
-
-    #header{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    
-        margin-bottom: 25px;
-    
-        gap: 20px;
-        flex-wrap: wrap;
-    }
-    
-    .header-left{
-        display: flex;
-        align-items: center;
-    }
-    
-    .header-right{
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        margin-left: auto;
-        flex-wrap: wrap;
-    }
-    
-    #header h1{
-        color: #002D81;
-        font-size: 56px;
-        font-weight: 400;
-    }
-    /* ================= INPUT ================= */
-
-    #header input{
-        width: 250px;
-        height: 58px;
-
-        padding: 0 20px;
-
-        border-radius: 22px;
-        border: 1px solid #cfcfcf;
-
-        background: #f8f8f8;
-
-        outline: none;
-
-        font-size: 18px;
-
-        transition: 0.3s;
-    }
-
-    #header input:focus{
-        border: 1px solid #00C4C0;
-        box-shadow: 0 0 8px rgba(0,196,192,0.2);
-    }
-
-    /* ================= TABELA ================= */
-
-    table{
-        width: 100%;
-        max-width: 100%;
-        
-        border-collapse: collapse;
-
-        background: white;
-
-        border-radius: 0;
-
-        overflow: hidden;
-        border-radius: 10px;
-    }
-
-    /* ================= TÍTULO DA TABELA ================= */
-
-    #table_titulo{
-        background: #002d81d5;
-        color: white;
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-
-    }
-
-    #table_titulo th{
-        padding: 14px;
-        font-size: 18px;
-        font-weight: 600;
-    }
-
-    /* ================= CABEÇALHO ================= */
-
-    thead{
-        background: #00C4C0;
-        color: white;
-        
-
-    }
-
-    th{
-        padding: 12px;
-
-        font-size: 16px;
-        font-weight: 600;
-    }
-
-    /* ================= LINHAS ================= */
-
-    td{
-        padding: 16px 14px;
-
-        font-size: 15px;
-
-        color: #222;
-
-        border-bottom: 1px solid #e5e5e5;
-    }
-
-    tbody tr:hover{
-        background: #00aca916;
-    }
-
-    /* ================= STATUS ================= */
-
-    .em_estoque{
-        color: green;
-        font-weight: bold;
-    }
-
-    .fora_estoque{
-        color: red;
-        font-weight: bold;
-    }
-
-    .alerta{
-        color: rgb(255, 191, 0);
-        font-weight: bold;
-    }
-
-    /* ================= DATA ================= */
-
-    .data{
-        background: #e9ecef;
-
-        padding: 6px 12px;
-
-        border-radius: 10px;
-    }
-
-    /* ================= LINKS ================= */
-
-    a{
-        color: #0d6efd;
-        text-decoration: underline;
-    }
-
-    /* ================= RESPONSIVO ================= */
-    @media(max-width: 900px){
-
-        #header{
-            flex-direction: column;
-            align-items: flex-start;
-        }
-    
-        .header-right{
-            width: 100%;
-            flex-direction: column;
-            align-items: stretch;
-        }
-    
-        #header input{
-            width: 100%;
-        }
-    
-        table{
-            display: block;
-            overflow-x: auto;
-        }
-    }
-
-    /* COLUNA ID */
-
-    th:first-child,
-    td:first-child{
-        width: 70px;
-        max-width: 70px;
-        
-    }
-
-    .acoes{
-        display: flex;
-        flex-direction: row;
-        gap: 8px;
-        
-    }
-
-    .btn-tabela {
-        background: #00C4C0;
-        border: none;
-        color: white;
-        border-radius: 6px;
-        width: 50px;
-        min-width: 80px;
-        height: 32px;
-        padding: 0 12px;
-        font-size: 14px;
-        transition: 0.3s;
-        text-align: center;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .btn-tabela:hover {
-        cursor: pointer;
-        background: #00aca8;
-    }
-
-    .acoes{
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    /* BASE */
-    .btn-acao{
-        text-decoration: none;
-        padding: 8px 12px;
-        border-radius: 12px;
-        font-size: 14px;
-        font-weight: 600;
-        transition: 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: auto;
-        white-space: nowrap;
-
-        flex-shrink: 0;
-    }
-    .acoes,
-.solicitar{
-    min-width: 220px;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
 }
 
-    /* EDITAR */
-    .btn-editar{
-        background: #E8F1FF;
-        color: #2563EB;
-        border: 1px solid #BFDBFE;
-    }
 
-    .btn-editar:hover{
-        background: #DCEBFF;
-        transform: translateY(-2px);
-    }
+/* ============================================================
+   BODY
+============================================================ */
 
-    /* EXCLUIR */
-    .btn-excluir{
-        background: #FFEDEE;
-        color: #DC2626;
-        border: 1px solid #FECACA;
-    }
+body {
+    background: #F4F6FA;
+    overflow-x: hidden;
+}
 
-    .btn-excluir:hover{
-        background: #FFDCDC;
-        transform: translateY(-2px);
-    }
 
-    /* ENTRADA */
-    .btn-entrada{
-        background: #E7FFF5;
-        color: #059669;
-        border: 1px solid #A7F3D0;
-    }
+/* ============================================================
+   CONTAINER
+============================================================ */
 
-    .btn-entrada:hover{
-        background: #D8FCEC;
-        transform: translateY(-2px);
-    }
+#container {
+    display: flex;
+}
 
-    /* SAÍDA */
-    .btn-saida{
-        background: #FFF4E5;
-        color: #D97706;
-        border: 1px solid #FCD9A5;
-    }
 
-    .btn-saida:hover{
-        background: #FFE9C7;
-        transform: translateY(-2px);
-    }
+/* ============================================================
+   CONTEÚDO
+============================================================ */
 
-    .btn-acao{
-        gap: 4px;
-    }
+#content {
+    flex: 1;
+    padding: 30px 40px;
 
-    .btn-acao i{
-        font-size: 15px;
-    }
+    /*
+     * Mantém o scroll horizontal da página,
+     * mas não interfere mais no modal porque
+     * o modal é movido para o BODY pelo JavaScript.
+     */
+    overflow-x: auto;
+}
 
-    /* ================= BOTÃO CADASTRO ================= */
 
-    .btn-cadastro {
-        flex: none !important;
-        width: auto !important;
-        min-width: 240px;
-        height: 44px;
-        margin-top: 0 !important; /* Elimina o desalinhamento gerado pelo mt-2 do bootstrap */
-        padding: 0 20px;
-        border: none;
-        border-radius: 8px;
-        
-        background: linear-gradient(135deg, #002D81 0%, #00819F 50%, #00C4C0 100%);
-        background-size: 200% auto;
-        
-        color: #ffffff !important;
-        font-size: 15px;
-        font-weight: 600;
-        letter-spacing: 0.3px;
-        
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        box-shadow: 0 2px 4px rgba(0, 45, 129, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
-    }
+/* ============================================================
+   HEADER
+============================================================ */
 
-    .btn-cadastro:hover {
-        cursor: pointer;
-        background-position: right center;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 20px rgba(0, 130, 160, 0.3), 0 2px 8px rgba(0, 45, 129, 0.15);
-    }
+#header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
-    .btn-cadastro:active {
-        transform: translateY(1px);
-        box-shadow: 0 2px 5px rgba(0, 45, 129, 0.2);
-    }
+    margin-bottom: 25px;
 
-    .btn-cadastro:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(0, 196, 192, 0.4);
-    }
+    gap: 20px;
 
-    #header select{
-        width: 230px;
-        height: 58px;
-    
-        padding: 0 20px;
-    
-        border-radius: 22px;
-        border: 1px solid #cfcfcf;
-    
-        background: #f8f8f8;
-    
-        outline: none;
-    
-        font-size: 16px;
-    
-        transition: 0.3s;
-    }
-    
-    #header select:focus{
-        border: 1px solid #00C4C0;
-        box-shadow: 0 0 8px rgba(0,196,192,0.2);
-    }
+    flex-wrap: wrap;
+}
 
-#filtro{
+
+.header-left {
     display: flex;
     align-items: center;
-    justify-content: center;
-}
-
-.estoque-baixo {
-    color:  black;
-    background-color: #ffb8b864;
-    font-weight: bold;
-    
-    text-align: center;
-}
-
-#quantidade{
-    text-align: center;
 }
 
 
-
-
-#estoque_minimo{
-    text-align: center;
-    font-weight: bold;
-}
-
-.preco-venda{
-    text-align: right;
-    white-space: nowrap;
-}
-
-
-.filtros-card{
+.header-right {
     display: flex;
     align-items: center;
+
+    gap: 16px;
+
+    margin-left: auto;
+
+    flex-wrap: wrap;
+}
+
+
+#header h1 {
+    color: #002D81;
+
+    font-size: 56px;
+
+    font-weight: 400;
+}
+
+
+#icon {
+    position: relative;
+
+    left: 20px;
+
+    font-size: 50px;
+
+    color: #00C4C0;
+}
+
+
+/* ============================================================
+   INPUT
+============================================================ */
+
+#header input {
+    width: 250px;
+    height: 58px;
+
+    padding: 0 20px;
+
+    border-radius: 22px;
+
+    border: 1px solid #cfcfcf;
+
+    background: #f8f8f8;
+
+    outline: none;
+
+    font-size: 18px;
+
+    transition: 0.3s;
+}
+
+
+#header input:focus {
+    border: 1px solid #00C4C0;
+
+    box-shadow:
+        0 0 8px rgba(0,196,192,0.2);
+}
+
+
+/* ============================================================
+   FILTROS
+============================================================ */
+
+.filtros-card {
+    display: flex;
+
+    align-items: center;
+
     gap: 15px;
-
-
 }
 
-.filtro-item{
+
+.filtro-item {
     display: flex;
+
     align-items: center;
+
     gap: 8px;
 
     color: #002D81;
+
     font-weight: 600;
 }
 
-.filtro-item i{
+
+.filtro-item i {
     color: #00C4C0;
+
     font-size: 18px;
 }
 
-.filtros-form{
+
+.filtros-form {
     display: flex;
+
     gap: 12px;
 }
 
-.filtros-form select{
+
+.filtros-form select {
     min-width: 220px;
+
     height: 48px;
 
     padding: 0 16px;
 
     border-radius: 12px;
+
     border: 1px solid #d1d5db;
 
     background: #fafafa;
 
     font-size: 15px;
+
     transition: .3s;
 }
 
-.filtros-form select:hover{
+
+.filtros-form select:hover {
     border-color: #00C4C0;
 }
 
-.filtros-form select:focus{
+
+.filtros-form select:focus {
     outline: none;
+
     border-color: #00C4C0;
-    box-shadow: 0 0 0 3px rgba(0,196,192,.15);
+
+    box-shadow:
+        0 0 0 3px rgba(0,196,192,.15);
 }
 
-#content{
-    overflow-x: auto;
-}
 
-/**/
-.linha-produto{
-    cursor:pointer;
-}
+/* ============================================================
+   BOTÃO CADASTRO
+============================================================ */
 
-.detalhes-row td{
-    padding:0;
-    border:none;
-}
+.btn-cadastro {
+    flex: none !important;
 
-.detalhes-produto{
-    max-height:0;
-    overflow:hidden;
+    width: auto !important;
+
+    min-width: 240px;
+
+    height: 44px;
+
+    margin-top: 0 !important;
+
+    padding: 0 20px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: linear-gradient(
+        135deg,
+        #002D81 0%,
+        #00819F 50%,
+        #00C4C0 100%
+    );
+
+    background-size: 200% auto;
+
+    color: #ffffff !important;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    letter-spacing: 0.3px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-decoration: none;
 
     transition:
-        max-height .45s ease,
-        padding .45s ease;
+        all 0.3s cubic-bezier(
+            0.25,
+            0.8,
+            0.25,
+            1
+        );
 
-    background:#f8fafc;
+    box-shadow:
+        0 2px 4px rgba(0, 45, 129, 0.15),
+        0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-.detalhes-produto.ativo{
-    max-height:400px;
-    padding:25px;
+
+.btn-cadastro:hover {
+    cursor: pointer;
+
+    background-position: right center;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 6px 20px rgba(0, 130, 160, 0.3),
+        0 2px 8px rgba(0, 45, 129, 0.15);
 }
 
-.detalhes-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:15px;
+
+.btn-cadastro:active {
+    transform: translateY(1px);
 }
 
-.card-info{
-    background:white;
 
-    border-radius:14px;
+/* ============================================================
+   GRID
+============================================================ */
 
-    padding:18px;
+.produtos-grid {
+    display: grid;
 
-    display:flex;
-    align-items:center;
-    gap:12px;
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(270px, 1fr)
+        );
 
-    box-shadow:0 2px 10px rgba(0,0,0,.05);
+    gap: 20px;
 }
 
-.card-info i{
-    color:#00C4C0;
-    font-size:20px;
-}
 
-/**/
-.imagem-produto{
-    text-align: left;
-    margin: 1px 1px;
-    margin-left: 10px;
+/* ============================================================
+   CARD
+============================================================ */
+
+.produto-card {
     position: relative;
-    top: -25px;
-}
 
-.imagem-produto i{
-    font-size: 50px;
-    color: #00C4C0;
-}
+    background: white;
 
-#linha-mais{
+    border-radius: 16px;
+
+    border: 1px solid #E7EAF0;
+
+    box-shadow:
+        0 1px 3px rgba(16, 24, 64, 0.06);
+
+    padding: 20px;
+
+    cursor: pointer;
+
     display: flex;
-    flex-direction: row;
-    height: 45px;
+
+    flex-direction: column;
+
+    gap: 14px;
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        transform .2s ease;
+
+    border-left: 4px solid #00C4C0;
 }
 
-#icon{
+
+.produto-card:hover {
+    box-shadow:
+        0 8px 20px rgba(16, 24, 64, 0.10);
+
+    transform: translateY(-2px);
+}
+
+
+.produto-card.card-estoque-baixo {
+    border-left: 4px solid #DC2626;
+}
+
+
+/* ============================================================
+   TOPO
+============================================================ */
+
+.card-topo {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+}
+
+
+.card-imagem {
+    width: 56px;
+    height: 56px;
+
+    border-radius: 14px;
+
+    background: linear-gradient(
+        135deg,
+        #E6FBFA 0%,
+        #E4EEFF 100%
+    );
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+.card-imagem i {
+    font-size: 26px;
+
+    color: #00819F;
+}
+
+
+.card-estoque-baixo .card-imagem {
+    background: linear-gradient(
+        135deg,
+        #FFEDEE 0%,
+        #FFF4E5 100%
+    );
+}
+
+
+.card-estoque-baixo .card-imagem i {
+    color: #DC2626;
+}
+
+
+/* ============================================================
+   MENU (...)
+============================================================ */
+
+.card-opcoes-wrap {
     position: relative;
-    left: 20px;
-    font-size: 50px;
-    color: #00C4C0;
 }
 
-/* =========================================================
-   OTIMIZAÇÃO DE PRODUTOS - RENDERIZAÇÃO FORA DA TELA
-   ========================================================= */
 
-/* Cada grupo representa um produto + sua linha de detalhes */
-tbody.produto-grupo {
-    content-visibility: auto;
-    contain-intrinsic-size: 130px;
+.btn-opcoes {
+    width: 34px;
+    height: 34px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: transparent;
+
+    color: #7A8399;
+
+    font-size: 16px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    cursor: pointer;
+
+    transition: .2s;
 }
+
+
+.btn-opcoes:hover {
+    background: #F1F3F8;
+
+    color: #002D81;
+}
+
+
+.menu-opcoes {
+    position: absolute;
+
+    top: 40px;
+
+    right: 0;
+
+    background: white;
+
+    border: 1px solid #E7EAF0;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 10px 24px rgba(16, 24, 64, 0.14);
+
+    min-width: 150px;
+
+    padding: 6px;
+
+    display: none;
+
+    flex-direction: column;
+
+    gap: 2px;
+
+    z-index: 100;
+}
+
+
+.menu-opcoes.aberto {
+    display: flex;
+}
+
+
+.menu-opcoes a {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 9px 10px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    text-decoration: none;
+
+    color: #2563EB;
+
+    transition: .15s;
+}
+
+
+.menu-opcoes a:hover {
+    background: #E8F1FF;
+}
+
+
+.menu-opcoes a.opcao-excluir {
+    color: #DC2626;
+}
+
+
+.menu-opcoes a.opcao-excluir:hover {
+    background: #FFEDEE;
+}
+
+
+/* ============================================================
+   CORPO DO CARD
+============================================================ */
+
+.card-corpo {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+
+.card-categoria {
+    font-size: 12.5px;
+
+    font-weight: 600;
+
+    color: #00819F;
+}
+
+
+.card-nome {
+    font-size: 18px;
+
+    font-weight: 700;
+
+    color: #17223B;
+
+    line-height: 1.25;
+}
+
+
+.card-preco {
+    margin-top: 6px;
+
+    display: flex;
+
+    align-items: baseline;
+
+    gap: 4px;
+
+    color: #002D81;
+}
+
+
+.card-preco .moeda {
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+.card-preco span:last-child {
+    font-size: 24px;
+
+    font-weight: 700;
+}
+
+
+/* ============================================================
+   ESTOQUE
+============================================================ */
+
+.card-estoque-linha {
+    margin-top: 8px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+}
+
+
+.estoque-info {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    color: #17223B;
+}
+
+
+.estoque-info.estoque-baixo {
+    color: #DC2626;
+}
+
+
+.estoque-minimo-info {
+    font-size: 13px;
+
+    color: #8A93A6;
+}
+
+
+/* ============================================================
+   BOTÕES ENTRADA / SAÍDA
+============================================================ */
+
+.card-acoes {
+    display: flex;
+
+    gap: 10px;
+}
+
+
+.btn-acao {
+    flex: 1;
+
+    text-decoration: none;
+
+    padding: 9px 10px;
+
+    border-radius: 10px;
+
+    font-size: 13.5px;
+
+    font-weight: 600;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 6px;
+
+    transition: .2s ease;
+}
+
+
+.btn-acao i {
+    font-size: 14px;
+}
+
+
+.btn-entrada {
+    background: #E7FFF5;
+
+    color: #059669;
+
+    border: 1px solid #A7F3D0;
+}
+
+
+.btn-entrada:hover {
+    background: #D8FCEC;
+
+    transform: translateY(-1px);
+}
+
+
+.btn-saida {
+    background: #FFF4E5;
+
+    color: #D97706;
+
+    border: 1px solid #FCD9A5;
+}
+
+
+.btn-saida:hover {
+    background: #FFE9C7;
+
+    transform: translateY(-1px);
+}
+
+
+/* ============================================================
+   MODAL LATERAL
+============================================================ */
 
 /*
-   O navegador não precisa pintar/renderizar o conteúdo
-   que está muito distante da área visível.
-*/
-.linha-produto,
-.detalhes-row {
-    contain: layout paint style;
+ * ATENÇÃO:
+ *
+ * O JavaScript move o modal diretamente para o BODY.
+ *
+ * Portanto ele NÃO fica preso dentro do #content.
+ *
+ * position: fixed significa:
+ * coordenadas relativas à janela do navegador.
+ */
+
+.modal-produto {
+
+    position: fixed !important;
+
+    left: 0;
+    top: 0;
+
+    width: 405px;
+
+    max-width: calc(100vw - 24px);
+
+    max-height: calc(100vh - 24px);
+
+    background: #FFFFFF;
+
+    border: 1px solid #E7EAF0;
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 20px 50px rgba(16, 24, 64, 0.18),
+        0 5px 15px rgba(16, 24, 64, 0.08);
+
+    z-index: 999999;
+
+    overflow: visible;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+    /*
+     * NÃO usar translate(-50%, -50%).
+     */
+
+    transform: translateX(0);
+
+    transition:
+        opacity .20s ease,
+        transform .20s ease,
+        visibility .20s ease;
 }
 
-/* Mantém as linhas estáveis durante a rolagem */
-.tabela-produtos {
-    contain: layout style;
+
+/* ============================================================
+   MODAL VISÍVEL
+============================================================ */
+
+.modal-produto.visivel {
+
+    opacity: 1;
+
+    visibility: visible;
+
+    pointer-events: auto;
 }
 
-/* Evita que a tabela fique recalculando tudo */
-#tabelaDados {
-    contain: content;
+
+/* ============================================================
+   ANIMAÇÃO - DIREITA
+============================================================ */
+
+.modal-produto.modal-direita {
+
+    transform: translateX(-8px);
+}
+
+
+.modal-produto.modal-direita.visivel {
+
+    transform: translateX(0);
+}
+
+
+/* ============================================================
+   ANIMAÇÃO - ESQUERDA
+============================================================ */
+
+.modal-produto.modal-esquerda {
+
+    transform: translateX(8px);
+}
+
+
+.modal-produto.modal-esquerda.visivel {
+
+    transform: translateX(0);
+}
+
+
+/* ============================================================
+   SETA
+============================================================ */
+
+.modal-seta {
+
+    position: absolute;
+
+    width: 18px;
+    height: 18px;
+
+    background: #FFFFFF;
+
+    transform: rotate(45deg);
+
+    top: 32px;
+
+    z-index: -1;
+}
+
+
+/* ============================================================
+   SETA - MODAL À DIREITA
+============================================================ */
+
+.modal-direita .modal-seta {
+
+    left: -9px;
+
+    border-left: 1px solid #E7EAF0;
+
+    border-bottom: 1px solid #E7EAF0;
+}
+
+
+/* ============================================================
+   SETA - MODAL À ESQUERDA
+============================================================ */
+
+.modal-esquerda .modal-seta {
+
+    right: -9px;
+
+    border-right: 1px solid #E7EAF0;
+
+    border-top: 1px solid #E7EAF0;
+}
+
+
+/* ============================================================
+   CABEÇALHO DO MODAL
+============================================================ */
+
+.modal-header {
+
+    min-height: 108px;
+
+    padding: 25px 24px 20px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    border-bottom: 1px solid #EEF1F6;
+}
+
+
+.modal-label {
+
+    display: block;
+
+    color: #00A9A6;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 8px;
+}
+
+
+.modal-header h2 {
+
+    color: #17223B;
+
+    font-size: 25px;
+
+    line-height: 1.2;
+
+    font-weight: 700;
+
+    max-width: 290px;
+
+    word-break: break-word;
+}
+
+
+/* ============================================================
+   BOTÃO FECHAR
+============================================================ */
+
+.btn-fechar-modal {
+
+    flex-shrink: 0;
+
+    width: 42px;
+    height: 42px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background: #F1F4F8;
+
+    color: #8490A5;
+
+    font-size: 17px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+}
+
+
+.btn-fechar-modal:hover {
+
+    background: #E7EBF2;
+
+    color: #002D81;
+
+    transform: rotate(90deg);
+}
+
+
+/* ============================================================
+   CONTEÚDO
+============================================================ */
+
+.modal-conteudo {
+
+    padding: 22px 24px 24px;
+
+    max-height: calc(100vh - 132px);
+
+    overflow-y: auto;
+}
+
+
+/* ============================================================
+   CATEGORIA
+============================================================ */
+
+.modal-categoria {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 9px 14px;
+
+    border-radius: 20px;
+
+    background: #E6FBFA;
+
+    color: #00819F;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    margin-bottom: 16px;
+}
+
+
+/* ============================================================
+   PREÇO
+============================================================ */
+
+.modal-preco-box {
+
+    background: linear-gradient(
+        135deg,
+        #F1F8FF 0%,
+        #E9FBFA 100%
+    );
+
+    border: 1px solid #E0EEF7;
+
+    border-radius: 16px;
+
+    padding: 18px 20px;
+
+    margin-bottom: 18px;
+}
+
+
+.modal-preco-box > span {
+
+    display: block;
+
+    color: #7C879B;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    margin-bottom: 5px;
+}
+
+
+.modal-preco-box strong {
+
+    display: flex;
+
+    align-items: baseline;
+
+    gap: 5px;
+
+    color: #002D81;
+}
+
+
+.modal-preco-box strong small {
+
+    font-size: 15px;
+
+    font-weight: 700;
+}
+
+
+.modal-preco-box strong span {
+
+    font-size: 34px;
+
+    font-weight: 700;
+
+    line-height: 1;
+}
+
+
+/* ============================================================
+   INFORMAÇÕES
+============================================================ */
+
+.modal-informacoes {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+
+.modal-info {
+
+    min-height: 68px;
+
+    padding: 10px 12px;
+
+    background: #F7F9FC;
+
+    border-radius: 13px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.modal-info-icone {
+
+    flex-shrink: 0;
+
+    width: 40px;
+    height: 40px;
+
+    border-radius: 11px;
+
+    background: #E6FBFA;
+
+    color: #00A6B5;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 17px;
+}
+
+
+.modal-info-texto {
+
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+
+.modal-info-texto span {
+
+    color: #8993A7;
+
+    font-size: 12px;
+
+    font-weight: 600;
+}
+
+
+.modal-info-texto strong {
+
+    color: #26334D;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    line-height: 1.3;
+
+    word-break: break-word;
+}
+
+
+/* ============================================================
+   AÇÕES DO MODAL
+============================================================ */
+
+.modal-acoes {
+
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 18px;
+}
+
+
+.modal-btn {
+
+    flex: 1;
+
+    min-height: 48px;
+
+    border-radius: 11px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    text-decoration: none;
+
+    font-size: 13.5px;
+
+    font-weight: 700;
+
+    transition: .2s ease;
+}
+
+
+.modal-btn i {
+
+    font-size: 15px;
+}
+
+
+.modal-btn-entrada {
+
+    background: #E7FFF5;
+
+    color: #059669;
+
+    border: 1px solid #A7F3D0;
+}
+
+
+.modal-btn-entrada:hover {
+
+    background: #D8FCEC;
+
+    transform: translateY(-1px);
+}
+
+
+.modal-btn-saida {
+
+    background: #FFF4E5;
+
+    color: #D97706;
+
+    border: 1px solid #FCD9A5;
+}
+
+
+.modal-btn-saida:hover {
+
+    background: #FFE9C7;
+
+    transform: translateY(-1px);
+}
+
+
+/* ============================================================
+   SCROLLBAR
+============================================================ */
+
+.modal-conteudo::-webkit-scrollbar {
+
+    width: 5px;
+}
+
+
+.modal-conteudo::-webkit-scrollbar-track {
+
+    background: transparent;
+}
+
+
+.modal-conteudo::-webkit-scrollbar-thumb {
+
+    background: #D5DCE8;
+
+    border-radius: 10px;
+}
+
+
+/* ============================================================
+   ESTADO VAZIO
+============================================================ */
+
+.estado-vazio {
+
+    background: white;
+
+    border: 1px dashed #D7DCE6;
+
+    border-radius: 16px;
+
+    padding: 60px 20px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 12px;
+
+    color: #8A93A6;
+}
+
+
+.estado-vazio i {
+
+    font-size: 36px;
+
+    color: #00C4C0;
+}
+
+
+/* ============================================================
+   RESPONSIVO
+============================================================ */
+
+@media (max-width: 1100px) {
+
+    .header-right {
+
+        width: 100%;
+
+        margin-left: 0;
+
+    }
+
+}
+
+
+@media (max-width: 900px) {
+
+    #content {
+
+        padding: 25px 20px;
+
+    }
+
+
+    #header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+    }
+
+
+    .header-right {
+
+        width: 100%;
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+    }
+
+
+    #header input {
+
+        width: 100%;
+
+    }
+
+
+    .filtros-card {
+
+        width: 100%;
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+    }
+
+
+    .filtros-form {
+
+        width: 100%;
+
+        flex-direction: column;
+
+    }
+
+
+    .filtros-form select {
+
+        width: 100%;
+
+        min-width: 0;
+
+    }
+
+
+    .btn-cadastro {
+
+        width: 100% !important;
+
+    }
+
+
+    .produtos-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+
+/* ============================================================
+   CELULAR
+============================================================ */
+
+@media (max-width: 600px) {
+
+    /*
+     * No celular não há espaço suficiente
+     * para ficar ao lado do card.
+     */
+
+    .modal-produto {
+
+        width: calc(100vw - 24px);
+
+        max-width: none;
+
+        max-height: calc(100vh - 24px);
+
+    }
+
+
+    .modal-header {
+
+        padding: 20px;
+
+    }
+
+
+    .modal-conteudo {
+
+        padding: 18px 20px 20px;
+
+    }
+
+
+    .modal-header h2 {
+
+        font-size: 21px;
+
+        max-width: 230px;
+
+    }
+
+
+    .modal-preco-box strong span {
+
+        font-size: 30px;
+
+    }
+
+
+    .modal-seta {
+
+        display: none;
+
+    }
+
 }
