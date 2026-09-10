@@ -10,6 +10,22 @@
 <link rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+{% set categoria_icones = {
+    'Analgésicos': 'bi-capsule-pill',
+    'Anti-inflamatórios': 'bi-capsule',
+    'Antibióticos': 'bi-virus',
+    'Antialérgicos': 'bi-bandaid',
+    'Gastrointestinais': 'bi-cup-hot',
+    'Cardiovasculares': 'bi-heart-pulse',
+    'Antidiabéticos': 'bi-droplet',
+    'Respiratórios': 'bi-lungs-fill',
+    'Dermatológicos': 'bi-eyedropper',
+    'Vitaminas e Suplementos': 'bi-heart',
+    'Medicamentos Controlados': 'bi-shield-lock',
+    'Vacinas': 'bi-shield-check',
+    'Materiais Hospitalares': 'bi-hospital',
+    'EPIs': 'bi-person-badge'
+} %}
 
 <div id="container">
 
@@ -170,6 +186,8 @@
 
             {% for produto in produtos %}
 
+            {% set icone = categoria_icones.get(produto.categoria, 'bi-box-seam') %}
+
             <div class="produto-card
                 {% if produto.quantidade_estoque <= produto.estoque_minimo %}
                     card-estoque-baixo
@@ -179,10 +197,15 @@
                 data-nome="{{ produto.nome }}"
                 data-fornecedor="{{ produto.fornecedor.nome_fornecedor }}"
                 data-categoria="{{ produto.categoria }}"
+                data-icone="{{ icone }}"
                 data-estoque="{{ produto.quantidade_estoque }}"
                 data-minimo="{{ produto.estoque_minimo }}"
                 data-preco="{{ '%.2f'|format(produto.preco_venda) }}"
-                data-custo="{{ '%.2f'|format(produto.preco_custo) if produto.preco_custo is not none else '0.00' }}">
+                data-custo="{{ '%.2f'|format(produto.preco_custo) if produto.preco_custo is not none else '0.00' }}"
+                data-entrada="{{ url_for('novo_pedido', tipo='entrada', id=produto.id) }}"
+                data-saida="{{ url_for('novo_pedido_saida', tipo='saida', id=produto.id) }}"
+                data-editar="{{ url_for('editar_produto', id=produto.id) }}"
+                data-excluir="{{ url_for('excluir_produto', id=produto.id) }}">
 
 
                 <!-- =================================================
@@ -193,67 +216,7 @@
 
                     <div class="card-imagem">
 
-                        {% if produto.categoria == "Analgésicos" %}
-
-                            <i class="bi bi-capsule-pill"></i>
-
-                        {% elif produto.categoria == "Anti-inflamatórios" %}
-
-                            <i class="bi bi-capsule"></i>
-
-                        {% elif produto.categoria == "Antibióticos" %}
-
-                            <i class="bi bi-virus"></i>
-
-                        {% elif produto.categoria == "Antialérgicos" %}
-
-                            <i class="bi bi-bandaid"></i>
-
-                        {% elif produto.categoria == "Gastrointestinais" %}
-
-                            <i class="bi bi-cup-hot"></i>
-
-                        {% elif produto.categoria == "Cardiovasculares" %}
-
-                            <i class="bi bi-heart-pulse"></i>
-
-                        {% elif produto.categoria == "Antidiabéticos" %}
-
-                            <i class="bi bi-droplet"></i>
-
-                        {% elif produto.categoria == "Respiratórios" %}
-
-                            <i class="bi bi-lungs-fill"></i>
-
-                        {% elif produto.categoria == "Dermatológicos" %}
-
-                            <i class="bi bi-eyedropper"></i>
-
-                        {% elif produto.categoria == "Vitaminas e Suplementos" %}
-
-                            <i class="bi bi-heart"></i>
-
-                        {% elif produto.categoria == "Medicamentos Controlados" %}
-
-                            <i class="bi bi-shield-lock"></i>
-
-                        {% elif produto.categoria == "Vacinas" %}
-
-                            <i class="bi bi-shield-check"></i>
-
-                        {% elif produto.categoria == "Materiais Hospitalares" %}
-
-                            <i class="bi bi-hospital"></i>
-
-                        {% elif produto.categoria == "EPIs" %}
-
-                            <i class="bi bi-person-badge"></i>
-
-                        {% else %}
-
-                            <i class="bi bi-box-seam"></i>
-
-                        {% endif %}
+                        <i class="bi {{ icone }}"></i>
 
                     </div>
 
@@ -423,225 +386,203 @@
 
 
 <!-- =============================================================
-     MODAL DE DETALHES
-     
+     MODAL DE DETALHES DO PRODUTO
+
      IMPORTANTE:
-     O JavaScript vai mover este elemento diretamente para o BODY.
-     Assim ele não fica preso ao #content ou ao template pai.
+     O JavaScript vai mover o overlay diretamente para o BODY,
+     para que o modal centralizado nunca fique preso a nenhum
+     contêiner pai (#content, sidebar, overflow, transform etc).
 ============================================================= -->
 
-<div id="modalProduto"
-     class="modal-produto"
-     aria-hidden="true">
+<div id="modalOverlay" class="modal-overlay" aria-hidden="true">
 
-    <div class="modal-seta"></div>
+    <div id="modalProduto"
+         class="modal-produto"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="modalNome"
+         tabindex="-1">
 
+        <!-- CABEÇALHO -->
 
-    <!-- CABEÇALHO -->
+        <div class="modal-header">
 
-    <div class="modal-header">
+            <div class="modal-header-info">
 
-        <div>
+                <div class="modal-icone" id="modalIcone">
+                    <i class="bi bi-box-seam"></i>
+                </div>
 
-            <span class="modal-label">
-                DETALHES DO PRODUTO
-            </span>
+                <div class="modal-header-texto">
 
-            <h2 id="modalNome">
-                Produto
-            </h2>
+                    <span class="modal-categoria-tag" id="modalCategoria">
+                        Categoria
+                    </span>
 
-        </div>
+                    <h2 id="modalNome">
+                        Produto
+                    </h2>
 
+                </div>
 
-        <button type="button"
-                id="fecharModal"
-                class="btn-fechar-modal"
-                aria-label="Fechar">
-
-            <i class="bi bi-x-lg"></i>
-
-        </button>
-
-    </div>
+            </div>
 
 
-    <!-- CONTEÚDO -->
+            <button type="button"
+                    id="fecharModal"
+                    class="btn-fechar-modal"
+                    aria-label="Fechar">
 
-    <div class="modal-conteudo">
+                <i class="bi bi-x-lg"></i>
 
-        <div class="modal-categoria"
-             id="modalCategoria">
-
-            Categoria
+            </button>
 
         </div>
 
 
-        <div class="modal-preco-box">
+        <!-- CONTEÚDO -->
 
-            <span>
-                Preço de venda
-            </span>
+        <div class="modal-conteudo">
 
-            <strong>
 
-                <small>R$</small>
+            <!-- ALERTA DE ESTOQUE BAIXO -->
 
-                <span id="modalPreco">
-                    0,00
+            <div class="modal-alerta-estoque"
+                 id="modalAlertaEstoque"
+                 hidden>
+
+                <i class="bi bi-exclamation-triangle-fill"></i>
+
+                <span>
+                    Estoque abaixo do mínimo recomendado. Considere repor
+                    este produto o quanto antes.
                 </span>
 
-            </strong>
-
-        </div>
+            </div>
 
 
-        <div class="modal-informacoes">
+            <!-- PREÇOS E MARGEM -->
 
+            <div class="modal-precos">
 
-            <!-- ID -->
+                <div class="preco-box preco-venda">
 
-            <div class="modal-info">
+                    <span>Preço de venda</span>
 
-                <div class="modal-info-icone">
-
-                    <i class="bi bi-hash"></i>
-
-                </div>
-
-                <div class="modal-info-texto">
-
-                    <span>ID</span>
-
-                    <strong id="modalId">
-                        #0
+                    <strong>
+                        <small>R$</small>
+                        <span id="modalPreco">0,00</span>
                     </strong>
 
                 </div>
 
-            </div>
 
-
-            <!-- FORNECEDOR -->
-
-            <div class="modal-info">
-
-                <div class="modal-info-icone">
-
-                    <i class="bi bi-truck"></i>
-
-                </div>
-
-                <div class="modal-info-texto">
-
-                    <span>Fornecedor</span>
-
-                    <strong id="modalFornecedor">
-                        -
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-            <!-- CATEGORIA -->
-
-            <div class="modal-info">
-
-                <div class="modal-info-icone">
-
-                    <i class="bi bi-tags"></i>
-
-                </div>
-
-                <div class="modal-info-texto">
-
-                    <span>Categoria</span>
-
-                    <strong id="modalCategoriaInfo">
-                        -
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-            <!-- ESTOQUE -->
-
-            <div class="modal-info">
-
-                <div class="modal-info-icone">
-
-                    <i class="bi bi-box-seam"></i>
-
-                </div>
-
-                <div class="modal-info-texto">
-
-                    <span>Estoque atual</span>
-
-                    <strong id="modalEstoque">
-                        0 unidades
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-            <!-- ESTOQUE MÍNIMO -->
-
-            <div class="modal-info">
-
-                <div class="modal-info-icone">
-
-                    <i class="bi bi-exclamation-triangle"></i>
-
-                </div>
-
-                <div class="modal-info-texto">
-
-                    <span>Estoque mínimo</span>
-
-                    <strong id="modalMinimo">
-                        0 unidades
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-            <!-- PREÇO DE CUSTO -->
-
-            <div class="modal-info">
-
-                <div class="modal-info-icone">
-
-                    <i class="bi bi-cash-stack"></i>
-
-                </div>
-
-                <div class="modal-info-texto">
+                <div class="preco-box preco-custo">
 
                     <span>Preço de custo</span>
 
-                    <strong id="modalCusto">
-                        R$ 0,00
+                    <strong>
+                        <small>R$</small>
+                        <span id="modalCusto">0,00</span>
                     </strong>
+
+                </div>
+
+
+                <div class="preco-box preco-margem" id="modalMargemBox">
+
+                    <span>Margem de lucro</span>
+
+                    <strong id="modalMargem">0%</strong>
 
                 </div>
 
             </div>
 
 
+            <!-- NÍVEL DE ESTOQUE -->
+
+            <div class="modal-estoque-card">
+
+                <div class="modal-estoque-topo">
+
+                    <span>
+                        <i class="bi bi-box-seam"></i>
+                        Nível de estoque
+                    </span>
+
+                    <strong id="modalEstoqueTexto">
+                        0 un.
+                    </strong>
+
+                </div>
+
+
+                <div class="modal-estoque-barra">
+
+                    <div class="modal-estoque-marcador-minimo"
+                         id="modalMarcadorMinimo"></div>
+
+                    <div class="modal-estoque-preenchimento"
+                         id="modalEstoqueBarra"></div>
+
+                </div>
+
+
+                <div class="modal-estoque-legenda">
+
+                    <span>
+                        Mínimo recomendado:
+                        <strong id="modalMinimoLegenda">0</strong> un.
+                    </span>
+
+                    <span class="modal-estoque-status"
+                          id="modalEstoqueStatus">
+                        Estoque normal
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- INFORMAÇÕES GERAIS -->
+
+            <div class="modal-informacoes">
+
+                <div class="modal-info">
+
+                    <div class="modal-info-icone">
+                        <i class="bi bi-hash"></i>
+                    </div>
+
+                    <div class="modal-info-texto">
+                        <span>Código do produto</span>
+                        <strong id="modalId">#0</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="modal-info">
+
+                    <div class="modal-info-icone">
+                        <i class="bi bi-truck"></i>
+                    </div>
+
+                    <div class="modal-info-texto">
+                        <span>Fornecedor</span>
+                        <strong id="modalFornecedor">-</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
 
 
-        <!-- BOTÕES -->
+        <!-- AÇÕES -->
 
         <div class="modal-acoes">
 
@@ -650,7 +591,6 @@
                class="modal-btn modal-btn-entrada">
 
                 <i class="bi bi-box-arrow-in-down"></i>
-
                 Entrada
 
             </a>
@@ -661,8 +601,27 @@
                class="modal-btn modal-btn-saida">
 
                 <i class="bi bi-box-arrow-up"></i>
-
                 Saída
+
+            </a>
+
+
+            <a id="modalEditar"
+               href="#"
+               class="modal-btn modal-btn-editar">
+
+                <i class="bi bi-pencil-square"></i>
+                Editar
+
+            </a>
+
+
+            <a id="modalExcluir"
+               href="#"
+               class="modal-btn modal-btn-excluir">
+
+                <i class="bi bi-trash3-fill"></i>
+                Excluir
 
             </a>
 
@@ -682,22 +641,17 @@
 document.addEventListener("DOMContentLoaded", function () {
 
     /*
-     * ==========================================================
-     * CORREÇÃO PRINCIPAL
-     *
-     * Move o modal diretamente para o BODY.
-     *
+     * Move o overlay do modal diretamente para o BODY.
      * Isso impede que #content, sidebar, transform,
-     * overflow ou qualquer outro elemento pai altere
-     * o comportamento do position: fixed.
-     * ==========================================================
+     * overflow ou qualquer outro elemento pai interfira
+     * no posicionamento do modal centralizado.
      */
 
-    const modal = document.getElementById("modalProduto");
+    const overlay = document.getElementById("modalOverlay");
 
-    if (modal && modal.parentElement !== document.body) {
+    if (overlay && overlay.parentElement !== document.body) {
 
-        document.body.appendChild(modal);
+        document.body.appendChild(overlay);
 
     }
 
@@ -754,8 +708,14 @@ document.addEventListener("DOMContentLoaded", function () {
        ELEMENTOS DO MODAL
     ======================================================== */
 
+    const modal =
+        document.getElementById("modalProduto");
+
     const fecharModal =
         document.getElementById("fecharModal");
+
+    const modalIcone =
+        document.getElementById("modalIcone");
 
     const modalNome =
         document.getElementById("modalNome");
@@ -769,14 +729,23 @@ document.addEventListener("DOMContentLoaded", function () {
     const modalCategoria =
         document.getElementById("modalCategoria");
 
-    const modalCategoriaInfo =
-        document.getElementById("modalCategoriaInfo");
+    const modalAlertaEstoque =
+        document.getElementById("modalAlertaEstoque");
 
-    const modalEstoque =
-        document.getElementById("modalEstoque");
+    const modalEstoqueTexto =
+        document.getElementById("modalEstoqueTexto");
 
-    const modalMinimo =
-        document.getElementById("modalMinimo");
+    const modalMinimoLegenda =
+        document.getElementById("modalMinimoLegenda");
+
+    const modalEstoqueBarra =
+        document.getElementById("modalEstoqueBarra");
+
+    const modalMarcadorMinimo =
+        document.getElementById("modalMarcadorMinimo");
+
+    const modalEstoqueStatus =
+        document.getElementById("modalEstoqueStatus");
 
     const modalPreco =
         document.getElementById("modalPreco");
@@ -784,18 +753,32 @@ document.addEventListener("DOMContentLoaded", function () {
     const modalCusto =
         document.getElementById("modalCusto");
 
+    const modalMargem =
+        document.getElementById("modalMargem");
+
+    const modalMargemBox =
+        document.getElementById("modalMargemBox");
+
     const modalEntrada =
         document.getElementById("modalEntrada");
 
     const modalSaida =
         document.getElementById("modalSaida");
 
+    const modalEditar =
+        document.getElementById("modalEditar");
+
+    const modalExcluir =
+        document.getElementById("modalExcluir");
+
 
     /* ========================================================
-       PRODUTO ATUAL
+       ESTADO
     ======================================================== */
 
     let produtoAtual = null;
+
+    let ultimoElementoFocado = null;
 
 
     /* ========================================================
@@ -818,154 +801,192 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* ========================================================
-       POSICIONAR MODAL
+       PREENCHER MODAL
     ======================================================== */
 
-    function posicionarModal(card) {
+    function preencherModal(card) {
 
-        if (!card || !modal) {
-            return;
-        }
+        const nome =
+            card.dataset.nome || "Produto";
 
+        const categoria =
+            card.dataset.categoria || "-";
 
-        /*
-         * IMPORTANTE:
-         *
-         * O modal está diretamente no BODY.
-         *
-         * Portanto getBoundingClientRect() e position:fixed
-         * trabalham no mesmo sistema de coordenadas.
-         */
+        const icone =
+            card.dataset.icone || "bi-box-seam";
 
-        const rect =
-            card.getBoundingClientRect();
+        const estoque =
+            parseInt(card.dataset.estoque || "0", 10);
 
+        const minimo =
+            parseInt(card.dataset.minimo || "0", 10);
 
-        const larguraModal =
-            modal.offsetWidth;
+        const preco =
+            parseFloat(card.dataset.preco || "0");
 
-        const alturaModal =
-            modal.offsetHeight;
+        const custo =
+            parseFloat(card.dataset.custo || "0");
 
 
-        const distancia = 14;
+        /* ----- Cabeçalho ----- */
 
-        const margem = 12;
+        modalIcone.innerHTML =
+            '<i class="bi ' + icone + '"></i>';
 
+        modalNome.textContent = nome;
 
-        /*
-         * ======================================================
-         * VERTICAL
-         * ======================================================
-         */
-
-        let top =
-            rect.top;
+        modalCategoria.textContent = categoria;
 
 
-        /*
-         * Tenta alinhar o topo do modal
-         * com o topo do card.
-         */
+        /* ----- ID / Fornecedor ----- */
 
-        if (
-            top + alturaModal >
-            window.innerHeight - margem
-        ) {
+        modalId.textContent =
+            "#" + (card.dataset.id || "0");
 
-            top =
-                window.innerHeight -
-                alturaModal -
-                margem;
-
-        }
+        modalFornecedor.textContent =
+            card.dataset.fornecedor || "-";
 
 
-        /*
-         * Impede sair pelo topo.
-         */
+        /* ----- Preço, custo e margem ----- */
 
-        if (top < margem) {
+        modalPreco.textContent =
+            formatarPreco(preco);
 
-            top = margem;
-
-        }
+        modalCusto.textContent =
+            formatarPreco(custo);
 
 
-        /*
-         * ======================================================
-         * HORIZONTAL
-         *
-         * PRIMEIRA OPÇÃO:
-         * direita do card
-         * ======================================================
-         */
+        if (custo > 0 && preco > 0) {
 
-        let left =
-            rect.right + distancia;
+            const margemPercentual =
+                ((preco - custo) / preco) * 100;
 
-        let lado =
-            "direita";
+            modalMargem.textContent =
+                margemPercentual.toFixed(1)
+                    .replace(".", ",") + "%";
 
+            modalMargemBox.classList.toggle(
+                "margem-negativa",
+                margemPercentual < 0
+            );
 
-        /*
-         * Se não couber à direita,
-         * tenta colocar à esquerda.
-         */
+        } else {
 
-        if (
-            left + larguraModal >
-            window.innerWidth - margem
-        ) {
+            modalMargem.textContent = "—";
 
-            left =
-                rect.left -
-                larguraModal -
-                distancia;
-
-            lado =
-                "esquerda";
+            modalMargemBox.classList.remove(
+                "margem-negativa"
+            );
 
         }
 
 
-        /*
-         * Se não couber nem à esquerda,
-         * mantém o modal dentro da tela.
-         */
+        /* ----- Estoque ----- */
 
-        if (left < margem) {
+        const estoqueBaixo =
+            estoque <= minimo;
 
-            left = margem;
+        modalAlertaEstoque.hidden = !estoqueBaixo;
 
-        }
+        modalEstoqueTexto.textContent =
+            estoque + " un.";
 
-
-        /*
-         * ======================================================
-         * APLICAÇÃO
-         * ======================================================
-         */
-
-        modal.style.left =
-            Math.round(left) + "px";
-
-        modal.style.top =
-            Math.round(top) + "px";
+        modalMinimoLegenda.textContent = minimo;
 
 
         /*
-         * Atualiza o lado da seta.
+         * A barra usa uma escala visual em que o
+         * estoque mínimo fica marcado como referência,
+         * sempre deixando espaço para o estoque atual
+         * ser maior ou menor que o mínimo.
          */
 
-        modal.classList.remove(
-            "modal-direita",
-            "modal-esquerda"
+        const escalaMaxima =
+            Math.max(estoque, minimo * 2, 1);
+
+        const percentualEstoque =
+            Math.min(
+                100,
+                Math.round((estoque / escalaMaxima) * 100)
+            );
+
+        const percentualMinimo =
+            Math.min(
+                100,
+                Math.round((minimo / escalaMaxima) * 100)
+            );
+
+        modalEstoqueBarra.style.width =
+            percentualEstoque + "%";
+
+        modalMarcadorMinimo.style.left =
+            percentualMinimo + "%";
+
+
+        modalEstoqueBarra.classList.remove(
+            "barra-baixa",
+            "barra-atencao",
+            "barra-normal"
         );
 
-        modal.classList.add(
-            "modal-" + lado
-        );
+        if (estoque <= minimo) {
+
+            modalEstoqueBarra.classList.add("barra-baixa");
+
+            modalEstoqueStatus.textContent =
+                "Abaixo do mínimo";
+
+            modalEstoqueStatus.classList.remove(
+                "status-atencao",
+                "status-normal"
+            );
+
+            modalEstoqueStatus.classList.add("status-baixo");
+
+        } else if (estoque <= minimo * 1.5) {
+
+            modalEstoqueBarra.classList.add("barra-atencao");
+
+            modalEstoqueStatus.textContent =
+                "Estoque em atenção";
+
+            modalEstoqueStatus.classList.remove(
+                "status-baixo",
+                "status-normal"
+            );
+
+            modalEstoqueStatus.classList.add("status-atencao");
+
+        } else {
+
+            modalEstoqueBarra.classList.add("barra-normal");
+
+            modalEstoqueStatus.textContent =
+                "Estoque normal";
+
+            modalEstoqueStatus.classList.remove(
+                "status-baixo",
+                "status-atencao"
+            );
+
+            modalEstoqueStatus.classList.add("status-normal");
+
+        }
+
+
+        /* ----- Links de ação ----- */
+
+        modalEntrada.href =
+            card.dataset.entrada || "#";
+
+        modalSaida.href =
+            card.dataset.saida || "#";
+
+        modalEditar.href =
+            card.dataset.editar || "#";
+
+        modalExcluir.href =
+            card.dataset.excluir || "#";
 
     }
 
@@ -978,87 +999,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
         produtoAtual = card;
 
-
-        /* ====================================================
-           PREENCHER DADOS
-        ==================================================== */
-
-        modalNome.textContent =
-            card.dataset.nome || "Produto";
+        ultimoElementoFocado = document.activeElement;
 
 
-        modalId.textContent =
-            "#" + (card.dataset.id || "0");
+        preencherModal(card);
 
 
-        modalFornecedor.textContent =
-            card.dataset.fornecedor || "-";
+        overlay.classList.add("visivel");
 
+        overlay.setAttribute("aria-hidden", "false");
 
-        modalCategoria.textContent =
-            card.dataset.categoria || "-";
+        document.body.classList.add("modal-aberto");
 
-
-        modalCategoriaInfo.textContent =
-            card.dataset.categoria || "-";
-
-
-        modalEstoque.textContent =
-            (card.dataset.estoque || 0) +
-            " unidades";
-
-
-        modalMinimo.textContent =
-            (card.dataset.minimo || 0) +
-            " unidades";
-
-
-        modalPreco.textContent =
-            formatarPreco(card.dataset.preco);
-
-
-        modalCusto.textContent =
-            "R$ " +
-            formatarPreco(card.dataset.custo);
-
-
-        /* ====================================================
-           LINKS
-        ==================================================== */
-
-        const id =
-            card.dataset.id;
-
-
-        modalEntrada.href =
-            "/pedido/entrada?tipo=entrada&id=" + id;
-
-
-        modalSaida.href =
-            "/pedido/saida?tipo=saida&id=" + id;
-
-
-        /* ====================================================
-           MOSTRA MODAL
-        ==================================================== */
-
-        modal.classList.add("visivel");
-
-        modal.setAttribute(
-            "aria-hidden",
-            "false"
-        );
-
-
-        /*
-         * Primeiro mostra o modal.
-         *
-         * Depois mede o tamanho real.
-         */
 
         requestAnimationFrame(function () {
 
-            posicionarModal(card);
+            modal.focus();
 
         });
 
@@ -1071,16 +1027,47 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function fecharDetalhes() {
 
-        modal.classList.remove("visivel");
+        overlay.classList.remove("visivel");
 
-        modal.setAttribute(
-            "aria-hidden",
-            "true"
-        );
+        overlay.setAttribute("aria-hidden", "true");
+
+        document.body.classList.remove("modal-aberto");
 
         produtoAtual = null;
 
+
+        if (ultimoElementoFocado) {
+
+            ultimoElementoFocado.focus();
+
+        }
+
     }
+
+
+    /* ========================================================
+       CONFIRMAÇÃO DE EXCLUSÃO
+    ======================================================== */
+
+    modalExcluir.addEventListener("click", function (e) {
+
+        const nome =
+            modalNome.textContent || "este produto";
+
+        const confirmado =
+            window.confirm(
+                'Tem certeza que deseja excluir "' +
+                nome +
+                '"? Esta ação não pode ser desfeita.'
+            );
+
+        if (!confirmado) {
+
+            e.preventDefault();
+
+        }
+
+    });
 
 
     /* ========================================================
@@ -1118,19 +1105,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
 
-                /*
-                 * Clicou novamente no mesmo card.
-                 */
-
-                if (produtoAtual === card) {
-
-                    fecharDetalhes();
-
-                    return;
-
-                }
-
-
                 abrirModal(card);
 
             });
@@ -1159,54 +1133,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* ========================================================
-       CLIQUE FORA
+       CLIQUE NO OVERLAY (FORA DO MODAL)
     ======================================================== */
 
-    document.addEventListener(
-        "click",
-        function (e) {
+    overlay.addEventListener("click", function (e) {
 
-            if (!produtoAtual) {
-
-                return;
-
-            }
-
-
-            /*
-             * Não fecha clicando no card.
-             */
-
-            if (
-                e.target.closest(".produto-card")
-            ) {
-
-                return;
-
-            }
-
-
-            /*
-             * Não fecha clicando no modal.
-             */
-
-            if (
-                e.target.closest("#modalProduto")
-            ) {
-
-                return;
-
-            }
-
+        if (e.target === overlay) {
 
             fecharDetalhes();
 
         }
-    );
+
+    });
 
 
     /* ========================================================
-       MENU DE OPÇÕES
+       MENU DE OPÇÕES DOS CARDS
     ======================================================== */
 
     document.querySelectorAll(".btn-opcoes")
@@ -1277,48 +1219,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* ========================================================
-       REDIMENSIONAR
-    ======================================================== */
-
-    window.addEventListener(
-        "resize",
-        function () {
-
-            if (produtoAtual) {
-
-                posicionarModal(
-                    produtoAtual
-                );
-
-            }
-
-        }
-    );
-
-
-    /* ========================================================
-       SCROLL
-    ======================================================== */
-
-    window.addEventListener(
-        "scroll",
-        function () {
-
-            if (produtoAtual) {
-
-                posicionarModal(
-                    produtoAtual
-                );
-
-            }
-
-        },
-        true
-    );
-
-
-    /* ========================================================
-       ESC
+       ESC FECHA O MODAL
     ======================================================== */
 
     document.addEventListener(

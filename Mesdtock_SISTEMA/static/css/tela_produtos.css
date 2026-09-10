@@ -25,6 +25,11 @@ body {
 }
 
 
+body.modal-aberto {
+    overflow: hidden;
+}
+
+
 /* ============================================================
    CONTAINER
 ============================================================ */
@@ -42,11 +47,6 @@ body {
     flex: 1;
     padding: 30px 40px;
 
-    /*
-     * Mantém o scroll horizontal da página,
-     * mas não interfere mais no modal porque
-     * o modal é movido para o BODY pelo JavaScript.
-     */
     overflow-x: auto;
 }
 
@@ -700,46 +700,69 @@ body {
 
 
 /* ============================================================
-   MODAL LATERAL
+   ESTADO VAZIO
 ============================================================ */
 
-/*
- * ATENÇÃO:
- *
- * O JavaScript move o modal diretamente para o BODY.
- *
- * Portanto ele NÃO fica preso dentro do #content.
- *
- * position: fixed significa:
- * coordenadas relativas à janela do navegador.
- */
+.estado-vazio {
 
-.modal-produto {
+    background: white;
 
-    position: fixed !important;
+    border: 1px dashed #D7DCE6;
 
-    left: 0;
-    top: 0;
+    border-radius: 16px;
 
-    width: 405px;
+    padding: 60px 20px;
 
-    max-width: calc(100vw - 24px);
+    display: flex;
 
-    max-height: calc(100vh - 24px);
+    flex-direction: column;
 
-    background: #FFFFFF;
+    align-items: center;
 
-    border: 1px solid #E7EAF0;
+    gap: 12px;
 
-    border-radius: 20px;
+    color: #8A93A6;
+}
 
-    box-shadow:
-        0 20px 50px rgba(16, 24, 64, 0.18),
-        0 5px 15px rgba(16, 24, 64, 0.08);
+
+.estado-vazio i {
+
+    font-size: 36px;
+
+    color: #00C4C0;
+}
+
+
+/* ============================================================================
+   MODAL DE DETALHES DO PRODUTO
+   ----------------------------------------------------------------------------
+   O JavaScript move o overlay diretamente para o BODY, então o modal
+   é sempre centralizado na janela, independente de onde o card esteja
+   na página. Isso resolve todos os problemas de posicionamento/recorte
+   que existiam na versão anterior (popover ao lado do card).
+============================================================================ */
+
+.modal-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(15, 23, 42, 0.50);
+
+    backdrop-filter: blur(3px);
+
+    -webkit-backdrop-filter: blur(3px);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 24px;
 
     z-index: 999999;
-
-    overflow: visible;
 
     opacity: 0;
 
@@ -747,24 +770,13 @@ body {
 
     pointer-events: none;
 
-    /*
-     * NÃO usar translate(-50%, -50%).
-     */
-
-    transform: translateX(0);
-
     transition:
-        opacity .20s ease,
-        transform .20s ease,
-        visibility .20s ease;
+        opacity .22s ease,
+        visibility .22s ease;
 }
 
 
-/* ============================================================
-   MODAL VISÍVEL
-============================================================ */
-
-.modal-produto.visivel {
+.modal-overlay.visivel {
 
     opacity: 1;
 
@@ -775,95 +787,56 @@ body {
 
 
 /* ============================================================
-   ANIMAÇÃO - DIREITA
+   CAIXA DO MODAL
 ============================================================ */
 
-.modal-produto.modal-direita {
+.modal-produto {
 
-    transform: translateX(-8px);
-}
+    width: 460px;
 
+    max-width: 100%;
 
-.modal-produto.modal-direita.visivel {
-
-    transform: translateX(0);
-}
-
-
-/* ============================================================
-   ANIMAÇÃO - ESQUERDA
-============================================================ */
-
-.modal-produto.modal-esquerda {
-
-    transform: translateX(8px);
-}
-
-
-.modal-produto.modal-esquerda.visivel {
-
-    transform: translateX(0);
-}
-
-
-/* ============================================================
-   SETA
-============================================================ */
-
-.modal-seta {
-
-    position: absolute;
-
-    width: 18px;
-    height: 18px;
+    max-height: calc(100vh - 48px);
 
     background: #FFFFFF;
 
-    transform: rotate(45deg);
+    border-radius: 22px;
 
-    top: 32px;
+    box-shadow:
+        0 30px 70px rgba(16, 24, 64, 0.28),
+        0 8px 20px rgba(16, 24, 64, 0.12);
 
-    z-index: -1;
+    display: flex;
+
+    flex-direction: column;
+
+    overflow: hidden;
+
+    outline: none;
+
+    transform: scale(.94) translateY(10px);
+
+    opacity: 0;
+
+    transition:
+        transform .22s cubic-bezier(.2, .9, .3, 1),
+        opacity .22s ease;
+}
+
+
+.modal-overlay.visivel .modal-produto {
+
+    transform: scale(1) translateY(0);
+
+    opacity: 1;
 }
 
 
 /* ============================================================
-   SETA - MODAL À DIREITA
-============================================================ */
-
-.modal-direita .modal-seta {
-
-    left: -9px;
-
-    border-left: 1px solid #E7EAF0;
-
-    border-bottom: 1px solid #E7EAF0;
-}
-
-
-/* ============================================================
-   SETA - MODAL À ESQUERDA
-============================================================ */
-
-.modal-esquerda .modal-seta {
-
-    right: -9px;
-
-    border-right: 1px solid #E7EAF0;
-
-    border-top: 1px solid #E7EAF0;
-}
-
-
-/* ============================================================
-   CABEÇALHO DO MODAL
+   CABEÇALHO
 ============================================================ */
 
 .modal-header {
-
-    min-height: 108px;
-
-    padding: 25px 24px 20px;
 
     display: flex;
 
@@ -871,11 +844,70 @@ body {
 
     align-items: flex-start;
 
-    border-bottom: 1px solid #EEF1F6;
+    gap: 16px;
+
+    padding: 26px 26px 22px;
+
+    background: linear-gradient(
+        135deg,
+        #F1F8FF 0%,
+        #E6FBFA 100%
+    );
+
+    border-bottom: 1px solid #E7EAF0;
+
+    flex-shrink: 0;
 }
 
 
-.modal-label {
+.modal-header-info {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    min-width: 0;
+}
+
+
+.modal-icone {
+
+    flex-shrink: 0;
+
+    width: 54px;
+    height: 54px;
+
+    border-radius: 16px;
+
+    background: #FFFFFF;
+
+    box-shadow: 0 2px 6px rgba(16, 24, 64, 0.10);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+.modal-icone i {
+
+    font-size: 24px;
+
+    color: #00819F;
+}
+
+
+.modal-header-texto {
+
+    min-width: 0;
+}
+
+
+.modal-categoria-tag {
 
     display: block;
 
@@ -885,9 +917,11 @@ body {
 
     font-weight: 800;
 
-    letter-spacing: 1px;
+    letter-spacing: .6px;
 
-    margin-bottom: 8px;
+    text-transform: uppercase;
+
+    margin-bottom: 4px;
 }
 
 
@@ -895,13 +929,11 @@ body {
 
     color: #17223B;
 
-    font-size: 25px;
+    font-size: 21px;
 
-    line-height: 1.2;
+    line-height: 1.25;
 
     font-weight: 700;
-
-    max-width: 290px;
 
     word-break: break-word;
 }
@@ -915,18 +947,18 @@ body {
 
     flex-shrink: 0;
 
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
 
     border: none;
 
     border-radius: 12px;
 
-    background: #F1F4F8;
+    background: #FFFFFF;
 
     color: #8490A5;
 
-    font-size: 17px;
+    font-size: 16px;
 
     display: flex;
 
@@ -936,15 +968,17 @@ body {
 
     cursor: pointer;
 
+    box-shadow: 0 2px 6px rgba(16, 24, 64, 0.08);
+
     transition: .2s ease;
 }
 
 
 .btn-fechar-modal:hover {
 
-    background: #E7EBF2;
+    background: #FFEDEE;
 
-    color: #002D81;
+    color: #DC2626;
 
     transform: rotate(90deg);
 }
@@ -956,45 +990,159 @@ body {
 
 .modal-conteudo {
 
-    padding: 22px 24px 24px;
-
-    max-height: calc(100vh - 132px);
+    padding: 22px 26px 6px;
 
     overflow-y: auto;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+}
+
+
+.modal-conteudo::-webkit-scrollbar {
+
+    width: 5px;
+}
+
+
+.modal-conteudo::-webkit-scrollbar-track {
+
+    background: transparent;
+}
+
+
+.modal-conteudo::-webkit-scrollbar-thumb {
+
+    background: #D5DCE8;
+
+    border-radius: 10px;
 }
 
 
 /* ============================================================
-   CATEGORIA
+   ALERTA DE ESTOQUE BAIXO
 ============================================================ */
 
-.modal-categoria {
+.modal-alerta-estoque {
 
-    display: inline-flex;
+    display: flex;
 
-    align-items: center;
+    align-items: flex-start;
 
-    padding: 9px 14px;
+    gap: 10px;
 
-    border-radius: 20px;
+    background: #FFF2F2;
 
-    background: #E6FBFA;
+    border: 1px solid #FFD3D3;
 
-    color: #00819F;
+    color: #B91C1C;
+
+    border-radius: 12px;
+
+    padding: 12px 14px;
 
     font-size: 13px;
 
-    font-weight: 700;
+    font-weight: 600;
 
-    margin-bottom: 16px;
+    line-height: 1.4;
+}
+
+
+.modal-alerta-estoque i {
+
+    font-size: 16px;
+
+    margin-top: 1px;
+
+    flex-shrink: 0;
 }
 
 
 /* ============================================================
-   PREÇO
+   PREÇOS E MARGEM
 ============================================================ */
 
-.modal-preco-box {
+.modal-precos {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr 1fr;
+
+    gap: 10px;
+}
+
+
+.preco-box {
+
+    background: #F7F9FC;
+
+    border: 1px solid #EEF1F6;
+
+    border-radius: 14px;
+
+    padding: 14px 12px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+
+    min-width: 0;
+}
+
+
+.preco-box > span {
+
+    color: #7C879B;
+
+    font-size: 11.5px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: .3px;
+}
+
+
+.preco-box strong {
+
+    display: flex;
+
+    align-items: baseline;
+
+    gap: 3px;
+
+    color: #17223B;
+
+    font-size: 19px;
+
+    font-weight: 700;
+
+    line-height: 1.1;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+.preco-box strong small {
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+.preco-venda {
 
     background: linear-gradient(
         135deg,
@@ -1002,65 +1150,43 @@ body {
         #E9FBFA 100%
     );
 
-    border: 1px solid #E0EEF7;
-
-    border-radius: 16px;
-
-    padding: 18px 20px;
-
-    margin-bottom: 18px;
+    border-color: #DCEEF7;
 }
 
 
-.modal-preco-box > span {
-
-    display: block;
-
-    color: #7C879B;
-
-    font-size: 13px;
-
-    font-weight: 600;
-
-    margin-bottom: 5px;
-}
-
-
-.modal-preco-box strong {
-
-    display: flex;
-
-    align-items: baseline;
-
-    gap: 5px;
+.preco-venda strong {
 
     color: #002D81;
+
+    font-size: 21px;
 }
 
 
-.modal-preco-box strong small {
+.preco-margem strong {
 
-    font-size: 15px;
-
-    font-weight: 700;
+    color: #059669;
 }
 
 
-.modal-preco-box strong span {
+.preco-margem.margem-negativa strong {
 
-    font-size: 34px;
-
-    font-weight: 700;
-
-    line-height: 1;
+    color: #DC2626;
 }
 
 
 /* ============================================================
-   INFORMAÇÕES
+   NÍVEL DE ESTOQUE
 ============================================================ */
 
-.modal-informacoes {
+.modal-estoque-card {
+
+    background: #F7F9FC;
+
+    border: 1px solid #EEF1F6;
+
+    border-radius: 16px;
+
+    padding: 16px 16px 14px;
 
     display: flex;
 
@@ -1070,13 +1196,209 @@ body {
 }
 
 
+.modal-estoque-topo {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    font-size: 13px;
+}
+
+
+.modal-estoque-topo span {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    color: #536078;
+
+    font-weight: 600;
+}
+
+
+.modal-estoque-topo span i {
+
+    color: #00A6B5;
+}
+
+
+.modal-estoque-topo strong {
+
+    color: #17223B;
+
+    font-size: 15px;
+}
+
+
+.modal-estoque-barra {
+
+    position: relative;
+
+    width: 100%;
+
+    height: 10px;
+
+    background: #E7EAF0;
+
+    border-radius: 999px;
+
+    overflow: visible;
+}
+
+
+.modal-estoque-preenchimento {
+
+    height: 100%;
+
+    width: 0%;
+
+    border-radius: 999px;
+
+    transition: width .35s ease;
+}
+
+
+.modal-estoque-preenchimento.barra-normal {
+
+    background: linear-gradient(
+        90deg,
+        #00C4C0,
+        #00819F
+    );
+}
+
+
+.modal-estoque-preenchimento.barra-atencao {
+
+    background: linear-gradient(
+        90deg,
+        #FBBF24,
+        #D97706
+    );
+}
+
+
+.modal-estoque-preenchimento.barra-baixa {
+
+    background: linear-gradient(
+        90deg,
+        #F87171,
+        #DC2626
+    );
+}
+
+
+.modal-estoque-marcador-minimo {
+
+    position: absolute;
+
+    top: -3px;
+
+    width: 2px;
+
+    height: 16px;
+
+    background: #17223B;
+
+    opacity: .35;
+
+    border-radius: 2px;
+}
+
+
+.modal-estoque-legenda {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    font-size: 12px;
+
+    color: #8A93A6;
+
+    font-weight: 600;
+}
+
+
+.modal-estoque-legenda strong {
+
+    color: #536078;
+}
+
+
+.modal-estoque-status {
+
+    padding: 3px 10px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: .3px;
+}
+
+
+.modal-estoque-status.status-normal {
+
+    background: #E6FBFA;
+
+    color: #00819F;
+}
+
+
+.modal-estoque-status.status-atencao {
+
+    background: #FFF4E5;
+
+    color: #D97706;
+}
+
+
+.modal-estoque-status.status-baixo {
+
+    background: #FFEDEE;
+
+    color: #DC2626;
+}
+
+
+/* ============================================================
+   INFORMAÇÕES GERAIS
+============================================================ */
+
+.modal-informacoes {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+    padding-bottom: 4px;
+}
+
+
 .modal-info {
 
-    min-height: 68px;
+    min-height: 62px;
 
     padding: 10px 12px;
 
     background: #F7F9FC;
+
+    border: 1px solid #EEF1F6;
 
     border-radius: 13px;
 
@@ -1092,8 +1414,8 @@ body {
 
     flex-shrink: 0;
 
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
 
     border-radius: 11px;
 
@@ -1107,7 +1429,7 @@ body {
 
     justify-content: center;
 
-    font-size: 17px;
+    font-size: 16px;
 }
 
 
@@ -1153,35 +1475,41 @@ body {
 
 .modal-acoes {
 
-    display: flex;
+    display: grid;
 
-    gap: 10px;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
 
-    margin-top: 18px;
+    gap: 8px;
+
+    padding: 18px 26px 26px;
+
+    flex-shrink: 0;
 }
 
 
 .modal-btn {
 
-    flex: 1;
+    min-height: 52px;
 
-    min-height: 48px;
-
-    border-radius: 11px;
+    border-radius: 12px;
 
     display: flex;
+
+    flex-direction: column;
 
     align-items: center;
 
     justify-content: center;
 
-    gap: 7px;
+    gap: 4px;
 
     text-decoration: none;
 
-    font-size: 13.5px;
+    font-size: 12px;
 
     font-weight: 700;
+
+    text-align: center;
 
     transition: .2s ease;
 }
@@ -1189,7 +1517,7 @@ body {
 
 .modal-btn i {
 
-    font-size: 15px;
+    font-size: 16px;
 }
 
 
@@ -1229,61 +1557,39 @@ body {
 }
 
 
-/* ============================================================
-   SCROLLBAR
-============================================================ */
+.modal-btn-editar {
 
-.modal-conteudo::-webkit-scrollbar {
+    background: #E8F1FF;
 
-    width: 5px;
+    color: #2563EB;
+
+    border: 1px solid #C7DBFF;
 }
 
 
-.modal-conteudo::-webkit-scrollbar-track {
+.modal-btn-editar:hover {
 
-    background: transparent;
+    background: #D8E7FF;
+
+    transform: translateY(-1px);
 }
 
 
-.modal-conteudo::-webkit-scrollbar-thumb {
+.modal-btn-excluir {
 
-    background: #D5DCE8;
+    background: #FFEDEE;
 
-    border-radius: 10px;
+    color: #DC2626;
+
+    border: 1px solid #FFC9CC;
 }
 
 
-/* ============================================================
-   ESTADO VAZIO
-============================================================ */
+.modal-btn-excluir:hover {
 
-.estado-vazio {
+    background: #FFE0E2;
 
-    background: white;
-
-    border: 1px dashed #D7DCE6;
-
-    border-radius: 16px;
-
-    padding: 60px 20px;
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    gap: 12px;
-
-    color: #8A93A6;
-}
-
-
-.estado-vazio i {
-
-    font-size: 36px;
-
-    color: #00C4C0;
+    transform: translateY(-1px);
 }
 
 
@@ -1391,56 +1697,67 @@ body {
 
 @media (max-width: 600px) {
 
-    /*
-     * No celular não há espaço suficiente
-     * para ficar ao lado do card.
-     */
+    .modal-overlay {
+
+        padding: 0;
+
+        align-items: flex-end;
+    }
+
 
     .modal-produto {
 
-        width: calc(100vw - 24px);
+        width: 100%;
 
-        max-width: none;
+        max-height: 92vh;
 
-        max-height: calc(100vh - 24px);
+        border-radius: 22px 22px 0 0;
 
+        transform: translateY(24px);
+    }
+
+
+    .modal-overlay.visivel .modal-produto {
+
+        transform: translateY(0);
     }
 
 
     .modal-header {
 
-        padding: 20px;
-
-    }
-
-
-    .modal-conteudo {
-
-        padding: 18px 20px 20px;
-
+        padding: 20px 20px 18px;
     }
 
 
     .modal-header h2 {
 
-        font-size: 21px;
-
-        max-width: 230px;
-
+        font-size: 19px;
     }
 
 
-    .modal-preco-box strong span {
+    .modal-conteudo {
 
-        font-size: 30px;
-
+        padding: 18px 20px 6px;
     }
 
 
-    .modal-seta {
+    .modal-precos {
 
-        display: none;
+        grid-template-columns: 1fr 1fr;
+    }
 
+
+    .preco-margem {
+
+        grid-column: span 2;
+    }
+
+
+    .modal-acoes {
+
+        grid-template-columns: 1fr 1fr;
+
+        padding: 16px 20px 22px;
     }
 
 }
