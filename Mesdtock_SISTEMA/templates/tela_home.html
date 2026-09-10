@@ -56,62 +56,106 @@
 
         <div class="icones">
 
+            <!-- BOTÃO DO SINO -->
             <button id="btnNotificacao"
                     class="btn-icon-nav"
                     aria-label="Notificações">
+        
                 <i class="bi bi-bell"></i>
+        
+                {% if notificacoes %}
+                    <span id="contadorNotificacao" class="contador-notificacao">
+                        {{ notificacoes|length }}
+                    </span>
+                {% endif %}
+        
             </button>
         
+        
+            <!-- PAINEL DE NOTIFICAÇÕES -->
             <div id="painelNotificacao" class="painel-notificacao">
-
-                {% if notificacoes %}
-            
-                    {% for noti in notificacoes %}
-            
-                    <div class="noti-card">
-            
-                        <div class="circulo-{{ noti.tipo }}">
-            
-                            {% if noti.tipo == "vermelho" %}
-                                <i class="bi bi-exclamation-circle-fill"></i>
-            
-                            {% elif noti.tipo == "amarelo" %}
-                                <i class="bi bi-exclamation-triangle-fill"></i>
-            
-                            {% endif %}
-            
+        
+                <!-- CABEÇALHO -->
+                <div class="notificacao-header">
+        
+                    <h4>
+                        <i class="bi bi-bell"></i>
+                        Notificações
+                    </h4>
+        
+                    {% if notificacoes %}
+                        <button id="btnLimparNotificacoes"
+                                class="btn-limpar-notificacoes"
+                                type="button">
+        
+                            <i class="bi bi-trash3"></i>
+                            Limpar
+                        </button>
+                    {% endif %}
+        
+                </div>
+        
+        
+                <!-- LISTA DE NOTIFICAÇÕES -->
+                <div id="listaNotificacoes">
+        
+                    {% if notificacoes %}
+        
+                        {% for noti in notificacoes %}
+        
+                        <div class="noti-card">
+        
+                            <div class="circulo-{{ noti.tipo }}">
+        
+                                {% if noti.tipo == "vermelho" %}
+        
+                                    <i class="bi bi-exclamation-circle-fill"></i>
+        
+                                {% elif noti.tipo == "amarelo" %}
+        
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+        
+                                {% endif %}
+        
+                            </div>
+        
+                            <div class="noti-conteudo">
+        
+                                <h5>{{ noti.titulo }}</h5>
+        
+                                <p>{{ noti.mensagem }}</p>
+        
+                            </div>
+        
                         </div>
-            
-                        <div>
-            
-                            <h5>{{ noti.titulo }}</h5>
-            
-                            <p>{{ noti.mensagem }}</p>
-            
+        
+                        {% endfor %}
+        
+                    {% else %}
+        
+                        <div class="noti-card notificacao-vazia">
+        
+                            <div class="circulo-azul">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </div>
+        
+                            <div class="noti-conteudo">
+        
+                                <h5>Sistema OK</h5>
+        
+                                <p>Nenhuma notificação pendente.</p>
+        
+                            </div>
+        
                         </div>
-            
-                    </div>
-            
-                    {% endfor %}
-            
-                {% else %}
-            
-                    <div class="noti-card">
-            
-                        <div class="circulo-azul">
-                            <i class="bi bi-check-circle-fill"></i>
-                        </div>
-            
-                        <div>
-                            <h5>Sistema OK</h5>
-                            <p>Nenhuma notificação pendente.</p>
-                        </div>
-            
-                    </div>
-            
-                {% endif %}
-            
+        
+                    {% endif %}
+        
+                </div>
+        
             </div>
+        
+        </div>
         
     <a href="{{ url_for('tela_perfil_do_usuario') }}" class="user-nav" title="Meu perfil">
         <div class="user-nav-info">
@@ -328,6 +372,52 @@
     
     });
     
+    </script>
+
+    <script>
+        const btnLimparNotificacoes =
+    document.getElementById("btnLimparNotificacoes");
+
+const listaNotificacoes =
+    document.getElementById("listaNotificacoes");
+
+const contadorNotificacao =
+    document.getElementById("contadorNotificacao");
+
+
+if (btnLimparNotificacoes) {
+
+    btnLimparNotificacoes.addEventListener("click", function () {
+
+        // Remove todas as notificações
+        listaNotificacoes.innerHTML = `
+            <div class="noti-card notificacao-vazia">
+
+                <div class="circulo-azul">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+
+                <div class="noti-conteudo">
+                    <h5>Sistema OK</h5>
+                    <p>Nenhuma notificação pendente.</p>
+                </div>
+
+            </div>
+        `;
+
+
+        // Remove o contador
+        if (contadorNotificacao) {
+            contadorNotificacao.remove();
+        }
+
+
+        // Remove o próprio botão "Limpar"
+        btnLimparNotificacoes.remove();
+
+    });
+
+}
     </script>
 </body>
 </html>

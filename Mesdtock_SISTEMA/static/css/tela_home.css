@@ -129,7 +129,7 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-right: 20px;
+    margin-right: -400px;
 }
 
 .btn-icon-nav, .btn-perfil-nav {
@@ -763,6 +763,298 @@ body {
     font-size: 13px;
 }
 
+/* ============================================================
+   BOTÃO DE NOTIFICAÇÃO
+============================================================ */
+
+.btn-icon-nav {
+    position: relative;
+    border: none;
+    background: transparent;
+    color: white;
+    font-size: 25px;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+
+/* ============================================================
+   CONTADOR DE NOTIFICAÇÕES
+============================================================ */
+
+.contador-notificacao {
+    position: absolute;
+
+    top: 2px;
+    right: 0px;
+
+    min-width: 19px;
+    height: 19px;
+
+    padding: 0 5px;
+
+    background: #ef4444;
+    color: white;
+
+    border-radius: 50%;
+
+    border: 2px solid white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+
+    line-height: 1;
+
+    box-sizing: border-box;
+}
+
+/* ============================================================
+   CABEÇALHO DAS NOTIFICAÇÕES
+============================================================ */
+
+.notificacao-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 5px 5px 15px 5px;
+
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 12px;
+}
+
+.notificacao-header h4 {
+    margin: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: #002D81;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+
+/* ============================================================
+   BOTÃO LIMPAR
+============================================================ */
+
+.btn-limpar-notificacoes {
+    border: none;
+    background: transparent;
+
+    color: #64748b;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    padding: 7px 9px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    transition: all .2s ease;
+}
+
+.btn-limpar-notificacoes:hover {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.btn-limpar-notificacoes i {
+    font-size: 14px;
+}
+
+
+/* ============================================================
+   CONTADOR
+============================================================ */
+
+.contador-notificacao {
+    position: absolute;
+
+    top: 1px;
+    right: -2px;
+
+    min-width: 19px;
+    height: 19px;
+
+    padding: 0 4px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #ef4444;
+    color: white;
+
+    border: 2px solid white;
+    border-radius: 50%;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    line-height: 1;
+}
+
+
+/* ============================================================
+   PAINEL
+============================================================ */
+
+.painel-notificacao {
+    position: absolute;
+
+    top: 60px;
+    right: 20px;
+
+    width: 420px;
+    max-height: 450px;
+
+    overflow-y: auto;
+
+    background: white;
+
+    border-radius: 20px;
+
+    padding: 15px;
+
+    box-shadow: 0 15px 35px rgba(0, 0, 0, .15);
+
+    display: none;
+
+    z-index: 9999;
+}
+
+.painel-notificacao.ativo {
+    display: block;
+}
+
+
+/* ============================================================
+   CARD
+============================================================ */
+
+.noti-card {
+    background: #f8fafc;
+
+    border-radius: 16px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 15px;
+
+    margin-bottom: 12px;
+
+    transition: .3s;
+}
+
+.noti-card:hover {
+    background: #eef2f7;
+}
+
+
+/* ============================================================
+   ÍCONES
+============================================================ */
+
+.circulo-vermelho,
+.circulo-amarelo,
+.circulo-azul {
+    width: 45px;
+    height: 45px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: white;
+
+    font-size: 20px;
+}
+
+.circulo-vermelho {
+    background: #ef4444;
+}
+
+.circulo-amarelo {
+    background: #facc15;
+}
+
+.circulo-azul {
+    background: #3b82f6;
+}
+
+
+/* ============================================================
+   TEXTO
+============================================================ */
+
+.noti-conteudo {
+    flex: 1;
+}
+
+.noti-conteudo h5 {
+    margin: 0;
+
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.noti-conteudo p {
+    margin: 3px 0 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+
+/* CORES DOS TÍTULOS */
+
+.fora-estoque h5 {
+    color: #ef4444;
+}
+
+.alerta h5 {
+    color: #ca8a04;
+}
+
+.atencao h5 {
+    color: #2563eb;
+}
+
+
+/* ============================================================
+   NOTIFICAÇÃO VAZIA
+============================================================ */
+
+.notificacao-vazia {
+    margin-bottom: 0;
+}
+
 /* ================= USUÁRIO NA NAVBAR ================= */
 
 .user-nav{
@@ -777,6 +1069,7 @@ body {
     border: 1px solid rgba(255,255,255,.15);
     transition: background .2s ease, border-color .2s ease, transform .15s ease;
     max-width: 240px;
+    margin-right: 20px;
 }
 
 .user-nav:hover{
