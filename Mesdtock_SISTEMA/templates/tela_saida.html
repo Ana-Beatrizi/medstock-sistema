@@ -28,7 +28,7 @@
 
                     <div>
                         <h1>Pedidos</h1>
-                        <p>de SAIDA</p>
+                        <p>de SAÍDA</p>
                     </div>
 
                 </div>
@@ -38,7 +38,9 @@
 
             <div class="header-right">
 
-                <!-- FILTROS -->
+                <!-- =================================================
+                     FILTROS
+                ================================================== -->
 
                 <div class="filtros-card">
 
@@ -152,7 +154,9 @@
                 </div>
 
 
-                <!-- BUSCA -->
+                <!-- =================================================
+                     BUSCA
+                ================================================== -->
 
                 <div class="busca-wrapper">
 
@@ -160,12 +164,15 @@
 
                     <input type="text"
                            id="inputBusca"
-                           placeholder="Buscar...">
+                           placeholder="Buscar..."
+                           autocomplete="off">
 
                 </div>
 
 
-                <!-- NOVO PEDIDO -->
+                <!-- =================================================
+                     NOVO PEDIDO
+                ================================================== -->
 
                 <a href="{{ url_for('tela_produtos') }}"
                    class="btn btn-cadastro">
@@ -253,7 +260,7 @@
 
                 <i class="bi bi-box-arrow-up"></i>
 
-                <strong>
+                <strong id="contadorRegistros">
                     {{ saidas|length }}
                 </strong>
 
@@ -280,63 +287,79 @@
                 {% for item in saidas %}
 
                 <article class="pedido-card"
+                         data-pedido
                          data-produto="{{ item.nome|lower }}"
                          data-cliente="{{ item.cliente|lower }}">
 
 
                     <!-- =================================================
-                         IMAGEM
+                         IMAGEM + STATUS
                     ================================================== -->
 
                     <div class="pedido-imagem-area">
-           
-                        <!-- STATUS DO PEDIDO -->
-                    
+
+
+                        <!-- STATUS -->
+
                         <div class="status-area">
-                    
+
                             {% if item.status == 'PENDENTE' %}
-                    
+
                                 <span class="status status-pendente">
+
                                     <span class="status-dot"></span>
+
                                     Pendente
+
                                 </span>
-                    
+
                             {% elif item.status == 'PROCESSADO' %}
-                    
+
                                 <span class="status status-processado">
+
                                     <span class="status-dot"></span>
+
                                     Processado
+
                                 </span>
-                    
+
                             {% elif item.status == 'CANCELADO' %}
-                    
+
                                 <span class="status status-cancelado">
+
                                     <span class="status-dot"></span>
+
                                     Cancelado
+
                                 </span>
-                    
+
                             {% else %}
-                    
+
                                 <span class="status">
+
                                     <span class="status-dot"></span>
+
                                     {{ item.status }}
+
                                 </span>
-                    
+
                             {% endif %}
-                    
+
                         </div>
-                    
-                    
-                        <!-- IMAGEM -->
-                    
+
+
+                        <!-- =================================================
+                             IMAGEM
+                        ================================================== -->
+
                         {% if item.imagem %}
-                    
+
                             <div class="pedido-imagem">
-                    
+
                                 {% if item.imagem.startswith('http://') or item.imagem.startswith('https://') %}
-                    
+
                                     <!-- IMAGEM EXTERNA -->
-                    
+
                                     <img
                                         src="{{ item.imagem }}"
                                         alt="{{ item.nome }}"
@@ -344,13 +367,14 @@
                                         onerror="
                                             this.style.display='none';
                                             this.parentElement.classList.add('sem-imagem');
+                                            this.nextElementSibling.style.display='flex';
                                         "
                                     >
-                    
+
                                 {% else %}
-                    
+
                                     <!-- IMAGEM LOCAL -->
-                    
+
                                     <img
                                         src="{{ url_for('static', filename='uploads/produtos/' + item.imagem) }}"
                                         alt="{{ item.nome }}"
@@ -358,34 +382,36 @@
                                         onerror="
                                             this.style.display='none';
                                             this.parentElement.classList.add('sem-imagem');
+                                            this.nextElementSibling.style.display='flex';
                                         "
                                     >
-                    
+
                                 {% endif %}
-                    
-                    
+
+
                                 <div class="imagem-placeholder">
-                    
+
                                     <i class="bi bi-capsule"></i>
-                    
+
                                 </div>
-                    
+
                             </div>
-                    
+
                         {% else %}
-                    
-                            <div class="pedido-imagem">
-                    
-                                <div class="imagem-placeholder sem-imagem">
-                    
+
+                            <div class="pedido-imagem sem-imagem">
+
+                                <div class="imagem-placeholder"
+                                     style="display:flex;">
+
                                     <i class="bi bi-capsule"></i>
-                    
+
                                 </div>
-                    
+
                             </div>
-                    
+
                         {% endif %}
-                    
+
                     </div>
 
 
@@ -437,7 +463,9 @@
                         </div>
 
 
-                        <!-- INFORMAÇÕES -->
+                        <!-- =================================================
+                             INFORMAÇÕES
+                        ================================================== -->
 
                         <div class="pedido-informacoes">
 
@@ -500,7 +528,9 @@
                         </div>
 
 
-                        <!-- OBSERVAÇÃO -->
+                        <!-- =================================================
+                             OBSERVAÇÃO
+                        ================================================== -->
 
                         <div class="observacao">
 
@@ -523,7 +553,9 @@
                         </div>
 
 
-                        <!-- RODAPÉ -->
+                        <!-- =================================================
+                             RODAPÉ
+                        ================================================== -->
 
                         <div class="pedido-footer">
 
@@ -539,7 +571,9 @@
                             </span>
 
 
-                            <!-- AÇÕES -->
+                            <!-- =================================================
+                                 AÇÕES
+                            ================================================== -->
 
                             <div class="pedido-acoes">
 
@@ -547,26 +581,42 @@
                                 {% if item.status == 'PENDENTE' %}
 
 
-                                    <!-- CANCELAR -->
+                                    <!-- =================================================
+                                         CANCELAR
+                                    ================================================== -->
 
-                                    <a class="btn-tabela btn-cancelar"
-                                       href="{{ url_for('cancelar_saida', id=item.id) }}">
+                                    <a
+                                        class="btn-tabela btn-cancelar"
+                                        href="{{ url_for('cancelar_saida', id=item.id) }}"
+                                        title="Cancelar pedido"
+                                        onclick="abrirModalConfirmacao(event, this, 'cancelar')"
+                                    >
 
                                         <i class="bi bi-x-lg"></i>
 
-                                        Cancelar
+                                        <span>
+                                            Cancelar
+                                        </span>
 
                                     </a>
 
 
-                                    <!-- PROCESSAR -->
+                                    <!-- =================================================
+                                         PROCESSAR
+                                    ================================================== -->
 
-                                    <a class="btn-tabela btn-processar"
-                                       href="{{ url_for('processar_saida', id=item.id) }}">
+                                    <a
+                                        class="btn-tabela btn-processar"
+                                        href="{{ url_for('processar_saida', id=item.id) }}"
+                                        title="Processar pedido"
+                                        onclick="abrirModalConfirmacao(event, this, 'processar')"
+                                    >
 
                                         <i class="bi bi-check-lg"></i>
 
-                                        Processar
+                                        <span>
+                                            Processar
+                                        </span>
 
                                     </a>
 
@@ -653,57 +703,532 @@
 
 
 <!-- =============================================================
-     BUSCA DOS CARDS
+     MODAL DE CONFIRMAÇÃO
+     
+     IMPORTANTE:
+     Ele fica FORA do .container para não ficar preso ao conteúdo.
+============================================================= -->
+
+<div id="modalConfirmacao"
+     class="modal-confirmacao"
+     aria-hidden="true">
+
+
+    <!-- FUNDO -->
+
+    <div class="modal-overlay"
+         onclick="fecharModalConfirmacao()">
+    </div>
+
+
+    <!-- =========================================================
+         CARD DO MODAL
+    ========================================================== -->
+
+    <div class="modal-confirmacao-card"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="modalTitulo"
+         aria-describedby="modalMensagem">
+
+
+        <!-- ÍCONE -->
+
+        <div id="modalIcone"
+             class="modal-confirmacao-icone">
+
+            <i class="bi bi-question-lg"></i>
+
+        </div>
+
+
+        <!-- CONTEÚDO -->
+
+        <div class="modal-confirmacao-conteudo">
+
+            <h3 id="modalTitulo">
+                Confirmar ação
+            </h3>
+
+            <p id="modalMensagem">
+                Tem certeza que deseja realizar esta ação?
+            </p>
+
+        </div>
+
+
+        <!-- BOTÕES -->
+
+        <div class="modal-confirmacao-acoes">
+
+
+            <!-- VOLTAR -->
+
+            <button
+                type="button"
+                class="modal-btn modal-btn-voltar"
+                onclick="fecharModalConfirmacao()"
+            >
+
+                <i class="bi bi-arrow-left"></i>
+
+                <span>
+                    Voltar
+                </span>
+
+            </button>
+
+
+            <!-- CONFIRMAR -->
+
+            <button
+                type="button"
+                id="btnConfirmarModal"
+                class="modal-btn modal-btn-confirmar"
+            >
+
+                <i id="modalBtnIcone"
+                   class="bi bi-check-lg">
+                </i>
+
+                <span id="modalBtnTexto">
+                    Confirmar
+                </span>
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =============================================================
+     JAVASCRIPT
 ============================================================= -->
 
 <script>
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const inputBusca = document.getElementById("inputBusca");
 
-    const cards = document.querySelectorAll(".pedido-card");
+    /* =========================================================
+       BUSCA
+    ========================================================== */
 
+    const inputBusca =
+        document.getElementById("inputBusca");
 
-    if (!inputBusca) {
-        return;
-    }
+    const cards =
+        document.querySelectorAll(".pedido-card");
 
-
-    inputBusca.addEventListener("input", function () {
-
-        const filtro = this.value
-            .toLowerCase()
-            .trim();
+    const contador =
+        document.getElementById("contadorRegistros");
 
 
-        cards.forEach(function (card) {
+    if (inputBusca) {
 
-            const produto =
-                card.dataset.produto || "";
+        inputBusca.addEventListener("input", function () {
 
-            const cliente =
-                card.dataset.cliente || "";
+            const filtro =
+                this.value
+                    .toLowerCase()
+                    .trim();
 
 
-            if (
-                produto.includes(filtro) ||
-                cliente.includes(filtro)
-            ) {
+            let quantidadeVisivel = 0;
 
-                card.style.display = "";
 
-            } else {
+            cards.forEach(function (card) {
 
-                card.style.display = "none";
+                const produto =
+                    card.dataset.produto || "";
+
+                const cliente =
+                    card.dataset.cliente || "";
+
+
+                const textoCompleto =
+                    card.textContent.toLowerCase();
+
+
+                if (
+                    produto.includes(filtro) ||
+                    cliente.includes(filtro) ||
+                    textoCompleto.includes(filtro)
+                ) {
+
+                    card.style.display = "";
+
+                    quantidadeVisivel++;
+
+                } else {
+
+                    card.style.display = "none";
+
+                }
+
+            });
+
+
+            if (contador) {
+
+                contador.textContent =
+                    quantidadeVisivel;
 
             }
 
         });
 
-    });
+    }
+
+
+    /* =========================================================
+       MODAL
+       
+       Coloca o modal diretamente no BODY.
+       Isso evita que ele fique preso ao container,
+       sidebar, content ou qualquer ancestral com transform.
+    ========================================================== */
+
+    const modal =
+        document.getElementById("modalConfirmacao");
+
+
+    if (modal && modal.parentElement !== document.body) {
+
+        document.body.appendChild(modal);
+
+    }
+
 
 });
+
+
+/* =============================================================
+   VARIÁVEL DO LINK
+============================================================= */
+
+let linkConfirmacao = null;
+
+
+/* =============================================================
+   ABRIR MODAL
+============================================================= */
+
+function abrirModalConfirmacao(event, elemento, tipo) {
+
+    event.preventDefault();
+
+    event.stopPropagation();
+
+
+    /* =========================================================
+       SALVA O LINK
+    ========================================================== */
+
+    linkConfirmacao = elemento;
+
+
+    /* =========================================================
+       ELEMENTOS DO MODAL
+    ========================================================== */
+
+    const modal =
+        document.getElementById("modalConfirmacao");
+
+    const icone =
+        document.getElementById("modalIcone");
+
+    const titulo =
+        document.getElementById("modalTitulo");
+
+    const mensagem =
+        document.getElementById("modalMensagem");
+
+    const btnConfirmar =
+        document.getElementById("btnConfirmarModal");
+
+    const btnIcone =
+        document.getElementById("modalBtnIcone");
+
+    const btnTexto =
+        document.getElementById("modalBtnTexto");
+
+
+    if (!modal) {
+        return;
+    }
+
+
+    /* =========================================================
+       GARANTE QUE O MODAL ESTÁ NO BODY
+    ========================================================== */
+
+    if (modal.parentElement !== document.body) {
+
+        document.body.appendChild(modal);
+
+    }
+
+
+    /* =========================================================
+       CANCELAR
+    ========================================================== */
+
+    if (tipo === "cancelar") {
+
+        modal.classList.add("cancelar");
+
+
+        icone.innerHTML = `
+            <i class="bi bi-exclamation-lg"></i>
+        `;
+
+
+        titulo.textContent =
+            "Cancelar pedido?";
+
+
+        mensagem.textContent =
+            "Tem certeza que deseja cancelar este pedido? Esta ação poderá alterar o status da solicitação.";
+
+
+        btnIcone.className =
+            "bi bi-x-lg";
+
+
+        btnTexto.textContent =
+            "Sim, cancelar";
+
+    }
+
+
+    /* =========================================================
+       PROCESSAR
+    ========================================================== */
+
+    else {
+
+        modal.classList.remove("cancelar");
+
+
+        icone.innerHTML = `
+            <i class="bi bi-check-lg"></i>
+        `;
+
+
+        titulo.textContent =
+            "Processar pedido?";
+
+
+        mensagem.textContent =
+            "Tem certeza que deseja processar este pedido? O estoque poderá ser atualizado após o processamento.";
+
+
+        btnIcone.className =
+            "bi bi-check-lg";
+
+
+        btnTexto.textContent =
+            "Sim, processar";
+
+    }
+
+
+    /* =========================================================
+       MOSTRAR
+    ========================================================== */
+
+    modal.classList.add("ativo");
+
+    modal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+
+    /* =========================================================
+       TRAVA O SCROLL DA PÁGINA
+    ========================================================== */
+
+    document.body.classList.add(
+        "modal-aberto"
+    );
+
+
+    /* =========================================================
+       FOCO NO BOTÃO
+    ========================================================== */
+
+    setTimeout(function () {
+
+        if (btnConfirmar) {
+
+            btnConfirmar.focus();
+
+        }
+
+    }, 150);
+
+}
+
+
+/* =============================================================
+   FECHAR MODAL
+============================================================= */
+
+function fecharModalConfirmacao() {
+
+    const modal =
+        document.getElementById("modalConfirmacao");
+
+
+    if (!modal) {
+        return;
+    }
+
+
+    modal.classList.remove("ativo");
+
+    modal.classList.remove("cancelar");
+
+
+    modal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+
+    linkConfirmacao = null;
+
+
+    document.body.classList.remove(
+        "modal-aberto"
+    );
+
+}
+
+
+/* =============================================================
+   CONFIRMAR AÇÃO
+============================================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+
+    const btnConfirmar =
+        document.getElementById("btnConfirmarModal");
+
+
+    if (!btnConfirmar) {
+        return;
+    }
+
+
+    btnConfirmar.addEventListener(
+        "click",
+        function () {
+
+
+            if (!linkConfirmacao) {
+                return;
+            }
+
+
+            const destino =
+                linkConfirmacao.href;
+
+
+            /* Evita duplo clique */
+
+            btnConfirmar.disabled = true;
+
+            btnConfirmar.classList.add(
+                "processando"
+            );
+
+
+            /* Pequena animação antes de navegar */
+
+            setTimeout(function () {
+
+                window.location.href =
+                    destino;
+
+            }, 100);
+
+        }
+    );
+
+});
+
+
+/* =============================================================
+   ESC - FECHAR MODAL
+============================================================= */
+
+document.addEventListener(
+    "keydown",
+    function (event) {
+
+
+        if (event.key === "Escape") {
+
+            const modal =
+                document.getElementById(
+                    "modalConfirmacao"
+                );
+
+
+            if (
+                modal &&
+                modal.classList.contains("ativo")
+            ) {
+
+                fecharModalConfirmacao();
+
+            }
+
+        }
+
+    }
+);
+
+
+/* =============================================================
+   CLIQUE NO BACKDROP
+============================================================= */
+
+document.addEventListener(
+    "click",
+    function (event) {
+
+
+        const modal =
+            document.getElementById(
+                "modalConfirmacao"
+            );
+
+
+        if (!modal) {
+            return;
+        }
+
+
+        if (
+            event.target.classList.contains(
+                "modal-overlay"
+            )
+        ) {
+
+            fecharModalConfirmacao();
+
+        }
+
+    }
+);
 
 </script>
 
