@@ -205,7 +205,8 @@
                 data-entrada="{{ url_for('novo_pedido', tipo='entrada', id=produto.id) }}"
                 data-saida="{{ url_for('novo_pedido_saida', tipo='saida', id=produto.id) }}"
                 data-editar="{{ url_for('editar_produto', id=produto.id) }}"
-                data-excluir="{{ url_for('excluir_produto', id=produto.id) }}">
+                data-excluir="{{ url_for('excluir_produto', id=produto.id) }}"
+                data-imagem="{% if produto.imagem %}{% if produto.imagem.startswith('http://') or produto.imagem.startswith('https://') %}{{ produto.imagem }}{% else %}{{ url_for('static', filename='uploads/produtos/' + produto.imagem) }}{% endif %}{% endif %}">
 
 
                 <!-- =================================================
@@ -214,10 +215,30 @@
 
                 <div class="card-topo">
 
-                    <div class="card-imagem">
+                    <div class="card-imagem {% if not produto.imagem %}sem-imagem{% endif %}">
 
+                        {% if produto.imagem %}
+                    
+                            {% if produto.imagem.startswith('http://') or produto.imagem.startswith('https://') %}
+                    
+                                <img src="{{ produto.imagem }}"
+                                     alt="{{ produto.nome }}"
+                                     loading="lazy"
+                                     onerror="this.parentElement.classList.add('sem-imagem');">
+                    
+                            {% else %}
+                    
+                                <img src="{{ url_for('static', filename='uploads/produtos/' + produto.imagem) }}"
+                                     alt="{{ produto.nome }}"
+                                     loading="lazy"
+                                     onerror="this.parentElement.classList.add('sem-imagem');">
+                    
+                            {% endif %}
+                    
+                        {% endif %}
+                    
                         <i class="bi {{ icone }}"></i>
-
+                    
                     </div>
 
 
@@ -830,8 +851,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
         /* ----- Cabeçalho ----- */
 
-        modalIcone.innerHTML =
-            '<i class="bi ' + icone + '"></i>';
+        const imagem = card.dataset.imagem || "";
+
+if (imagem) {
+
+    modalIcone.classList.remove("sem-imagem");
+
+    modalIcone.innerHTML =
+        '<img src="' + imagem + '" alt="' + nome + '" ' +
+        'onerror="this.parentElement.classList.add(\'sem-imagem\'); this.remove();">' +
+        '<i class="bi ' + icone + '"></i>';
+
+} else {
+
+    modalIcone.classList.add("sem-imagem");
+
+    modalIcone.innerHTML =
+        '<i class="bi ' + icone + '"></i>';
+
+}
 
         modalNome.textContent = nome;
 

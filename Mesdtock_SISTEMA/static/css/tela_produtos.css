@@ -1761,3 +1761,47 @@ body.modal-aberto {
     }
 
 }
+
+.card-imagem {
+    position: relative;
+    overflow: hidden;
+}
+
+.card-imagem img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 14px;
+}
+
+.card-imagem i {
+    display: none;
+}
+
+.card-imagem.sem-imagem i {
+    display: block;
+}
+
+.card-imagem.sem-imagem img {
+    display: none;
+}
+
+.modal-icone {
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-icone img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 16px;
+}
+
+.modal-icone i {
+    display: none;
+}
+
+.modal-icone.sem-imagem i {
+    display: block;
+}
