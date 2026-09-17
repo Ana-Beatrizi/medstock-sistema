@@ -21,8 +21,6 @@
 
         <div class="header">
 
-            <!-- TÍTULO -->
-
             <div class="header-left">
 
                 <div class="titulo-area">
@@ -175,7 +173,6 @@
                             </option>
 
                         </select>
-
 
                     </form>
 
@@ -332,116 +329,122 @@
 
 
                 <!-- =================================================
-                     IMAGEM
+                     IMAGEM + STATUS
                 ================================================== -->
 
-                <!-- =================================================
-                IMAGEM + STATUS
-           ================================================== -->
-           
-           <div class="pedido-imagem-area">
-           
-               <!-- STATUS DO PEDIDO -->
-           
-               <div class="status-area">
-           
-                   {% if item.status == 'PENDENTE' %}
-           
-                       <span class="status status-pendente">
-                           <span class="status-dot"></span>
-                           Pendente
-                       </span>
-           
-                   {% elif item.status == 'PROCESSADO' %}
-           
-                       <span class="status status-processado">
-                           <span class="status-dot"></span>
-                           Processado
-                       </span>
-           
-                   {% elif item.status == 'CANCELADO' %}
-           
-                       <span class="status status-cancelado">
-                           <span class="status-dot"></span>
-                           Cancelado
-                       </span>
-           
-                   {% else %}
-           
-                       <span class="status">
-                           <span class="status-dot"></span>
-                           {{ item.status }}
-                       </span>
-           
-                   {% endif %}
-           
-               </div>
-           
-           
-               <!-- IMAGEM -->
-           
-               {% if item.imagem %}
-           
-                   <div class="pedido-imagem">
-           
-                       {% if item.imagem.startswith('http://') or item.imagem.startswith('https://') %}
-           
-                           <!-- IMAGEM EXTERNA -->
-           
-                           <img
-                               src="{{ item.imagem }}"
-                               alt="{{ item.nome }}"
-                               loading="lazy"
-                               onerror="
-                                   this.style.display='none';
-                                   this.parentElement.classList.add('sem-imagem');
-                               "
-                           >
-           
-                       {% else %}
-           
-                           <!-- IMAGEM LOCAL -->
-           
-                           <img
-                               src="{{ url_for('static', filename='uploads/produtos/' + item.imagem) }}"
-                               alt="{{ item.nome }}"
-                               loading="lazy"
-                               onerror="
-                                   this.style.display='none';
-                                   this.parentElement.classList.add('sem-imagem');
-                               "
-                           >
-           
-                       {% endif %}
-           
-           
-                       <div class="imagem-placeholder">
-           
-                           <i class="bi bi-capsule"></i>
-           
-                       </div>
-           
-                   </div>
-           
-               {% else %}
-           
-                   <div class="pedido-imagem">
-           
-                       <div class="imagem-placeholder sem-imagem">
-           
-                           <i class="bi bi-capsule"></i>
-           
-                       </div>
-           
-                   </div>
-           
-               {% endif %}
-           
-           </div>
+                <div class="pedido-imagem-area">
+
+
+                    <!-- STATUS -->
+
+                    <div class="status-area">
+
+                        {% if item.status == 'PENDENTE' %}
+
+                            <span class="status status-pendente">
+
+                                <span class="status-dot"></span>
+
+                                Pendente
+
+                            </span>
+
+                        {% elif item.status == 'PROCESSADO' %}
+
+                            <span class="status status-processado">
+
+                                <span class="status-dot"></span>
+
+                                Processado
+
+                            </span>
+
+                        {% elif item.status == 'CANCELADO' %}
+
+                            <span class="status status-cancelado">
+
+                                <span class="status-dot"></span>
+
+                                Cancelado
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="status">
+
+                                <span class="status-dot"></span>
+
+                                {{ item.status }}
+
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- IMAGEM -->
+
+                    {% if item.imagem %}
+
+                        <div class="pedido-imagem">
+
+                            {% if item.imagem.startswith('http://') or item.imagem.startswith('https://') %}
+
+                                <img
+                                    src="{{ item.imagem }}"
+                                    alt="{{ item.nome }}"
+                                    loading="lazy"
+                                    onerror="
+                                        this.style.display='none';
+                                        this.parentElement.classList.add('sem-imagem');
+                                    "
+                                >
+
+                            {% else %}
+
+                                <img
+                                    src="{{ url_for('static', filename='uploads/produtos/' + item.imagem) }}"
+                                    alt="{{ item.nome }}"
+                                    loading="lazy"
+                                    onerror="
+                                        this.style.display='none';
+                                        this.parentElement.classList.add('sem-imagem');
+                                    "
+                                >
+
+                            {% endif %}
+
+
+                            <div class="imagem-placeholder">
+
+                                <i class="bi bi-capsule"></i>
+
+                            </div>
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="pedido-imagem sem-imagem">
+
+                            <div class="imagem-placeholder">
+
+                                <i class="bi bi-capsule"></i>
+
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+
+                </div>
 
 
                 <!-- =================================================
-                     CONTEÚDO DO CARD
+                     CONTEÚDO
                 ================================================== -->
 
                 <div class="pedido-conteudo">
@@ -578,11 +581,13 @@
                             {% if item.status == 'PENDENTE' %}
 
 
+                                <!-- CANCELAR -->
+
                                 <a
                                     class="btn-tabela btn-cancelar"
                                     href="{{ url_for('cancelar_entrada', id=item.id) }}"
                                     title="Cancelar pedido"
-                                    onclick="return confirmarCancelamento();"
+                                    onclick="abrirModalConfirmacao(event, this, 'cancelar')"
                                 >
 
                                     <i class="bi bi-x-lg"></i>
@@ -594,11 +599,13 @@
                                 </a>
 
 
+                                <!-- PROCESSAR -->
+
                                 <a
                                     class="btn-tabela btn-processar"
                                     href="{{ url_for('processar_entrada', id=item.id) }}"
                                     title="Processar pedido"
-                                    onclick="return confirmarProcessamento();"
+                                    onclick="abrirModalConfirmacao(event, this, 'processar')"
                                 >
 
                                     <i class="bi bi-check-lg"></i>
@@ -631,9 +638,7 @@
                     </div>
 
 
-                    <!-- =================================================
-                         OBSERVAÇÃO
-                    ================================================== -->
+                    <!-- OBSERVAÇÃO -->
 
                     {% if item.observacao %}
 
@@ -709,116 +714,465 @@
 
 
 <!-- =========================================================
+     MODAL
+     
+     IMPORTANTE:
+     O JavaScript abaixo move este elemento diretamente para
+     document.body. Assim ele não fica preso ao .container,
+     .content, sidebar ou qualquer outro elemento do layout.
+========================================================= -->
+
+<div
+    id="modalConfirmacao"
+    class="modal-confirmacao"
+    aria-hidden="true"
+>
+
+    <div
+        class="modal-overlay"
+        onclick="fecharModalConfirmacao()"
+    ></div>
+
+
+    <div
+        class="modal-confirmacao-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitulo"
+    >
+
+
+        <!-- ÍCONE -->
+
+        <div
+            id="modalIcone"
+            class="modal-confirmacao-icone"
+        >
+
+            <i class="bi bi-question-lg"></i>
+
+        </div>
+
+
+        <!-- CONTEÚDO -->
+
+        <div class="modal-confirmacao-conteudo">
+
+            <h3 id="modalTitulo">
+                Confirmar ação
+            </h3>
+
+            <p id="modalMensagem">
+                Tem certeza que deseja realizar esta ação?
+            </p>
+
+        </div>
+
+
+        <!-- BOTÕES -->
+
+        <div class="modal-confirmacao-acoes">
+
+
+            <!-- VOLTAR -->
+
+            <button
+                type="button"
+                class="modal-btn modal-btn-voltar"
+                onclick="fecharModalConfirmacao()"
+            >
+
+                <i class="bi bi-arrow-left"></i>
+
+                <span>
+                    Voltar
+                </span>
+
+            </button>
+
+
+            <!-- CONFIRMAR -->
+
+            <button
+                type="button"
+                id="btnConfirmarModal"
+                class="modal-btn modal-btn-confirmar"
+            >
+
+                <i
+                    id="modalBtnIcone"
+                    class="bi bi-check-lg"
+                ></i>
+
+                <span id="modalBtnTexto">
+                    Confirmar
+                </span>
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
      JAVASCRIPT
-========================================================== -->
+========================================================= -->
 
 <script>
-
 
 document.addEventListener("DOMContentLoaded", function () {
 
 
+    /* =====================================================
+       BUSCA
+    ===================================================== */
+
     const inputBusca =
         document.getElementById("inputBusca");
 
-
     const pedidos =
         document.querySelectorAll("[data-pedido]");
-
 
     const contador =
         document.getElementById("contadorRegistros");
 
 
-    if (!inputBusca) {
-        return;
-    }
+    if (inputBusca) {
+
+        inputBusca.addEventListener("input", function () {
 
 
-    inputBusca.addEventListener("input", function () {
+            const filtro =
+                this.value
+                    .toLowerCase()
+                    .trim();
 
 
-        const filtro =
-            this.value
-                .toLowerCase()
-                .trim();
+            let quantidadeVisivel = 0;
 
 
-        let quantidadeVisivel = 0;
+            pedidos.forEach(function (pedido) {
 
 
-        pedidos.forEach(function (pedido) {
+                const texto =
+                    pedido.textContent
+                        .toLowerCase();
 
 
-            const texto =
-                pedido.textContent
-                    .toLowerCase();
+                if (texto.includes(filtro)) {
+
+                    pedido.style.display = "";
+
+                    quantidadeVisivel++;
+
+                } else {
+
+                    pedido.style.display = "none";
+
+                }
 
 
-            if (texto.includes(filtro)) {
+            });
 
 
-                pedido.style.display = "";
+            if (contador) {
 
-
-                quantidadeVisivel++;
-
-
-            } else {
-
-
-                pedido.style.display = "none";
-
+                contador.textContent =
+                    quantidadeVisivel;
 
             }
 
 
         });
 
+    }
 
-        if (contador) {
 
-            contador.textContent =
-                quantidadeVisivel;
+    /* =====================================================
+       MODAL
+    ===================================================== */
+
+    const modal =
+        document.getElementById("modalConfirmacao");
+
+
+    const btnConfirmar =
+        document.getElementById("btnConfirmarModal");
+
+
+    /*
+       ESTA É A PRINCIPAL CORREÇÃO.
+
+       O modal sai do bloco onde o conteúdo está sendo
+       renderizado e vai diretamente para o BODY.
+
+       Assim ele não fica limitado por:
+       - .container
+       - .content
+       - sidebar
+       - overflow
+       - transform
+       - altura do conteúdo
+    */
+
+    if (modal && modal.parentElement !== document.body) {
+
+        document.body.appendChild(modal);
+
+    }
+
+
+    /* =====================================================
+       VARIÁVEL DO LINK
+    ===================================================== */
+
+    let linkConfirmacao = null;
+
+
+    /* =====================================================
+       ABRIR MODAL
+    ===================================================== */
+
+    window.abrirModalConfirmacao =
+        function (event, elemento, tipo) {
+
+
+            event.preventDefault();
+
+
+            linkConfirmacao = elemento;
+
+
+            const icone =
+                document.getElementById("modalIcone");
+
+
+            const titulo =
+                document.getElementById("modalTitulo");
+
+
+            const mensagem =
+                document.getElementById("modalMensagem");
+
+
+            const btnIcone =
+                document.getElementById("modalBtnIcone");
+
+
+            const btnTexto =
+                document.getElementById("modalBtnTexto");
+
+
+            if (!modal) {
+                return;
+            }
+
+
+            /* =========================================
+               CANCELAR
+            ========================================= */
+
+            if (tipo === "cancelar") {
+
+
+                modal.classList.add("cancelar");
+
+
+                icone.innerHTML = `
+                    <i class="bi bi-exclamation-lg"></i>
+                `;
+
+
+                titulo.textContent =
+                    "Cancelar pedido?";
+
+
+                mensagem.textContent =
+                    "Tem certeza que deseja cancelar este pedido? Esta ação alterará o status da solicitação.";
+
+
+                btnIcone.className =
+                    "bi bi-x-lg";
+
+
+                btnTexto.textContent =
+                    "Sim, cancelar";
+
+
+            }
+
+
+            /* =========================================
+               PROCESSAR
+            ========================================= */
+
+            else {
+
+
+                modal.classList.remove("cancelar");
+
+
+                icone.innerHTML = `
+                    <i class="bi bi-check-lg"></i>
+                `;
+
+
+                titulo.textContent =
+                    "Processar pedido?";
+
+
+                mensagem.textContent =
+                    "Tem certeza que deseja processar este pedido? O estoque será atualizado após o processamento.";
+
+
+                btnIcone.className =
+                    "bi bi-check-lg";
+
+
+                btnTexto.textContent =
+                    "Sim, processar";
+
+
+            }
+
+
+            /* =========================================
+               MOSTRAR
+            ========================================= */
+
+            modal.classList.add("ativo");
+
+            modal.setAttribute("aria-hidden", "false");
+
+
+            /*
+               Impede a página de continuar rolando
+               enquanto o modal está aberto.
+            */
+
+            document.body.style.overflow = "hidden";
+
+
+            /*
+               Coloca foco no botão de confirmação.
+            */
+
+            setTimeout(function () {
+
+                if (btnConfirmar) {
+
+                    btnConfirmar.focus();
+
+                }
+
+            }, 50);
+
+        };
+
+
+    /* =====================================================
+       FECHAR MODAL
+    ===================================================== */
+
+    window.fecharModalConfirmacao =
+        function () {
+
+
+            if (!modal) {
+                return;
+            }
+
+
+            modal.classList.remove("ativo");
+
+            modal.classList.remove("cancelar");
+
+
+            modal.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+
+            linkConfirmacao = null;
+
+
+            document.body.style.overflow = "";
+
+
+        };
+
+
+    /* =====================================================
+       CONFIRMAR AÇÃO
+    ===================================================== */
+
+    if (btnConfirmar) {
+
+
+        btnConfirmar.addEventListener(
+            "click",
+            function () {
+
+
+                if (linkConfirmacao) {
+
+
+                    const destino =
+                        linkConfirmacao.href;
+
+
+                    /*
+                       Evita duplo clique.
+                    */
+
+                    btnConfirmar.disabled = true;
+
+
+                    window.location.href =
+                        destino;
+
+
+                }
+
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       ESC - FECHAR
+    ===================================================== */
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+
+            if (
+                event.key === "Escape" &&
+                modal &&
+                modal.classList.contains("ativo")
+            ) {
+
+
+                fecharModalConfirmacao();
+
+
+            }
 
         }
-
-
-    });
+    );
 
 
 });
-
-
-/* =========================================================
-   CONFIRMAÇÃO DE CANCELAMENTO
-========================================================= */
-
-function confirmarCancelamento() {
-
-
-    return confirm(
-        "Tem certeza que deseja cancelar este pedido?"
-    );
-
-
-}
-
-
-/* =========================================================
-   CONFIRMAÇÃO DE PROCESSAMENTO
-========================================================= */
-
-function confirmarProcessamento() {
-
-
-    return confirm(
-        "Deseja processar este pedido de entrada?"
-    );
-
-
-}
-
 
 </script>
 
