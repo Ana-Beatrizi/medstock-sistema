@@ -7,40 +7,29 @@
 <link rel="stylesheet"
       href="{{ url_for('static', filename='css/tela_entrada.css') }}">
 
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-<div class="container">
+<div id="container">
 
-    <main class="content">
+    <main id="content">
 
-        <!-- =====================================================
-             CABEÇALHO
-        ====================================================== -->
+        <!-- =========================================================
+             HEADER
+        ========================================================== -->
 
-        <div class="header">
+        <div id="header">
 
             <div class="header-left">
 
-                <div class="titulo-area">
+                <h1>Pedidos de Saída</h1>
 
-                    <div class="titulo-icon">
-                        <i class="bi bi-box-arrow-up"></i>
-                    </div>
-
-                    <div>
-                        <h1>Pedidos</h1>
-                        <p>de SAÍDA</p>
-                    </div>
-
-                </div>
+                <i id="icon" class="bi bi-box-arrow-up"></i>
 
             </div>
 
 
             <div class="header-right">
-
-                <!-- =================================================
-                     FILTROS
-                ================================================== -->
 
                 <div class="filtros-card">
 
@@ -56,9 +45,6 @@
                     <form method="GET"
                           action="{{ url_for('tela_saida') }}"
                           class="filtros-form">
-
-
-                        <!-- PRODUTO -->
 
                         <select name="produto"
                                 onchange="this.form.submit()">
@@ -83,8 +69,6 @@
                         </select>
 
 
-                        <!-- CLIENTE -->
-
                         <select name="cliente"
                                 onchange="this.form.submit()">
 
@@ -108,8 +92,6 @@
                         </select>
 
 
-                        <!-- STATUS -->
-
                         <select name="status"
                                 onchange="this.form.submit()">
 
@@ -117,34 +99,25 @@
                                 Todos os status
                             </option>
 
-
                             <option value="PENDENTE"
                                 {% if status_selecionado == 'PENDENTE' %}
                                     selected
                                 {% endif %}>
-
                                 ⏳ Pendente
-
                             </option>
-
 
                             <option value="PROCESSADO"
                                 {% if status_selecionado == 'PROCESSADO' %}
                                     selected
                                 {% endif %}>
-
                                 ✅ Processado
-
                             </option>
-
 
                             <option value="CANCELADO"
                                 {% if status_selecionado == 'CANCELADO' %}
                                     selected
                                 {% endif %}>
-
                                 ❌ Cancelado
-
                             </option>
 
                         </select>
@@ -154,30 +127,15 @@
                 </div>
 
 
-                <!-- =================================================
-                     BUSCA
-                ================================================== -->
+                <input type="text"
+                       id="inputBusca"
+                       placeholder="Pesquisar">
 
-                <div class="busca-wrapper">
-
-                    <i class="bi bi-search"></i>
-
-                    <input type="text"
-                           id="inputBusca"
-                           placeholder="Buscar..."
-                           autocomplete="off">
-
-                </div>
-
-
-                <!-- =================================================
-                     NOVO PEDIDO
-                ================================================== -->
 
                 <a href="{{ url_for('tela_produtos') }}"
                    class="btn btn-cadastro">
 
-                    <i class="bi bi-plus-lg"></i>
+                    <i class="bi bi-plus-lg me-2"></i>
 
                     Fazer Novo Pedido
 
@@ -188,514 +146,252 @@
         </div>
 
 
-        <!-- =====================================================
-             ALERTAS
-        ====================================================== -->
+        <!-- =========================================================
+             MENSAGENS
+        ========================================================== -->
 
         {% with mensagens = get_flashed_messages(with_categories=true) %}
 
             {% if mensagens %}
 
-                <div class="alerts-container">
+                {% for categoria, msg in mensagens %}
 
-                    {% for categoria, msg in mensagens %}
+                <div class="custom-alert alert-{{ categoria }} alert-flash"
+                     role="alert">
 
-                        <div class="custom-alert alert-{{ categoria }}"
-                             role="alert">
+                    <div class="alert-content">
 
-                            <div class="alert-content">
+                        {% if categoria == 'success' %}
 
-                                {% if categoria == 'success' %}
+                            <i class="bi bi-check-circle-fill alert-icon"></i>
 
-                                    <i class="bi bi-check-circle-fill alert-icon"></i>
+                        {% elif categoria == 'danger'
+                           or categoria == 'error' %}
 
-                                {% elif categoria == 'danger' or categoria == 'error' %}
+                            <i class="bi bi-exclamation-triangle-fill alert-icon"></i>
 
-                                    <i class="bi bi-exclamation-triangle-fill alert-icon"></i>
+                        {% else %}
 
-                                {% else %}
+                            <i class="bi bi-info-circle-fill alert-icon"></i>
 
-                                    <i class="bi bi-info-circle-fill alert-icon"></i>
+                        {% endif %}
 
-                                {% endif %}
+                        <span class="alert-text">
+                            {{ msg }}
+                        </span>
 
-                                <span class="alert-text">
-                                    {{ msg }}
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    {% endfor %}
+                    </div>
 
                 </div>
+
+                {% endfor %}
 
             {% endif %}
 
         {% endwith %}
 
 
-        <!-- =====================================================
-             TOPO DOS PEDIDOS
-        ====================================================== -->
+        <!-- =========================================================
+             TOPO
+        ========================================================== -->
 
-        <div class="pedidos-topo">
+        <div class="pedidos-topo-info">
 
             <div>
-
-                <h2>
-                    <i class="bi bi-list-check"></i>
-                    Pedidos de saída
-                </h2>
-
-                <p>
-                    Confira os produtos enviados aos clientes.
-                </p>
-
+                <h2><i class="bi bi-list-check"></i> Pedidos de saída</h2>
+                <p>Confira os produtos enviados aos clientes.</p>
             </div>
 
-
             <div class="total-registros">
-
                 <i class="bi bi-box-arrow-up"></i>
-
-                <strong id="contadorRegistros">
-                    {{ saidas|length }}
-                </strong>
-
-                <span>
-                    registros
-                </span>
-
+                <strong id="contadorRegistros">{{ saidas|length }}</strong>
+                <span>registros</span>
             </div>
 
         </div>
 
 
-        <!-- =====================================================
-             GRID DOS CARDS
-        ====================================================== -->
+        <!-- =========================================================
+             GRID
+        ========================================================== -->
 
-        <div class="pedidos-grid"
-             id="tabelaDados">
+        <div class="pedidos-grid" id="pedidosGrid">
 
+            {% for item in saidas %}
 
-            {% if saidas %}
+            {% set status_classe = 'status-pendente' %}
+            {% if item.status == 'PROCESSADO' %}
+                {% set status_classe = 'status-processado' %}
+            {% elif item.status == 'CANCELADO' %}
+                {% set status_classe = 'status-cancelado' %}
+            {% endif %}
 
+            <div class="pedido-card {{ status_classe }}"
 
-                {% for item in saidas %}
-
-                <article class="pedido-card"
-                         data-pedido
-                         data-produto="{{ item.nome|lower }}"
-                         data-cliente="{{ item.cliente|lower }}">
-
-
-                    <!-- =================================================
-                         IMAGEM + STATUS
-                    ================================================== -->
-
-                    <div class="pedido-imagem-area">
-
-
-                        <!-- STATUS -->
-
-                        <div class="status-area">
-
-                            {% if item.status == 'PENDENTE' %}
-
-                                <span class="status status-pendente">
-
-                                    <span class="status-dot"></span>
-
-                                    Pendente
-
-                                </span>
-
-                            {% elif item.status == 'PROCESSADO' %}
-
-                                <span class="status status-processado">
-
-                                    <span class="status-dot"></span>
-
-                                    Processado
-
-                                </span>
-
-                            {% elif item.status == 'CANCELADO' %}
-
-                                <span class="status status-cancelado">
-
-                                    <span class="status-dot"></span>
-
-                                    Cancelado
-
-                                </span>
-
-                            {% else %}
-
-                                <span class="status">
-
-                                    <span class="status-dot"></span>
-
-                                    {{ item.status }}
-
-                                </span>
-
-                            {% endif %}
-
-                        </div>
+                data-id="{{ item.id }}"
+                data-nome="{{ item.nome }}"
+                data-cliente="{{ item.cliente }}"
+                data-status="{{ item.status }}"
+                data-quantidade="{{ item.quantidade_pedido }}"
+                data-valor="{{ '%.2f'|format(item.valor_total|float) }}"
+                data-data="{{ item.data_pedido.strftime('%d/%m/%Y') }}"
+                data-observacao="{{ item.observacao if item.observacao else '' }}"
+                data-processar="{% if item.status == 'PENDENTE' %}{{ url_for('processar_saida', id=item.id) }}{% endif %}"
+                data-cancelar="{% if item.status == 'PENDENTE' %}{{ url_for('cancelar_saida', id=item.id) }}{% endif %}"
+                data-imagem="{% if item.imagem %}{% if item.imagem.startswith('http://') or item.imagem.startswith('https://') %}{{ item.imagem }}{% else %}{{ url_for('static', filename='uploads/produtos/' + item.imagem) }}{% endif %}{% endif %}">
 
 
-                        <!-- =================================================
-                             IMAGEM
-                        ================================================== -->
+                <!-- TOPO -->
+
+                <div class="card-topo">
+
+                    <div class="card-imagem {% if not item.imagem %}sem-imagem{% endif %}">
 
                         {% if item.imagem %}
 
-                            <div class="pedido-imagem">
+                            {% if item.imagem.startswith('http://') or item.imagem.startswith('https://') %}
 
-                                {% if item.imagem.startswith('http://') or item.imagem.startswith('https://') %}
+                                <img src="{{ item.imagem }}"
+                                     alt="{{ item.nome }}"
+                                     loading="lazy"
+                                     onerror="this.parentElement.classList.add('sem-imagem');">
 
-                                    <!-- IMAGEM EXTERNA -->
+                            {% else %}
 
-                                    <img
-                                        src="{{ item.imagem }}"
-                                        alt="{{ item.nome }}"
-                                        loading="lazy"
-                                        onerror="
-                                            this.style.display='none';
-                                            this.parentElement.classList.add('sem-imagem');
-                                            this.nextElementSibling.style.display='flex';
-                                        "
-                                    >
+                                <img src="{{ url_for('static', filename='uploads/produtos/' + item.imagem) }}"
+                                     alt="{{ item.nome }}"
+                                     loading="lazy"
+                                     onerror="this.parentElement.classList.add('sem-imagem');">
 
-                                {% else %}
-
-                                    <!-- IMAGEM LOCAL -->
-
-                                    <img
-                                        src="{{ url_for('static', filename='uploads/produtos/' + item.imagem) }}"
-                                        alt="{{ item.nome }}"
-                                        loading="lazy"
-                                        onerror="
-                                            this.style.display='none';
-                                            this.parentElement.classList.add('sem-imagem');
-                                            this.nextElementSibling.style.display='flex';
-                                        "
-                                    >
-
-                                {% endif %}
-
-
-                                <div class="imagem-placeholder">
-
-                                    <i class="bi bi-capsule"></i>
-
-                                </div>
-
-                            </div>
-
-                        {% else %}
-
-                            <div class="pedido-imagem sem-imagem">
-
-                                <div class="imagem-placeholder"
-                                     style="display:flex;">
-
-                                    <i class="bi bi-capsule"></i>
-
-                                </div>
-
-                            </div>
+                            {% endif %}
 
                         {% endif %}
 
-                    </div>
-
-
-                    <!-- =================================================
-                         CONTEÚDO
-                    ================================================== -->
-
-                    <div class="pedido-conteudo">
-
-
-                        <!-- PRODUTO -->
-
-                        <div class="pedido-titulo">
-
-                            <span class="pedido-label">
-                                PRODUTO
-                            </span>
-
-                            <h3>
-                                {{ item.nome }}
-                            </h3>
-
-                        </div>
-
-
-                        <!-- CLIENTE -->
-
-                        <div class="pedido-fornecedor">
-
-                            <div class="fornecedor-icon">
-
-                                <i class="bi bi-person-fill"></i>
-
-                            </div>
-
-
-                            <div>
-
-                                <span>
-                                    Cliente
-                                </span>
-
-                                <strong>
-                                    {{ item.cliente }}
-                                </strong>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- =================================================
-                             INFORMAÇÕES
-                        ================================================== -->
-
-                        <div class="pedido-informacoes">
-
-
-                            <!-- QUANTIDADE -->
-
-                            <div class="info-item">
-
-                                <div class="info-icon quantidade-icon">
-
-                                    <i class="bi bi-box-seam"></i>
-
-                                </div>
-
-
-                                <div>
-
-                                    <span>
-                                        Quantidade
-                                    </span>
-
-                                    <strong>
-                                        {{ item.quantidade_pedido }}
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-
-                            <!-- VALOR -->
-
-                            <div class="info-item">
-
-                                <div class="info-icon valor-icon">
-
-                                    <i class="bi bi-cash-coin"></i>
-
-                                </div>
-
-
-                                <div>
-
-                                    <span>
-                                        Valor total
-                                    </span>
-
-                                    <strong class="valor-total">
-
-                                        R$
-
-                                        {{ "%.2f"|format(item.valor_total|float) }}
-
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- =================================================
-                             OBSERVAÇÃO
-                        ================================================== -->
-
-                        <div class="observacao">
-
-                            <i class="bi bi-chat-left-text"></i>
-
-                            <span>
-
-                                {% if item.observacao %}
-
-                                    {{ item.observacao }}
-
-                                {% else %}
-
-                                    Nenhuma observação
-
-                                {% endif %}
-
-                            </span>
-
-                        </div>
-
-
-                        <!-- =================================================
-                             RODAPÉ
-                        ================================================== -->
-
-                        <div class="pedido-footer">
-
-
-                            <!-- DATA -->
-
-                            <span class="data">
-
-                                <i class="bi bi-calendar3"></i>
-
-                                {{ item.data_pedido.strftime('%d/%m/%Y') }}
-
-                            </span>
-
-
-                            <!-- =================================================
-                                 AÇÕES
-                            ================================================== -->
-
-                            <div class="pedido-acoes">
-
-
-                                {% if item.status == 'PENDENTE' %}
-
-
-                                    <!-- =================================================
-                                         CANCELAR
-                                    ================================================== -->
-
-                                    <a
-                                        class="btn-tabela btn-cancelar"
-                                        href="{{ url_for('cancelar_saida', id=item.id) }}"
-                                        title="Cancelar pedido"
-                                        onclick="abrirModalConfirmacao(event, this, 'cancelar')"
-                                    >
-
-                                        <i class="bi bi-x-lg"></i>
-
-                                        <span>
-                                            Cancelar
-                                        </span>
-
-                                    </a>
-
-
-                                    <!-- =================================================
-                                         PROCESSAR
-                                    ================================================== -->
-
-                                    <a
-                                        class="btn-tabela btn-processar"
-                                        href="{{ url_for('processar_saida', id=item.id) }}"
-                                        title="Processar pedido"
-                                        onclick="abrirModalConfirmacao(event, this, 'processar')"
-                                    >
-
-                                        <i class="bi bi-check-lg"></i>
-
-                                        <span>
-                                            Processar
-                                        </span>
-
-                                    </a>
-
-
-                                {% elif item.status == 'PROCESSADO' %}
-
-                                    <span class="acao-indisponivel">
-
-                                        <i class="bi bi-check-circle"></i>
-
-                                        Pedido processado
-
-                                    </span>
-
-
-                                {% elif item.status == 'CANCELADO' %}
-
-                                    <span class="acao-indisponivel">
-
-                                        <i class="bi bi-x-circle"></i>
-
-                                        Pedido cancelado
-
-                                    </span>
-
-                                {% endif %}
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </article>
-
-                {% endfor %}
-
-
-            {% else %}
-
-
-                <!-- =================================================
-                     SEM REGISTROS
-                ================================================== -->
-
-                <div class="sem-registros">
-
-                    <div class="empty-icon">
-
-                        <i class="bi bi-box-arrow-up"></i>
+                        <i class="bi bi-capsule"></i>
 
                     </div>
 
 
-                    <h3>
-                        Nenhum pedido de saída encontrado
-                    </h3>
+                    <span class="status-badge {{ status_classe }}">
 
+                        <span class="dot"></span>
 
-                    <p>
-                        Não existem pedidos de saída que correspondam
-                        aos filtros selecionados.
-                    </p>
+                        {% if item.status == 'PENDENTE' %}
+                            Pendente
+                        {% elif item.status == 'PROCESSADO' %}
+                            Processado
+                        {% elif item.status == 'CANCELADO' %}
+                            Cancelado
+                        {% else %}
+                            {{ item.status }}
+                        {% endif %}
 
-
-                    <a href="{{ url_for('tela_produtos') }}"
-                       class="empty-button">
-
-                        <i class="bi bi-plus-lg"></i>
-
-                        Fazer novo pedido
-
-                    </a>
+                    </span>
 
                 </div>
 
-            {% endif %}
+
+                <!-- CORPO -->
+
+                <div class="card-corpo">
+
+                    <span class="card-categoria">
+                        <i class="bi bi-person-fill"></i>
+                        {{ item.cliente }}
+                    </span>
+
+                    <h3 class="card-nome">
+                        {{ item.nome }}
+                    </h3>
+
+                    <div class="card-preco">
+                        <span class="moeda">R$</span>
+                        <span>{{ '%.2f'|format(item.valor_total|float) }}</span>
+                    </div>
+
+                    <div class="card-estoque-linha">
+
+                        <div class="estoque-info">
+                            <i class="bi bi-box-seam"></i>
+                            <span>{{ item.quantidade_pedido }} un.</span>
+                        </div>
+
+                        <div class="estoque-minimo-info">
+                            <span>{{ item.data_pedido.strftime('%d/%m/%Y') }}</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- AÇÕES -->
+
+                <div class="card-acoes">
+
+                    {% if item.status == 'PENDENTE' %}
+
+                        <a class="btn-acao btn-entrada"
+                           href="{{ url_for('processar_saida', id=item.id) }}"
+                           onclick="return confirm('Tem certeza que deseja processar este pedido? O estoque poderá ser atualizado.');">
+
+                            <i class="bi bi-check-lg"></i>
+                            Processar
+
+                        </a>
+
+                        <a class="btn-acao btn-cancelar"
+                           href="{{ url_for('cancelar_saida', id=item.id) }}"
+                           onclick="return confirm('Tem certeza que deseja cancelar este pedido?');">
+
+                            <i class="bi bi-x-lg"></i>
+                            Cancelar
+
+                        </a>
+
+                    {% else %}
+
+                        <span class="acao-indisponivel-card">
+
+                            {% if item.status == 'PROCESSADO' %}
+                                <i class="bi bi-check-circle"></i> Pedido processado
+                            {% elif item.status == 'CANCELADO' %}
+                                <i class="bi bi-x-circle"></i> Pedido cancelado
+                            {% else %}
+                                <i class="bi bi-lock"></i> Pedido finalizado
+                            {% endif %}
+
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% endfor %}
 
         </div>
+
+
+        <!-- =========================================================
+             ESTADO VAZIO
+        ========================================================== -->
+
+        {% if not saidas %}
+
+        <div class="estado-vazio">
+
+            <i class="bi bi-box-arrow-up"></i>
+
+            <p>
+                Nenhum pedido de saída encontrado para os filtros selecionados.
+            </p>
+
+        </div>
+
+        {% endif %}
+
 
     </main>
 
@@ -703,99 +399,170 @@
 
 
 <!-- =============================================================
-     MODAL DE CONFIRMAÇÃO
-     
-     IMPORTANTE:
-     Ele fica FORA do .container para não ficar preso ao conteúdo.
+     MODAL DE DETALHES DO PEDIDO
 ============================================================= -->
 
-<div id="modalConfirmacao"
-     class="modal-confirmacao"
-     aria-hidden="true">
+<div id="modalOverlay" class="modal-overlay" aria-hidden="true">
 
-
-    <!-- FUNDO -->
-
-    <div class="modal-overlay"
-         onclick="fecharModalConfirmacao()">
-    </div>
-
-
-    <!-- =========================================================
-         CARD DO MODAL
-    ========================================================== -->
-
-    <div class="modal-confirmacao-card"
+    <div id="modalPedido"
+         class="modal-produto"
          role="dialog"
          aria-modal="true"
-         aria-labelledby="modalTitulo"
-         aria-describedby="modalMensagem">
+         aria-labelledby="modalNome"
+         tabindex="-1">
+
+        <!-- CABEÇALHO -->
+
+        <div class="modal-header">
+
+            <div class="modal-header-info">
+
+                <div class="modal-icone" id="modalIcone">
+                    <i class="bi bi-capsule"></i>
+                </div>
+
+                <div class="modal-header-texto">
+
+                    <span class="modal-categoria-tag status-badge" id="modalStatus">
+                        Status
+                    </span>
+
+                    <h2 id="modalNome">
+                        Produto
+                    </h2>
+
+                </div>
+
+            </div>
 
 
-        <!-- ÍCONE -->
+            <button type="button"
+                    id="fecharModal"
+                    class="btn-fechar-modal"
+                    aria-label="Fechar">
 
-        <div id="modalIcone"
-             class="modal-confirmacao-icone">
+                <i class="bi bi-x-lg"></i>
 
-            <i class="bi bi-question-lg"></i>
+            </button>
 
         </div>
 
 
         <!-- CONTEÚDO -->
 
-        <div class="modal-confirmacao-conteudo">
+        <div class="modal-conteudo">
 
-            <h3 id="modalTitulo">
-                Confirmar ação
-            </h3>
 
-            <p id="modalMensagem">
-                Tem certeza que deseja realizar esta ação?
-            </p>
+            <div class="modal-alerta-estoque"
+                 id="modalAlertaPendente"
+                 hidden>
+
+                <i class="bi bi-exclamation-triangle-fill"></i>
+
+                <span>
+                    Este pedido ainda está pendente de processamento.
+                </span>
+
+            </div>
+
+
+            <div class="modal-info">
+
+                <div class="modal-info-icone">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+
+                <div class="modal-info-texto">
+                    <span>Cliente</span>
+                    <strong id="modalCliente">-</strong>
+                </div>
+
+            </div>
+
+
+            <!-- QUANTIDADE, VALOR E DATA -->
+
+            <div class="modal-precos">
+
+                <div class="preco-box">
+                    <span>Quantidade</span>
+                    <strong id="modalQuantidade">0 un.</strong>
+                </div>
+
+                <div class="preco-box preco-venda">
+                    <span>Valor total</span>
+                    <strong>
+                        <small>R$</small>
+                        <span id="modalValor">0,00</span>
+                    </strong>
+                </div>
+
+                <div class="preco-box">
+                    <span>Data</span>
+                    <strong id="modalData">-</strong>
+                </div>
+
+            </div>
+
+
+            <!-- INFORMAÇÕES GERAIS -->
+
+            <div class="modal-informacoes">
+
+                <div class="modal-info">
+
+                    <div class="modal-info-icone">
+                        <i class="bi bi-hash"></i>
+                    </div>
+
+                    <div class="modal-info-texto">
+                        <span>Código do pedido</span>
+                        <strong id="modalId">#0</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="modal-info" id="modalObsWrap">
+
+                    <div class="modal-info-icone">
+                        <i class="bi bi-chat-left-text"></i>
+                    </div>
+
+                    <div class="modal-info-texto">
+                        <span>Observação</span>
+                        <strong id="modalObservacao">Nenhuma observação</strong>
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
 
 
-        <!-- BOTÕES -->
+        <!-- AÇÕES -->
 
-        <div class="modal-confirmacao-acoes">
+        <div class="modal-acoes" id="modalAcoes">
 
+            <a id="modalProcessar"
+               href="#"
+               class="modal-btn modal-btn-entrada">
 
-            <!-- VOLTAR -->
+                <i class="bi bi-check-lg"></i>
+                Processar
 
-            <button
-                type="button"
-                class="modal-btn modal-btn-voltar"
-                onclick="fecharModalConfirmacao()"
-            >
-
-                <i class="bi bi-arrow-left"></i>
-
-                <span>
-                    Voltar
-                </span>
-
-            </button>
+            </a>
 
 
-            <!-- CONFIRMAR -->
+            <a id="modalCancelar"
+               href="#"
+               class="modal-btn modal-btn-excluir">
 
-            <button
-                type="button"
-                id="btnConfirmarModal"
-                class="modal-btn modal-btn-confirmar"
-            >
+                <i class="bi bi-x-lg"></i>
+                Cancelar
 
-                <i id="modalBtnIcone"
-                   class="bi bi-check-lg">
-                </i>
-
-                <span id="modalBtnTexto">
-                    Confirmar
-                </span>
-
-            </button>
+            </a>
 
         </div>
 
@@ -804,79 +571,46 @@
 </div>
 
 
-<!-- =============================================================
-     JAVASCRIPT
-============================================================= -->
-
 <script>
 
 document.addEventListener("DOMContentLoaded", function () {
 
+    const overlay = document.getElementById("modalOverlay");
 
-    /* =========================================================
-       BUSCA
-    ========================================================== */
+    if (overlay && overlay.parentElement !== document.body) {
+        document.body.appendChild(overlay);
+    }
 
-    const inputBusca =
-        document.getElementById("inputBusca");
 
-    const cards =
-        document.querySelectorAll(".pedido-card");
+    /* ===================== BUSCA ===================== */
 
-    const contador =
-        document.getElementById("contadorRegistros");
-
+    const inputBusca = document.getElementById("inputBusca");
+    const contador = document.getElementById("contadorRegistros");
 
     if (inputBusca) {
 
-        inputBusca.addEventListener("input", function () {
+        inputBusca.addEventListener("keyup", function () {
 
-            const filtro =
-                this.value
-                    .toLowerCase()
-                    .trim();
+            const filtro = this.value.toLowerCase().trim();
+            let visiveis = 0;
 
+            document.querySelectorAll(".pedido-card").forEach(function (card) {
 
-            let quantidadeVisivel = 0;
+                const nome = (card.dataset.nome || "").toLowerCase();
+                const cliente = (card.dataset.cliente || "").toLowerCase();
+                const status = (card.dataset.status || "").toLowerCase();
 
-
-            cards.forEach(function (card) {
-
-                const produto =
-                    card.dataset.produto || "";
-
-                const cliente =
-                    card.dataset.cliente || "";
-
-
-                const textoCompleto =
-                    card.textContent.toLowerCase();
-
-
-                if (
-                    produto.includes(filtro) ||
-                    cliente.includes(filtro) ||
-                    textoCompleto.includes(filtro)
-                ) {
-
+                if (nome.includes(filtro) || cliente.includes(filtro) || status.includes(filtro)) {
                     card.style.display = "";
-
-                    quantidadeVisivel++;
-
+                    visiveis++;
                 } else {
-
                     card.style.display = "none";
-
                 }
 
             });
 
-
             if (contador) {
-
-                contador.textContent =
-                    quantidadeVisivel;
-
+                contador.textContent = visiveis;
             }
 
         });
@@ -884,353 +618,190 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    /* =========================================================
-       MODAL
-       
-       Coloca o modal diretamente no BODY.
-       Isso evita que ele fique preso ao container,
-       sidebar, content ou qualquer ancestral com transform.
-    ========================================================== */
+    /* ===================== ELEMENTOS DO MODAL ===================== */
 
-    const modal =
-        document.getElementById("modalConfirmacao");
+    const modal = document.getElementById("modalPedido");
+    const fecharModal = document.getElementById("fecharModal");
+    const modalIcone = document.getElementById("modalIcone");
+    const modalNome = document.getElementById("modalNome");
+    const modalStatus = document.getElementById("modalStatus");
+    const modalId = document.getElementById("modalId");
+    const modalCliente = document.getElementById("modalCliente");
+    const modalQuantidade = document.getElementById("modalQuantidade");
+    const modalValor = document.getElementById("modalValor");
+    const modalData = document.getElementById("modalData");
+    const modalObservacao = document.getElementById("modalObservacao");
+    const modalAlertaPendente = document.getElementById("modalAlertaPendente");
+    const modalAcoes = document.getElementById("modalAcoes");
+    const modalProcessar = document.getElementById("modalProcessar");
+    const modalCancelar = document.getElementById("modalCancelar");
+
+    let ultimoElementoFocado = null;
 
 
-    if (modal && modal.parentElement !== document.body) {
-
-        document.body.appendChild(modal);
-
+    function formatarPreco(valor) {
+        const numero = parseFloat(valor || 0);
+        return numero.toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
     }
 
 
-});
+    function preencherModal(card) {
 
+        const nome = card.dataset.nome || "Pedido";
+        const status = card.dataset.status || "-";
+        const imagem = card.dataset.imagem || "";
+        const quantidade = card.dataset.quantidade || "0";
+        const valor = card.dataset.valor || "0";
+        const data = card.dataset.data || "-";
+        const observacao = card.dataset.observacao || "";
+        const urlProcessar = card.dataset.processar || "";
+        const urlCancelar = card.dataset.cancelar || "";
 
-/* =============================================================
-   VARIÁVEL DO LINK
-============================================================= */
 
-let linkConfirmacao = null;
+        if (imagem) {
 
+            modalIcone.classList.remove("sem-imagem");
 
-/* =============================================================
-   ABRIR MODAL
-============================================================= */
+            modalIcone.innerHTML =
+                '<img src="' + imagem + '" alt="' + nome + '" ' +
+                'onerror="this.parentElement.classList.add(\'sem-imagem\'); this.remove();">' +
+                '<i class="bi bi-capsule"></i>';
 
-function abrirModalConfirmacao(event, elemento, tipo) {
+        } else {
 
-    event.preventDefault();
-
-    event.stopPropagation();
-
-
-    /* =========================================================
-       SALVA O LINK
-    ========================================================== */
-
-    linkConfirmacao = elemento;
-
-
-    /* =========================================================
-       ELEMENTOS DO MODAL
-    ========================================================== */
-
-    const modal =
-        document.getElementById("modalConfirmacao");
-
-    const icone =
-        document.getElementById("modalIcone");
-
-    const titulo =
-        document.getElementById("modalTitulo");
-
-    const mensagem =
-        document.getElementById("modalMensagem");
-
-    const btnConfirmar =
-        document.getElementById("btnConfirmarModal");
-
-    const btnIcone =
-        document.getElementById("modalBtnIcone");
-
-    const btnTexto =
-        document.getElementById("modalBtnTexto");
-
-
-    if (!modal) {
-        return;
-    }
-
-
-    /* =========================================================
-       GARANTE QUE O MODAL ESTÁ NO BODY
-    ========================================================== */
-
-    if (modal.parentElement !== document.body) {
-
-        document.body.appendChild(modal);
-
-    }
-
-
-    /* =========================================================
-       CANCELAR
-    ========================================================== */
-
-    if (tipo === "cancelar") {
-
-        modal.classList.add("cancelar");
-
-
-        icone.innerHTML = `
-            <i class="bi bi-exclamation-lg"></i>
-        `;
-
-
-        titulo.textContent =
-            "Cancelar pedido?";
-
-
-        mensagem.textContent =
-            "Tem certeza que deseja cancelar este pedido? Esta ação poderá alterar o status da solicitação.";
-
-
-        btnIcone.className =
-            "bi bi-x-lg";
-
-
-        btnTexto.textContent =
-            "Sim, cancelar";
-
-    }
-
-
-    /* =========================================================
-       PROCESSAR
-    ========================================================== */
-
-    else {
-
-        modal.classList.remove("cancelar");
-
-
-        icone.innerHTML = `
-            <i class="bi bi-check-lg"></i>
-        `;
-
-
-        titulo.textContent =
-            "Processar pedido?";
-
-
-        mensagem.textContent =
-            "Tem certeza que deseja processar este pedido? O estoque poderá ser atualizado após o processamento.";
-
-
-        btnIcone.className =
-            "bi bi-check-lg";
-
-
-        btnTexto.textContent =
-            "Sim, processar";
-
-    }
-
-
-    /* =========================================================
-       MOSTRAR
-    ========================================================== */
-
-    modal.classList.add("ativo");
-
-    modal.setAttribute(
-        "aria-hidden",
-        "false"
-    );
-
-
-    /* =========================================================
-       TRAVA O SCROLL DA PÁGINA
-    ========================================================== */
-
-    document.body.classList.add(
-        "modal-aberto"
-    );
-
-
-    /* =========================================================
-       FOCO NO BOTÃO
-    ========================================================== */
-
-    setTimeout(function () {
-
-        if (btnConfirmar) {
-
-            btnConfirmar.focus();
+            modalIcone.classList.add("sem-imagem");
+            modalIcone.innerHTML = '<i class="bi bi-capsule"></i>';
 
         }
 
-    }, 150);
+        modalNome.textContent = nome;
 
-}
+        modalStatus.classList.remove("status-pendente", "status-processado", "status-cancelado");
+
+        let statusTexto = status;
+
+        if (status === "PENDENTE") {
+            statusTexto = "Pendente";
+            modalStatus.classList.add("status-pendente");
+        } else if (status === "PROCESSADO") {
+            statusTexto = "Processado";
+            modalStatus.classList.add("status-processado");
+        } else if (status === "CANCELADO") {
+            statusTexto = "Cancelado";
+            modalStatus.classList.add("status-cancelado");
+        }
+
+        modalStatus.textContent = statusTexto;
+
+        modalId.textContent = "#" + (card.dataset.id || "0");
+        modalCliente.textContent = card.dataset.cliente || "-";
+        modalQuantidade.textContent = quantidade + " un.";
+        modalValor.textContent = formatarPreco(valor);
+        modalData.textContent = data;
+        modalObservacao.textContent = observacao ? observacao : "Nenhuma observação";
+
+        modalAlertaPendente.hidden = (status !== "PENDENTE");
 
 
-/* =============================================================
-   FECHAR MODAL
-============================================================= */
+        if (status === "PENDENTE") {
 
-function fecharModalConfirmacao() {
+            modalAcoes.hidden = false;
 
-    const modal =
-        document.getElementById("modalConfirmacao");
+            modalProcessar.href = urlProcessar;
+            modalCancelar.href = urlCancelar;
 
+            modalProcessar.onclick = function (e) {
+                if (!confirm("Tem certeza que deseja processar este pedido? O estoque poderá ser atualizado.")) {
+                    e.preventDefault();
+                }
+            };
 
-    if (!modal) {
-        return;
+            modalCancelar.onclick = function (e) {
+                if (!confirm("Tem certeza que deseja cancelar este pedido?")) {
+                    e.preventDefault();
+                }
+            };
+
+        } else {
+
+            modalAcoes.hidden = true;
+
+        }
+
     }
 
 
-    modal.classList.remove("ativo");
+    function abrirModal(card) {
 
-    modal.classList.remove("cancelar");
+        ultimoElementoFocado = document.activeElement;
 
+        preencherModal(card);
 
-    modal.setAttribute(
-        "aria-hidden",
-        "true"
-    );
+        overlay.classList.add("visivel");
+        overlay.setAttribute("aria-hidden", "false");
+        document.body.classList.add("modal-aberto");
 
+        requestAnimationFrame(function () {
+            modal.focus();
+        });
 
-    linkConfirmacao = null;
-
-
-    document.body.classList.remove(
-        "modal-aberto"
-    );
-
-}
-
-
-/* =============================================================
-   CONFIRMAR AÇÃO
-============================================================= */
-
-document.addEventListener("DOMContentLoaded", function () {
-
-
-    const btnConfirmar =
-        document.getElementById("btnConfirmarModal");
-
-
-    if (!btnConfirmar) {
-        return;
     }
 
 
-    btnConfirmar.addEventListener(
-        "click",
-        function () {
+    function fecharDetalhes() {
+
+        overlay.classList.remove("visivel");
+        overlay.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("modal-aberto");
+
+        if (ultimoElementoFocado) {
+            ultimoElementoFocado.focus();
+        }
+
+    }
 
 
-            if (!linkConfirmacao) {
+    document.querySelectorAll(".pedido-card").forEach(function (card) {
+
+        card.addEventListener("click", function (e) {
+
+            if (e.target.closest("a")) {
                 return;
             }
 
+            abrirModal(card);
 
-            const destino =
-                linkConfirmacao.href;
+        });
 
-
-            /* Evita duplo clique */
-
-            btnConfirmar.disabled = true;
-
-            btnConfirmar.classList.add(
-                "processando"
-            );
+    });
 
 
-            /* Pequena animação antes de navegar */
+    if (fecharModal) {
+        fecharModal.addEventListener("click", function (e) {
+            e.stopPropagation();
+            fecharDetalhes();
+        });
+    }
 
-            setTimeout(function () {
 
-                window.location.href =
-                    destino;
-
-            }, 100);
-
+    overlay.addEventListener("click", function (e) {
+        if (e.target === overlay) {
+            fecharDetalhes();
         }
-    );
+    });
+
+
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && overlay.classList.contains("visivel")) {
+            fecharDetalhes();
+        }
+    });
 
 });
 
-
-/* =============================================================
-   ESC - FECHAR MODAL
-============================================================= */
-
-document.addEventListener(
-    "keydown",
-    function (event) {
-
-
-        if (event.key === "Escape") {
-
-            const modal =
-                document.getElementById(
-                    "modalConfirmacao"
-                );
-
-
-            if (
-                modal &&
-                modal.classList.contains("ativo")
-            ) {
-
-                fecharModalConfirmacao();
-
-            }
-
-        }
-
-    }
-);
-
-
-/* =============================================================
-   CLIQUE NO BACKDROP
-============================================================= */
-
-document.addEventListener(
-    "click",
-    function (event) {
-
-
-        const modal =
-            document.getElementById(
-                "modalConfirmacao"
-            );
-
-
-        if (!modal) {
-            return;
-        }
-
-
-        if (
-            event.target.classList.contains(
-                "modal-overlay"
-            )
-        ) {
-
-            fecharModalConfirmacao();
-
-        }
-
-    }
-);
-
 </script>
-
 
 {% endblock %}
