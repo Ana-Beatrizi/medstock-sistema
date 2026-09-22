@@ -333,7 +333,7 @@
 
                         <a class="btn-acao btn-entrada"
                            href="{{ url_for('processar_entrada', id=item.id) }}"
-                           onclick="return confirm('Tem certeza que deseja processar este pedido? O estoque será atualizado.');">
+                           onclick="abrirModalConfirmacao(event, this, 'processar')">
 
                             <i class="bi bi-check-lg"></i>
                             Processar
@@ -342,7 +342,7 @@
 
                         <a class="btn-acao btn-cancelar"
                            href="{{ url_for('cancelar_entrada', id=item.id) }}"
-                           onclick="return confirm('Tem certeza que deseja cancelar este pedido?');">
+                           onclick="abrirModalConfirmacao(event, this, 'cancelar')">
 
                             <i class="bi bi-x-lg"></i>
                             Cancelar
@@ -571,6 +571,53 @@
 </div>
 
 
+<!-- =============================================================
+     MODAL DE CONFIRMAÇÃO (Processar / Cancelar)
+============================================================= -->
+
+<div id="modalConfirmacao" class="modal-overlay" aria-hidden="true">
+
+    <div class="modal-confirmacao-card"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="confirmTitulo"
+         aria-describedby="confirmMensagem">
+
+        <div id="confirmIcone" class="modal-confirmacao-icone">
+            <i class="bi bi-question-lg"></i>
+        </div>
+
+        <h3 id="confirmTitulo">Confirmar ação</h3>
+
+        <p id="confirmMensagem">Tem certeza que deseja realizar esta ação?</p>
+
+        <div class="modal-confirmacao-acoes">
+
+            <button type="button"
+                    class="confirm-btn confirm-btn-voltar"
+                    onclick="fecharModalConfirmacao()">
+
+                <i class="bi bi-arrow-left"></i>
+                <span>Voltar</span>
+
+            </button>
+
+            <a id="btnConfirmarAcao"
+               href="#"
+               class="confirm-btn confirm-btn-confirmar">
+
+                <i id="confirmBtnIcone" class="bi bi-check-lg"></i>
+                <span id="confirmBtnTexto">Confirmar</span>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 <script>
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -579,6 +626,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (overlay && overlay.parentElement !== document.body) {
         document.body.appendChild(overlay);
+    }
+
+
+    const overlayConfirmacao = document.getElementById("modalConfirmacao");
+
+    if (overlayConfirmacao && overlayConfirmacao.parentElement !== document.body) {
+        document.body.appendChild(overlayConfirmacao);
     }
 
 
@@ -714,15 +768,11 @@ document.addEventListener("DOMContentLoaded", function () {
             modalCancelar.href = urlCancelar;
 
             modalProcessar.onclick = function (e) {
-                if (!confirm("Tem certeza que deseja processar este pedido? O estoque será atualizado.")) {
-                    e.preventDefault();
-                }
+                abrirModalConfirmacao(e, this, "processar");
             };
 
             modalCancelar.onclick = function (e) {
-                if (!confirm("Tem certeza que deseja cancelar este pedido?")) {
-                    e.preventDefault();
-                }
+                abrirModalConfirmacao(e, this, "cancelar");
             };
 
         } else {
@@ -794,11 +844,91 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 
+    overlayConfirmacao.addEventListener("click", function (e) {
+        if (e.target === overlayConfirmacao) {
+            fecharModalConfirmacao();
+        }
+    });
+
+
     document.addEventListener("keydown", function (e) {
+
+        if (e.key === "Escape" && overlayConfirmacao.classList.contains("visivel")) {
+            fecharModalConfirmacao();
+            return;
+        }
+
         if (e.key === "Escape" && overlay.classList.contains("visivel")) {
             fecharDetalhes();
         }
+
     });
+
+
+    /* ===================== MODAL DE CONFIRMAÇÃO ===================== */
+
+    window.abrirModalConfirmacao = function (event, elemento, tipo) {
+
+        if (event) {
+            event.preventDefault();
+        }
+
+        const url = elemento.getAttribute("href");
+
+        if (!url || url === "#") {
+            return;
+        }
+
+        if (overlay.classList.contains("visivel")) {
+            fecharDetalhes();
+        }
+
+        const confirmIcone = document.getElementById("confirmIcone");
+        const confirmTitulo = document.getElementById("confirmTitulo");
+        const confirmMensagem = document.getElementById("confirmMensagem");
+        const btnConfirmarAcao = document.getElementById("btnConfirmarAcao");
+        const confirmBtnIcone = document.getElementById("confirmBtnIcone");
+        const confirmBtnTexto = document.getElementById("confirmBtnTexto");
+
+        confirmIcone.classList.remove("tipo-cancelar");
+        btnConfirmarAcao.classList.remove("tipo-cancelar");
+
+        if (tipo === "cancelar") {
+
+            confirmIcone.classList.add("tipo-cancelar");
+            confirmIcone.innerHTML = '<i class="bi bi-exclamation-lg"></i>';
+            confirmTitulo.textContent = "Cancelar pedido?";
+            confirmMensagem.textContent = "Tem certeza que deseja cancelar este pedido? Esta ação não pode ser desfeita.";
+            btnConfirmarAcao.classList.add("tipo-cancelar");
+            confirmBtnIcone.className = "bi bi-x-lg";
+            confirmBtnTexto.textContent = "Sim, cancelar";
+
+        } else {
+
+            confirmIcone.innerHTML = '<i class="bi bi-check-lg"></i>';
+            confirmTitulo.textContent = "Processar pedido?";
+            confirmMensagem.textContent = "Tem certeza que deseja processar este pedido? O estoque será atualizado.";
+            confirmBtnIcone.className = "bi bi-check-lg";
+            confirmBtnTexto.textContent = "Sim, processar";
+
+        }
+
+        btnConfirmarAcao.href = url;
+
+        overlayConfirmacao.classList.add("visivel");
+        overlayConfirmacao.setAttribute("aria-hidden", "false");
+        document.body.classList.add("modal-aberto");
+
+    };
+
+
+    window.fecharModalConfirmacao = function () {
+
+        overlayConfirmacao.classList.remove("visivel");
+        overlayConfirmacao.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("modal-aberto");
+
+    };
 
 });
 

@@ -1546,6 +1546,222 @@ body.modal-aberto {
 }
 
 
+/* ============================================================================
+   MODAL DE CONFIRMAÇÃO (Processar / Cancelar)
+   Reaproveita o mesmo overlay (.modal-overlay) do modal de detalhes,
+   só muda o conteúdo interno.
+============================================================================ */
+
+.modal-confirmacao-card {
+
+    width: min(400px, calc(100vw - 40px));
+
+    padding: 32px 28px;
+
+    background: #FFFFFF;
+
+    border-radius: 20px;
+
+    text-align: center;
+
+    box-shadow:
+        0 30px 70px rgba(16, 24, 64, 0.28),
+        0 8px 20px rgba(16, 24, 64, 0.12);
+
+    transform: scale(.94) translateY(10px);
+
+    opacity: 0;
+
+    transition:
+        transform .22s cubic-bezier(.2, .9, .3, 1),
+        opacity .22s ease;
+}
+
+
+.modal-overlay.visivel .modal-confirmacao-card {
+
+    transform: scale(1) translateY(0);
+
+    opacity: 1;
+}
+
+
+.modal-confirmacao-icone {
+
+    width: 64px;
+    height: 64px;
+
+    margin: 0 auto 18px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #E6FBFA;
+
+    color: #00819F;
+
+    font-size: 26px;
+
+    box-shadow:
+        0 6px 16px rgba(0, 129, 159, 0.12);
+
+    transition:
+        background .2s ease,
+        color .2s ease;
+}
+
+
+.modal-confirmacao-icone.tipo-cancelar {
+
+    background: #FFEDEE;
+
+    color: #DC2626;
+
+    box-shadow:
+        0 6px 16px rgba(220, 38, 38, 0.12);
+}
+
+
+.modal-confirmacao-card h3 {
+
+    color: #17223B;
+
+    font-size: 19px;
+
+    font-weight: 700;
+
+    margin-bottom: 8px;
+}
+
+
+.modal-confirmacao-card p {
+
+    max-width: 320px;
+
+    margin: 0 auto;
+
+    color: #667085;
+
+    font-size: 14px;
+
+    line-height: 1.55;
+}
+
+
+.modal-confirmacao-acoes {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: 26px;
+}
+
+
+.confirm-btn {
+
+    flex: 1;
+
+    height: 46px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    text-decoration: none;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
+}
+
+
+.confirm-btn-voltar {
+
+    background: #F1F5F9;
+
+    color: #475569;
+
+    border: 1px solid #E2E8F0;
+}
+
+
+.confirm-btn-voltar:hover {
+
+    background: #E2E8F0;
+
+    color: #334155;
+
+    transform: translateY(-1px);
+}
+
+
+.confirm-btn-confirmar {
+
+    background: linear-gradient(
+        135deg,
+        #002D81,
+        #00819F
+    );
+
+    color: #FFFFFF;
+
+    box-shadow:
+        0 5px 15px rgba(0, 45, 129, 0.18);
+}
+
+
+.confirm-btn-confirmar:hover {
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 8px 22px rgba(0, 45, 129, 0.28);
+}
+
+
+.confirm-btn-confirmar.tipo-cancelar {
+
+    background: linear-gradient(
+        135deg,
+        #DC2626,
+        #E85D68
+    );
+
+    box-shadow:
+        0 5px 15px rgba(220, 38, 38, 0.18);
+}
+
+
+.confirm-btn-confirmar.tipo-cancelar:hover {
+
+    box-shadow:
+        0 8px 22px rgba(220, 38, 38, 0.28);
+}
+
+
 /* ============================================================
    RESPONSIVO
 ============================================================ */
@@ -1718,6 +1934,30 @@ body.modal-aberto {
     .modal-acoes {
 
         padding: 16px 20px 22px;
+    }
+
+
+    .modal-confirmacao-card {
+
+        padding: 26px 20px;
+
+        border-radius: 18px;
+    }
+
+
+    .modal-confirmacao-acoes {
+
+        flex-direction: column-reverse;
+
+        gap: 9px;
+    }
+
+
+    .confirm-btn {
+
+        width: 100%;
+
+        flex: none;
     }
 
 }
