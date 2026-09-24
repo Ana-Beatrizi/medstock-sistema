@@ -3,12 +3,8 @@
 {% block conteudo %}
 
 <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
-
-<link rel="stylesheet"
-      href="{{ url_for('static', filename='css/tela_produtos.css') }}">
-
-<link rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tela_produtos.css') }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 {% set categoria_icones = {
     'Analgésicos': 'bi-capsule-pill',
@@ -27,105 +23,94 @@
     'EPIs': 'bi-person-badge'
 } %}
 
+{# Quantidade de filtros ativos (usada no selo do botão) #}
+{% set filtros_ativos = (1 if fornecedor_selecionado else 0) + (1 if estoque_selecionado else 0) %}
+
 <div id="container">
 
     <main id="content">
 
-        <!-- =========================================================
-             HEADER
-        ========================================================== -->
+        <!-- ================= HEADER ================= -->
 
         <div id="header">
 
-            <div class="header-left">
-
+            <div class="header-title">
                 <h1>Produtos</h1>
-
                 <i id="icon" class="bi bi-capsule-pill"></i>
-
             </div>
 
+            <div class="header-controls">
 
-            <div class="header-right">
+                <!-- FILTROS -->
+                <div class="filtro-dropdown">
 
-                <div class="filtros-card">
-
-                    <div class="filtro-item">
-
+                    <button type="button"
+                            class="btn-filtros {% if filtros_ativos %}ativo{% endif %}"
+                            id="btnFiltros"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                            aria-controls="filtrosPainel">
                         <i class="bi bi-funnel-fill"></i>
+                        <span>Filtros</span>
+                        {% if filtros_ativos %}
+                        <span class="filtro-badge">{{ filtros_ativos }}</span>
+                        {% endif %}
+                        <i class="bi bi-list"></i>
+                    </button>
 
-                        <span>Filtros:</span>
+                    <div class="filtros-painel" id="filtrosPainel">
+
+                        <form method="GET" action="{{ url_for('tela_produtos') }}" class="filtros-form">
+
+                            <label class="filtro-campo">
+                                <span>Fornecedor</span>
+                                <select name="fornecedor_id" onchange="this.form.submit()">
+                                    <option value="">Todos os fornecedores</option>
+                                    {% for fornecedor in fornecedores %}
+                                    <option value="{{ fornecedor.id }}"
+                                        {% if fornecedor_selecionado == fornecedor.id|string %}selected{% endif %}>
+                                        {{ fornecedor.nome_fornecedor }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </label>
+
+                            <label class="filtro-campo">
+                                <span>Estoque</span>
+                                <select name="estoque" onchange="this.form.submit()">
+                                    <option value="">Todos os produtos</option>
+                                    <option value="baixo" {% if estoque_selecionado == 'baixo' %}selected{% endif %}>
+                                        ⚠ Estoque baixo
+                                    </option>
+                                    <option value="normal" {% if estoque_selecionado == 'normal' %}selected{% endif %}>
+                                        ✅ Estoque normal
+                                    </option>
+                                </select>
+                            </label>
+
+                        </form>
+
+                        {% if filtros_ativos %}
+                        <a href="{{ url_for('tela_produtos') }}" class="btn-limpar-filtros">
+                            <i class="bi bi-x-circle"></i>
+                            Limpar filtros
+                        </a>
+                        {% endif %}
 
                     </div>
 
-
-                    <form method="GET"
-                          action="{{ url_for('tela_produtos') }}"
-                          class="filtros-form">
-
-                        <select name="fornecedor_id"
-                                onchange="this.form.submit()">
-
-                            <option value="">
-                                Todos os fornecedores
-                            </option>
-
-                            {% for fornecedor in fornecedores %}
-
-                            <option value="{{ fornecedor.id }}"
-                                {% if fornecedor_selecionado == fornecedor.id|string %}
-                                    selected
-                                {% endif %}>
-
-                                {{ fornecedor.nome_fornecedor }}
-
-                            </option>
-
-                            {% endfor %}
-
-                        </select>
-
-
-                        <select name="estoque"
-                                onchange="this.form.submit()">
-
-                            <option value="">
-                                Todos os produtos
-                            </option>
-
-                            <option value="baixo"
-                                {% if estoque_selecionado == 'baixo' %}
-                                    selected
-                                {% endif %}>
-                                ⚠ Estoque baixo
-                            </option>
-
-                            <option value="normal"
-                                {% if estoque_selecionado == 'normal' %}
-                                    selected
-                                {% endif %}>
-                                ✅ Estoque alto
-                            </option>
-
-                        </select>
-
-                    </form>
-
                 </div>
 
+                <!-- BUSCA -->
+                <div class="busca-wrap">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="inputBusca" placeholder="Pesquisar">
+                </div>
 
-                <input type="text"
-                       id="inputBusca"
-                       placeholder="Pesquisar">
-
-
-                <a href="{{ url_for('tela_cadastro_produto') }}"
-                   class="btn btn-cadastro">
-
-                    <i class="bi bi-plus-lg me-2"></i>
-
+                <!-- CADASTRAR -->
+                <a href="{{ url_for('tela_cadastro_produto') }}" class="btn-cadastro">
+                    <i class="bi bi-plus-lg"></i>
                     Cadastrar Novo Produto
-
                 </a>
 
             </div>
@@ -133,69 +118,41 @@
         </div>
 
 
-        <!-- =========================================================
-             MENSAGENS
-        ========================================================== -->
+        <!-- ================= MENSAGENS ================= -->
 
         {% with mensagens = get_flashed_messages(with_categories=true) %}
-
             {% if mensagens %}
-
                 {% for categoria, msg in mensagens %}
-
-                <div class="custom-alert alert-{{ categoria }} alert-flash"
-                     role="alert">
-
+                <div class="custom-alert alert-{{ categoria }} alert-flash" role="alert">
                     <div class="alert-content">
-
                         {% if categoria == 'success' %}
-
                             <i class="bi bi-check-circle-fill alert-icon"></i>
-
-                        {% elif categoria == 'danger'
-                           or categoria == 'error' %}
-
+                        {% elif categoria == 'danger' or categoria == 'error' %}
                             <i class="bi bi-exclamation-triangle-fill alert-icon"></i>
-
                         {% else %}
-
                             <i class="bi bi-info-circle-fill alert-icon"></i>
-
                         {% endif %}
-
-                        <span class="alert-text">
-                            {{ msg }}
-                        </span>
-
+                        <span class="alert-text">{{ msg }}</span>
                     </div>
-
                 </div>
-
                 {% endfor %}
-
             {% endif %}
-
         {% endwith %}
 
 
-        <!-- =========================================================
-             GRID
-        ========================================================== -->
+        <!-- ================= GRID ================= -->
 
         <div class="produtos-grid" id="produtosGrid">
 
             {% for produto in produtos %}
 
             {% set icone = categoria_icones.get(produto.categoria, 'bi-box-seam') %}
+            {% set estoque_baixo = produto.quantidade_estoque <= produto.estoque_minimo %}
 
-            <div class="produto-card
-                {% if produto.quantidade_estoque <= produto.estoque_minimo %}
-                    card-estoque-baixo
-                {% endif %}"
-
+            <div class="produto-card {% if estoque_baixo %}card-estoque-baixo{% endif %}"
                 data-id="{{ produto.id }}"
                 data-nome="{{ produto.nome }}"
-                data-fornecedor="{{ produto.fornecedor.nome_fornecedor }}"
+                data-fornecedor="{{ produto.fornecedor.nome_fornecedor if produto.fornecedor else '' }}"
                 data-categoria="{{ produto.categoria }}"
                 data-icone="{{ icone }}"
                 data-estoque="{{ produto.quantidade_estoque }}"
@@ -208,169 +165,86 @@
                 data-excluir="{{ url_for('excluir_produto', id=produto.id) }}"
                 data-imagem="{% if produto.imagem %}{% if produto.imagem.startswith('http://') or produto.imagem.startswith('https://') %}{{ produto.imagem }}{% else %}{{ url_for('static', filename='uploads/produtos/' + produto.imagem) }}{% endif %}{% endif %}">
 
-
-                <!-- =================================================
-                     TOPO
-                ================================================== -->
-
+                <!-- TOPO -->
                 <div class="card-topo">
 
                     <div class="card-imagem {% if not produto.imagem %}sem-imagem{% endif %}">
 
                         {% if produto.imagem %}
-                    
                             {% if produto.imagem.startswith('http://') or produto.imagem.startswith('https://') %}
-                    
-                                <img src="{{ produto.imagem }}"
-                                     alt="{{ produto.nome }}"
-                                     loading="lazy"
+                                <img src="{{ produto.imagem }}" alt="{{ produto.nome }}" loading="lazy"
                                      onerror="this.parentElement.classList.add('sem-imagem');">
-                    
                             {% else %}
-                    
                                 <img src="{{ url_for('static', filename='uploads/produtos/' + produto.imagem) }}"
-                                     alt="{{ produto.nome }}"
-                                     loading="lazy"
+                                     alt="{{ produto.nome }}" loading="lazy"
                                      onerror="this.parentElement.classList.add('sem-imagem');">
-                    
                             {% endif %}
-                    
                         {% endif %}
-                    
+
                         <i class="bi {{ icone }}"></i>
-                    
+
                     </div>
 
-
                     <!-- MENU (...) -->
-
                     <div class="card-opcoes-wrap">
 
-                        <button type="button"
-                                class="btn-opcoes"
-                                aria-label="Mais opções">
-
+                        <button type="button" class="btn-opcoes" aria-label="Mais opções">
                             <i class="bi bi-three-dots-vertical"></i>
-
                         </button>
 
-
                         <div class="menu-opcoes">
-
                             <a href="{{ url_for('editar_produto', id=produto.id) }}">
-
-                                <i class="bi bi-pencil-square"></i>
-
-                                Editar
-
+                                <i class="bi bi-pencil-square"></i> Editar
                             </a>
-
-
-                            <a href="{{ url_for('excluir_produto', id=produto.id) }}"
-                               class="opcao-excluir">
-
-                                <i class="bi bi-trash3-fill"></i>
-
-                                Excluir
-
+                            <a href="{{ url_for('excluir_produto', id=produto.id) }}" class="opcao-excluir">
+                                <i class="bi bi-trash3-fill"></i> Excluir
                             </a>
-
                         </div>
 
                     </div>
 
                 </div>
 
-
-                <!-- =================================================
-                     CORPO
-                ================================================== -->
-
+                <!-- CORPO -->
                 <div class="card-corpo">
 
-                    <span class="card-categoria">
-                        {{ produto.categoria }}
-                    </span>
+                    <span class="card-categoria">{{ produto.categoria }}</span>
 
-
-                    <h3 class="card-nome">
-                        {{ produto.nome }}
-                    </h3>
-
+                    <h3 class="card-nome">{{ produto.nome }}</h3>
 
                     <div class="card-preco">
-
-                        <span class="moeda">
-                            R$
-                        </span>
-
-                        <span>
-                            {{ '%.2f'|format(produto.preco_venda) }}
-                        </span>
-
+                        <span class="moeda">R$</span>
+                        <span>{{ '%.2f'|format(produto.preco_venda) }}</span>
                     </div>
-
 
                     <div class="card-estoque-linha">
 
-                        <div class="estoque-info
-                            {% if produto.quantidade_estoque <= produto.estoque_minimo %}
-                                estoque-baixo
-                            {% endif %}">
-
-                            {% if produto.quantidade_estoque <= produto.estoque_minimo %}
-
+                        <div class="estoque-info {% if estoque_baixo %}estoque-baixo{% endif %}">
+                            {% if estoque_baixo %}
                                 <i class="bi bi-exclamation-triangle-fill"></i>
-
                             {% endif %}
-
-                            <span>
-                                {{ produto.quantidade_estoque }} un.
-                            </span>
-
+                            <span>{{ produto.quantidade_estoque }} un.</span>
                         </div>
 
-
                         <div class="estoque-minimo-info">
-
-                            <span>
-                                mín. {{ produto.estoque_minimo }}
-                            </span>
-
+                            <span>mín. {{ produto.estoque_minimo }}</span>
                         </div>
 
                     </div>
 
                 </div>
 
-
-                <!-- =================================================
-                     BOTÕES
-                ================================================== -->
-
+                <!-- BOTÕES -->
                 <div class="card-acoes">
 
                     <a class="btn-acao btn-entrada"
-                       href="{{ url_for('novo_pedido',
-                                        tipo='entrada',
-                                        id=produto.id) }}">
-
-                        <i class="bi bi-box-arrow-in-down"></i>
-
-                        Entrada
-
+                       href="{{ url_for('novo_pedido', tipo='entrada', id=produto.id) }}">
+                        <i class="bi bi-box-arrow-in-down"></i> Entrada
                     </a>
 
-
                     <a class="btn-acao btn-saida"
-                       href="{{ url_for('novo_pedido_saida',
-                                        tipo='saida',
-                                        id=produto.id) }}">
-
-                        <i class="bi bi-box-arrow-up"></i>
-
-                        Saída
-
+                       href="{{ url_for('novo_pedido_saida', tipo='saida', id=produto.id) }}">
+                        <i class="bi bi-box-arrow-up"></i> Saída
                     </a>
 
                 </div>
@@ -382,24 +256,26 @@
         </div>
 
 
-        <!-- =========================================================
-             ESTADO VAZIO
-        ========================================================== -->
+        <!-- ================= ESTADO VAZIO ================= -->
 
         {% if not produtos %}
-
         <div class="estado-vazio">
-
             <i class="bi bi-capsule"></i>
-
-            <p>
-                Nenhum produto encontrado para os filtros selecionados.
-            </p>
-
+            <p>Nenhum produto encontrado para os filtros selecionados.</p>
+            {% if filtros_ativos %}
+            <a href="{{ url_for('tela_produtos') }}" class="btn-limpar-filtros">
+                <i class="bi bi-x-circle"></i>
+                Limpar filtros
+            </a>
+            {% endif %}
         </div>
-
         {% endif %}
 
+        <!-- Aparece quando a busca esconde todos os cards -->
+        <div class="estado-vazio" id="semResultadosBusca" hidden>
+            <i class="bi bi-search"></i>
+            <p>Nenhum produto corresponde à sua pesquisa.</p>
+        </div>
 
     </main>
 
@@ -408,24 +284,16 @@
 
 <!-- =============================================================
      MODAL DE DETALHES DO PRODUTO
-
-     IMPORTANTE:
-     O JavaScript vai mover o overlay diretamente para o BODY,
-     para que o modal centralizado nunca fique preso a nenhum
-     contêiner pai (#content, sidebar, overflow, transform etc).
+     O JavaScript move o overlay para o BODY para que o modal
+     fique sempre centralizado na janela.
 ============================================================= -->
 
 <div id="modalOverlay" class="modal-overlay" aria-hidden="true">
 
-    <div id="modalProduto"
-         class="modal-produto"
-         role="dialog"
-         aria-modal="true"
-         aria-labelledby="modalNome"
-         tabindex="-1">
+    <div id="modalProduto" class="modal-produto" role="dialog" aria-modal="true"
+         aria-labelledby="modalNome" tabindex="-1">
 
         <!-- CABEÇALHO -->
-
         <div class="modal-header">
 
             <div class="modal-header-info">
@@ -435,217 +303,104 @@
                 </div>
 
                 <div class="modal-header-texto">
-
-                    <span class="modal-categoria-tag" id="modalCategoria">
-                        Categoria
-                    </span>
-
-                    <h2 id="modalNome">
-                        Produto
-                    </h2>
-
+                    <span class="modal-categoria-tag" id="modalCategoria">Categoria</span>
+                    <h2 id="modalNome">Produto</h2>
                 </div>
 
             </div>
 
-
-            <button type="button"
-                    id="fecharModal"
-                    class="btn-fechar-modal"
-                    aria-label="Fechar">
-
+            <button type="button" id="fecharModal" class="btn-fechar-modal" aria-label="Fechar">
                 <i class="bi bi-x-lg"></i>
-
             </button>
 
         </div>
 
-
         <!-- CONTEÚDO -->
-
         <div class="modal-conteudo">
 
-
-            <!-- ALERTA DE ESTOQUE BAIXO -->
-
-            <div class="modal-alerta-estoque"
-                 id="modalAlertaEstoque"
-                 hidden>
-
+            <div class="modal-alerta-estoque" id="modalAlertaEstoque" hidden>
                 <i class="bi bi-exclamation-triangle-fill"></i>
-
-                <span>
-                    Estoque abaixo do mínimo recomendado. Considere repor
-                    este produto o quanto antes.
-                </span>
-
+                <span>Estoque abaixo do mínimo recomendado. Considere repor este produto o quanto antes.</span>
             </div>
 
             <div class="modal-info">
-
-                <div class="modal-info-icone">
-                    <i class="bi bi-truck"></i>
-                </div>
-
+                <div class="modal-info-icone"><i class="bi bi-truck"></i></div>
                 <div class="modal-info-texto">
                     <span>Fornecedor</span>
                     <strong id="modalFornecedor">-</strong>
                 </div>
-
             </div>
 
-
             <!-- PREÇOS E MARGEM -->
-
             <div class="modal-precos">
 
                 <div class="preco-box preco-venda">
-
                     <span>Preço de venda</span>
-
-                    <strong>
-                        <small>R$</small>
-                        <span id="modalPreco">0,00</span>
-                    </strong>
-
+                    <strong><small>R$</small><span id="modalPreco">0,00</span></strong>
                 </div>
-
 
                 <div class="preco-box preco-custo">
-
                     <span>Preço de custo</span>
-
-                    <strong>
-                        <small>R$</small>
-                        <span id="modalCusto">0,00</span>
-                    </strong>
-
+                    <strong><small>R$</small><span id="modalCusto">0,00</span></strong>
                 </div>
 
-
                 <div class="preco-box preco-margem" id="modalMargemBox">
-
                     <span>Margem de lucro</span>
-
                     <strong id="modalMargem">0%</strong>
-
                 </div>
 
             </div>
 
-
             <!-- NÍVEL DE ESTOQUE -->
-
             <div class="modal-estoque-card">
 
                 <div class="modal-estoque-topo">
-
-                    <span>
-                        <i class="bi bi-box-seam"></i>
-                        Nível de estoque
-                    </span>
-
-                    <strong id="modalEstoqueTexto">
-                        0 un.
-                    </strong>
-
+                    <span><i class="bi bi-box-seam"></i> Nível de estoque</span>
+                    <strong id="modalEstoqueTexto">0 un.</strong>
                 </div>
-
 
                 <div class="modal-estoque-barra">
-
-                    <div class="modal-estoque-marcador-minimo"
-                         id="modalMarcadorMinimo"></div>
-
-                    <div class="modal-estoque-preenchimento"
-                         id="modalEstoqueBarra"></div>
-
+                    <div class="modal-estoque-marcador-minimo" id="modalMarcadorMinimo"></div>
+                    <div class="modal-estoque-preenchimento" id="modalEstoqueBarra"></div>
                 </div>
 
-
                 <div class="modal-estoque-legenda">
-
-                    <span>
-                        Mínimo recomendado:
-                        <strong id="modalMinimoLegenda">0</strong> un.
-                    </span>
-
-                    <span class="modal-estoque-status"
-                          id="modalEstoqueStatus">
-                        Estoque normal
-                    </span>
-
+                    <span>Mínimo recomendado: <strong id="modalMinimoLegenda">0</strong> un.</span>
+                    <span class="modal-estoque-status" id="modalEstoqueStatus">Estoque normal</span>
                 </div>
 
             </div>
 
-
             <!-- INFORMAÇÕES GERAIS -->
-
             <div class="modal-informacoes">
-
                 <div class="modal-info">
-
-                    <div class="modal-info-icone">
-                        <i class="bi bi-hash"></i>
-                    </div>
-
+                    <div class="modal-info-icone"><i class="bi bi-hash"></i></div>
                     <div class="modal-info-texto">
                         <span>Código do produto</span>
                         <strong id="modalId">#0</strong>
                     </div>
-
                 </div>
-
-
-                
-
             </div>
 
         </div>
 
-
         <!-- AÇÕES -->
-
         <div class="modal-acoes">
 
-            <a id="modalEntrada"
-               href="#"
-               class="modal-btn modal-btn-entrada">
-
-                <i class="bi bi-box-arrow-in-down"></i>
-                Entrada
-
+            <a id="modalEntrada" href="#" class="modal-btn modal-btn-entrada">
+                <i class="bi bi-box-arrow-in-down"></i> Entrada
             </a>
 
-
-            <a id="modalSaida"
-               href="#"
-               class="modal-btn modal-btn-saida">
-
-                <i class="bi bi-box-arrow-up"></i>
-                Saída
-
+            <a id="modalSaida" href="#" class="modal-btn modal-btn-saida">
+                <i class="bi bi-box-arrow-up"></i> Saída
             </a>
 
-
-            <a id="modalEditar"
-               href="#"
-               class="modal-btn modal-btn-editar">
-
-                <i class="bi bi-pencil-square"></i>
-                Editar
-
+            <a id="modalEditar" href="#" class="modal-btn modal-btn-editar">
+                <i class="bi bi-pencil-square"></i> Editar
             </a>
 
-
-            <a id="modalExcluir"
-               href="#"
-               class="modal-btn modal-btn-excluir">
-
-                <i class="bi bi-trash3-fill"></i>
-                Excluir
-
+            <a id="modalExcluir" href="#" class="modal-btn modal-btn-excluir">
+                <i class="bi bi-trash3-fill"></i> Excluir
             </a>
 
         </div>
@@ -657,70 +412,99 @@
 
 <script>
 
-/* ============================================================
-   INICIALIZAÇÃO
-============================================================ */
-
 document.addEventListener("DOMContentLoaded", function () {
 
-    /*
-     * Move o overlay do modal diretamente para o BODY.
-     * Isso impede que #content, sidebar, transform,
-     * overflow ou qualquer outro elemento pai interfira
-     * no posicionamento do modal centralizado.
-     */
-
+    /* Move o overlay para o BODY (evita prender o modal em containers) */
     const overlay = document.getElementById("modalOverlay");
 
     if (overlay && overlay.parentElement !== document.body) {
-
         document.body.appendChild(overlay);
+    }
+
+
+    /* ========================================================
+       PAINEL DE FILTROS (abrir / fechar)
+    ======================================================== */
+
+    const btnFiltros = document.getElementById("btnFiltros");
+    const filtrosPainel = document.getElementById("filtrosPainel");
+
+    function fecharFiltros() {
+        if (!filtrosPainel) return;
+        filtrosPainel.classList.remove("aberto");
+        btnFiltros.setAttribute("aria-expanded", "false");
+    }
+
+    if (btnFiltros && filtrosPainel) {
+
+        btnFiltros.addEventListener("click", function (e) {
+            e.stopPropagation();
+
+            const aberto = filtrosPainel.classList.toggle("aberto");
+            btnFiltros.setAttribute("aria-expanded", aberto ? "true" : "false");
+        });
+
+        /* Cliques dentro do painel não fecham o painel */
+        filtrosPainel.addEventListener("click", function (e) {
+            e.stopPropagation();
+        });
 
     }
 
 
     /* ========================================================
-       BUSCA
+       BUSCA (mantém o texto ao trocar de filtro)
     ======================================================== */
 
     const inputBusca = document.getElementById("inputBusca");
+    const semResultadosBusca = document.getElementById("semResultadosBusca");
+    const CHAVE_BUSCA = "medstock_busca_produtos";
+
+    function aplicarBusca() {
+
+        const filtro = (inputBusca.value || "").toLowerCase().trim();
+        const cards = document.querySelectorAll(".produto-card");
+        let visiveis = 0;
+
+        cards.forEach(function (card) {
+
+            const texto = [
+                card.dataset.nome,
+                card.dataset.fornecedor,
+                card.dataset.categoria
+            ].join(" ").toLowerCase();
+
+            const mostrar = texto.includes(filtro);
+
+            card.style.display = mostrar ? "" : "none";
+
+            if (mostrar) visiveis++;
+
+        });
+
+        if (semResultadosBusca) {
+            semResultadosBusca.hidden = !(cards.length > 0 && visiveis === 0);
+        }
+
+    }
 
     if (inputBusca) {
 
-        inputBusca.addEventListener("keyup", function () {
+        try {
+            const salva = sessionStorage.getItem(CHAVE_BUSCA);
+            if (salva) {
+                inputBusca.value = salva;
+                aplicarBusca();
+            }
+        } catch (err) { /* sessionStorage indisponível */ }
 
-            const filtro =
-                this.value.toLowerCase().trim();
+        inputBusca.addEventListener("input", function () {
 
+            try {
+                sessionStorage.setItem(CHAVE_BUSCA, this.value);
+            } catch (err) { /* ignora */ }
 
-            document.querySelectorAll(".produto-card")
-                .forEach(function (card) {
-
-                    const nomeProduto =
-                        (card.dataset.nome || "").toLowerCase();
-
-                    const nomeFornecedor =
-                        (card.dataset.fornecedor || "").toLowerCase();
-
-                    const categoria =
-                        (card.dataset.categoria || "").toLowerCase();
-
-
-                    if (
-                        nomeProduto.includes(filtro) ||
-                        nomeFornecedor.includes(filtro) ||
-                        categoria.includes(filtro)
-                    ) {
-
-                        card.style.display = "";
-
-                    } else {
-
-                        card.style.display = "none";
-
-                    }
-
-                });
+            aplicarBusca();
 
         });
 
@@ -731,76 +515,29 @@ document.addEventListener("DOMContentLoaded", function () {
        ELEMENTOS DO MODAL
     ======================================================== */
 
-    const modal =
-        document.getElementById("modalProduto");
-
-    const fecharModal =
-        document.getElementById("fecharModal");
-
-    const modalIcone =
-        document.getElementById("modalIcone");
-
-    const modalNome =
-        document.getElementById("modalNome");
-
-    const modalId =
-        document.getElementById("modalId");
-
-    const modalFornecedor =
-        document.getElementById("modalFornecedor");
-
-    const modalCategoria =
-        document.getElementById("modalCategoria");
-
-    const modalAlertaEstoque =
-        document.getElementById("modalAlertaEstoque");
-
-    const modalEstoqueTexto =
-        document.getElementById("modalEstoqueTexto");
-
-    const modalMinimoLegenda =
-        document.getElementById("modalMinimoLegenda");
-
-    const modalEstoqueBarra =
-        document.getElementById("modalEstoqueBarra");
-
-    const modalMarcadorMinimo =
-        document.getElementById("modalMarcadorMinimo");
-
-    const modalEstoqueStatus =
-        document.getElementById("modalEstoqueStatus");
-
-    const modalPreco =
-        document.getElementById("modalPreco");
-
-    const modalCusto =
-        document.getElementById("modalCusto");
-
-    const modalMargem =
-        document.getElementById("modalMargem");
-
-    const modalMargemBox =
-        document.getElementById("modalMargemBox");
-
-    const modalEntrada =
-        document.getElementById("modalEntrada");
-
-    const modalSaida =
-        document.getElementById("modalSaida");
-
-    const modalEditar =
-        document.getElementById("modalEditar");
-
-    const modalExcluir =
-        document.getElementById("modalExcluir");
-
-
-    /* ========================================================
-       ESTADO
-    ======================================================== */
+    const modal = document.getElementById("modalProduto");
+    const fecharModal = document.getElementById("fecharModal");
+    const modalIcone = document.getElementById("modalIcone");
+    const modalNome = document.getElementById("modalNome");
+    const modalId = document.getElementById("modalId");
+    const modalFornecedor = document.getElementById("modalFornecedor");
+    const modalCategoria = document.getElementById("modalCategoria");
+    const modalAlertaEstoque = document.getElementById("modalAlertaEstoque");
+    const modalEstoqueTexto = document.getElementById("modalEstoqueTexto");
+    const modalMinimoLegenda = document.getElementById("modalMinimoLegenda");
+    const modalEstoqueBarra = document.getElementById("modalEstoqueBarra");
+    const modalMarcadorMinimo = document.getElementById("modalMarcadorMinimo");
+    const modalEstoqueStatus = document.getElementById("modalEstoqueStatus");
+    const modalPreco = document.getElementById("modalPreco");
+    const modalCusto = document.getElementById("modalCusto");
+    const modalMargem = document.getElementById("modalMargem");
+    const modalMargemBox = document.getElementById("modalMargemBox");
+    const modalEntrada = document.getElementById("modalEntrada");
+    const modalSaida = document.getElementById("modalSaida");
+    const modalEditar = document.getElementById("modalEditar");
+    const modalExcluir = document.getElementById("modalExcluir");
 
     let produtoAtual = null;
-
     let ultimoElementoFocado = null;
 
 
@@ -809,17 +546,10 @@ document.addEventListener("DOMContentLoaded", function () {
     ======================================================== */
 
     function formatarPreco(valor) {
-
-        const numero = parseFloat(valor || 0);
-
-        return numero.toLocaleString("pt-BR", {
-
+        return parseFloat(valor || 0).toLocaleString("pt-BR", {
             minimumFractionDigits: 2,
-
             maximumFractionDigits: 2
-
         });
-
     }
 
 
@@ -829,257 +559,154 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function preencherModal(card) {
 
-        const nome =
-            card.dataset.nome || "Produto";
-
-        const categoria =
-            card.dataset.categoria || "-";
-
-        const icone =
-            card.dataset.icone || "bi-box-seam";
-
-        const estoque =
-            parseInt(card.dataset.estoque || "0", 10);
-
-        const minimo =
-            parseInt(card.dataset.minimo || "0", 10);
-
-        const preco =
-            parseFloat(card.dataset.preco || "0");
-
-        const custo =
-            parseFloat(card.dataset.custo || "0");
-
-
-        /* ----- Cabeçalho ----- */
-
+        const nome = card.dataset.nome || "Produto";
+        const categoria = card.dataset.categoria || "-";
+        const icone = card.dataset.icone || "bi-box-seam";
+        const estoque = parseInt(card.dataset.estoque || "0", 10);
+        const minimo = parseInt(card.dataset.minimo || "0", 10);
+        const preco = parseFloat(card.dataset.preco || "0");
+        const custo = parseFloat(card.dataset.custo || "0");
         const imagem = card.dataset.imagem || "";
 
-if (imagem) {
 
-    modalIcone.classList.remove("sem-imagem");
+        /* ----- Cabeçalho (imagem ou ícone) ----- */
 
-    modalIcone.innerHTML =
-        '<img src="' + imagem + '" alt="' + nome + '" ' +
-        'onerror="this.parentElement.classList.add(\'sem-imagem\'); this.remove();">' +
-        '<i class="bi ' + icone + '"></i>';
+        modalIcone.innerHTML = "";
 
-} else {
+        const iconeEl = document.createElement("i");
+        iconeEl.className = "bi " + icone;
 
-    modalIcone.classList.add("sem-imagem");
+        if (imagem) {
 
-    modalIcone.innerHTML =
-        '<i class="bi ' + icone + '"></i>';
+            modalIcone.classList.remove("sem-imagem");
 
-}
+            const img = document.createElement("img");
+            img.src = imagem;
+            img.alt = nome;
+            img.onerror = function () {
+                modalIcone.classList.add("sem-imagem");
+                img.remove();
+            };
+
+            modalIcone.appendChild(img);
+
+        } else {
+
+            modalIcone.classList.add("sem-imagem");
+
+        }
+
+        modalIcone.appendChild(iconeEl);
 
         modalNome.textContent = nome;
-
         modalCategoria.textContent = categoria;
 
 
         /* ----- ID / Fornecedor ----- */
 
-        modalId.textContent =
-            "#" + (card.dataset.id || "0");
-
-        modalFornecedor.textContent =
-            card.dataset.fornecedor || "-";
+        modalId.textContent = "#" + (card.dataset.id || "0");
+        modalFornecedor.textContent = card.dataset.fornecedor || "-";
 
 
         /* ----- Preço, custo e margem ----- */
 
-        modalPreco.textContent =
-            formatarPreco(preco);
-
-        modalCusto.textContent =
-            formatarPreco(custo);
-
+        modalPreco.textContent = formatarPreco(preco);
+        modalCusto.textContent = formatarPreco(custo);
 
         if (custo > 0 && preco > 0) {
 
-            const margemPercentual =
-                ((preco - custo) / preco) * 100;
+            const margem = ((preco - custo) / preco) * 100;
 
-            modalMargem.textContent =
-                margemPercentual.toFixed(1)
-                    .replace(".", ",") + "%";
-
-            modalMargemBox.classList.toggle(
-                "margem-negativa",
-                margemPercentual < 0
-            );
+            modalMargem.textContent = margem.toFixed(1).replace(".", ",") + "%";
+            modalMargemBox.classList.toggle("margem-negativa", margem < 0);
 
         } else {
 
             modalMargem.textContent = "—";
-
-            modalMargemBox.classList.remove(
-                "margem-negativa"
-            );
+            modalMargemBox.classList.remove("margem-negativa");
 
         }
 
 
         /* ----- Estoque ----- */
 
-        const estoqueBaixo =
-            estoque <= minimo;
-
-        modalAlertaEstoque.hidden = !estoqueBaixo;
-
-        modalEstoqueTexto.textContent =
-            estoque + " un.";
-
+        modalAlertaEstoque.hidden = !(estoque <= minimo);
+        modalEstoqueTexto.textContent = estoque + " un.";
         modalMinimoLegenda.textContent = minimo;
 
-
-        /*
-         * A barra usa uma escala visual em que o
-         * estoque mínimo fica marcado como referência,
-         * sempre deixando espaço para o estoque atual
-         * ser maior ou menor que o mínimo.
-         */
-
-        const escalaMaxima =
-            Math.max(estoque, minimo * 2, 1);
-
-        const percentualEstoque =
-            Math.min(
-                100,
-                Math.round((estoque / escalaMaxima) * 100)
-            );
-
-        const percentualMinimo =
-            Math.min(
-                100,
-                Math.round((minimo / escalaMaxima) * 100)
-            );
+        const escalaMaxima = Math.max(estoque, minimo * 2, 1);
 
         modalEstoqueBarra.style.width =
-            percentualEstoque + "%";
+            Math.min(100, Math.round((estoque / escalaMaxima) * 100)) + "%";
 
         modalMarcadorMinimo.style.left =
-            percentualMinimo + "%";
+            Math.min(100, Math.round((minimo / escalaMaxima) * 100)) + "%";
 
-
-        modalEstoqueBarra.classList.remove(
-            "barra-baixa",
-            "barra-atencao",
-            "barra-normal"
-        );
+        modalEstoqueBarra.classList.remove("barra-baixa", "barra-atencao", "barra-normal");
+        modalEstoqueStatus.classList.remove("status-baixo", "status-atencao", "status-normal");
 
         if (estoque <= minimo) {
 
             modalEstoqueBarra.classList.add("barra-baixa");
-
-            modalEstoqueStatus.textContent =
-                "Abaixo do mínimo";
-
-            modalEstoqueStatus.classList.remove(
-                "status-atencao",
-                "status-normal"
-            );
-
             modalEstoqueStatus.classList.add("status-baixo");
+            modalEstoqueStatus.textContent = "Abaixo do mínimo";
 
         } else if (estoque <= minimo * 1.5) {
 
             modalEstoqueBarra.classList.add("barra-atencao");
-
-            modalEstoqueStatus.textContent =
-                "Estoque em atenção";
-
-            modalEstoqueStatus.classList.remove(
-                "status-baixo",
-                "status-normal"
-            );
-
             modalEstoqueStatus.classList.add("status-atencao");
+            modalEstoqueStatus.textContent = "Estoque em atenção";
 
         } else {
 
             modalEstoqueBarra.classList.add("barra-normal");
-
-            modalEstoqueStatus.textContent =
-                "Estoque normal";
-
-            modalEstoqueStatus.classList.remove(
-                "status-baixo",
-                "status-atencao"
-            );
-
             modalEstoqueStatus.classList.add("status-normal");
+            modalEstoqueStatus.textContent = "Estoque normal";
 
         }
 
 
         /* ----- Links de ação ----- */
 
-        modalEntrada.href =
-            card.dataset.entrada || "#";
-
-        modalSaida.href =
-            card.dataset.saida || "#";
-
-        modalEditar.href =
-            card.dataset.editar || "#";
-
-        modalExcluir.href =
-            card.dataset.excluir || "#";
+        modalEntrada.href = card.dataset.entrada || "#";
+        modalSaida.href = card.dataset.saida || "#";
+        modalEditar.href = card.dataset.editar || "#";
+        modalExcluir.href = card.dataset.excluir || "#";
 
     }
 
 
     /* ========================================================
-       ABRIR MODAL
+       ABRIR / FECHAR MODAL
     ======================================================== */
 
     function abrirModal(card) {
 
         produtoAtual = card;
-
         ultimoElementoFocado = document.activeElement;
-
 
         preencherModal(card);
 
-
         overlay.classList.add("visivel");
-
         overlay.setAttribute("aria-hidden", "false");
-
         document.body.classList.add("modal-aberto");
 
-
         requestAnimationFrame(function () {
-
             modal.focus();
-
         });
 
     }
 
-
-    /* ========================================================
-       FECHAR MODAL
-    ======================================================== */
-
     function fecharDetalhes() {
 
         overlay.classList.remove("visivel");
-
         overlay.setAttribute("aria-hidden", "true");
-
         document.body.classList.remove("modal-aberto");
 
         produtoAtual = null;
 
-
         if (ultimoElementoFocado) {
-
             ultimoElementoFocado.focus();
-
         }
 
     }
@@ -1091,20 +718,10 @@ if (imagem) {
 
     modalExcluir.addEventListener("click", function (e) {
 
-        const nome =
-            modalNome.textContent || "este produto";
+        const nome = modalNome.textContent || "este produto";
 
-        const confirmado =
-            window.confirm(
-                'Tem certeza que deseja excluir "' +
-                nome +
-                '"? Esta ação não pode ser desfeita.'
-            );
-
-        if (!confirmado) {
-
+        if (!window.confirm('Tem certeza que deseja excluir "' + nome + '"? Esta ação não pode ser desfeita.')) {
             e.preventDefault();
-
         }
 
     });
@@ -1114,169 +731,95 @@ if (imagem) {
        CLIQUE NOS CARDS
     ======================================================== */
 
-    document.querySelectorAll(".produto-card")
-        .forEach(function (card) {
+    document.querySelectorAll(".produto-card").forEach(function (card) {
 
-            card.addEventListener("click", function (e) {
+        card.addEventListener("click", function (e) {
 
-                /*
-                 * Não abre modal pelos links.
-                 */
+            /* Não abre pelos links nem pelo menu (...) */
+            if (e.target.closest("a") || e.target.closest(".card-opcoes-wrap")) {
+                return;
+            }
 
-                if (e.target.closest("a")) {
-
-                    return;
-
-                }
-
-
-                /*
-                 * Não abre modal pelo menu.
-                 */
-
-                if (
-                    e.target.closest(
-                        ".card-opcoes-wrap"
-                    )
-                ) {
-
-                    return;
-
-                }
-
-
-                abrirModal(card);
-
-            });
+            abrirModal(card);
 
         });
 
-
-    /* ========================================================
-       BOTÃO FECHAR
-    ======================================================== */
+    });
 
     if (fecharModal) {
 
-        fecharModal.addEventListener(
-            "click",
-            function (e) {
-
-                e.stopPropagation();
-
-                fecharDetalhes();
-
-            }
-        );
+        fecharModal.addEventListener("click", function (e) {
+            e.stopPropagation();
+            fecharDetalhes();
+        });
 
     }
 
+    overlay.addEventListener("click", function (e) {
+        if (e.target === overlay) {
+            fecharDetalhes();
+        }
+    });
+
 
     /* ========================================================
-       CLIQUE NO OVERLAY (FORA DO MODAL)
+       MENU (...) DOS CARDS
     ======================================================== */
 
-    overlay.addEventListener("click", function (e) {
+    document.querySelectorAll(".btn-opcoes").forEach(function (botao) {
 
-        if (e.target === overlay) {
+        botao.addEventListener("click", function (e) {
 
-            fecharDetalhes();
+            e.stopPropagation();
 
-        }
+            const menu = this.nextElementSibling;
+            const jaAberto = menu.classList.contains("aberto");
+
+            document.querySelectorAll(".menu-opcoes").forEach(function (m) {
+                m.classList.remove("aberto");
+            });
+
+            fecharFiltros();
+
+            if (!jaAberto) {
+                menu.classList.add("aberto");
+            }
+
+        });
 
     });
 
 
     /* ========================================================
-       MENU DE OPÇÕES DOS CARDS
+       CLIQUE FORA: fecha menus e painel de filtros
     ======================================================== */
 
-    document.querySelectorAll(".btn-opcoes")
-        .forEach(function (botao) {
+    document.addEventListener("click", function () {
 
-            botao.addEventListener(
-                "click",
-                function (e) {
-
-                    e.stopPropagation();
-
-
-                    const menu =
-                        this.nextElementSibling;
-
-
-                    const jaAberto =
-                        menu.classList.contains(
-                            "aberto"
-                        );
-
-
-                    document
-                        .querySelectorAll(".menu-opcoes")
-                        .forEach(function (m) {
-
-                            m.classList.remove(
-                                "aberto"
-                            );
-
-                        });
-
-
-                    if (!jaAberto) {
-
-                        menu.classList.add(
-                            "aberto"
-                        );
-
-                    }
-
-                }
-            );
-
+        document.querySelectorAll(".menu-opcoes").forEach(function (menu) {
+            menu.classList.remove("aberto");
         });
 
+        fecharFiltros();
 
-    /* ========================================================
-       FECHAR MENU
-    ======================================================== */
-
-    document.addEventListener(
-        "click",
-        function () {
-
-            document
-                .querySelectorAll(".menu-opcoes")
-                .forEach(function (menu) {
-
-                    menu.classList.remove(
-                        "aberto"
-                    );
-
-                });
-
-        }
-    );
+    });
 
 
     /* ========================================================
-       ESC FECHA O MODAL
+       ESC: fecha modal e painel de filtros
     ======================================================== */
 
-    document.addEventListener(
-        "keydown",
-        function (e) {
+    document.addEventListener("keydown", function (e) {
 
-            if (
-                e.key === "Escape" &&
-                produtoAtual
-            ) {
+        if (e.key !== "Escape") return;
 
-                fecharDetalhes();
-
-            }
-
+        if (produtoAtual) {
+            fecharDetalhes();
+        } else {
+            fecharFiltros();
         }
-    );
+
+    });
 
 });
 
