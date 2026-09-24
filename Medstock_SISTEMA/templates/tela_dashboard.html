@@ -65,6 +65,82 @@
 
   </section>
 
+  <!-- ===== PRODUTOS COM ESTOQUE BAIXO ===== -->
+  <section class="card panel fade-up d-3">
+    <header class="panel-head">
+      <h2><i class="bi bi-list-check"></i> Produtos com Estoque Baixo</h2>
+      <span class="badge-total">{{ produtos_baixos|length }} itens</span>
+    </header>
+
+    <div class="table-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Produto</th>
+            <th class="ta-c">Quantidade</th>
+            <th class="ta-c">Mínimo</th>
+            <th class="ta-c">Situação</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in produtos_baixos %}
+          <tr class="" style="animation-delay: {{ loop.index0 * 0.04 }}s">
+            <td class="muted">{{ loop.index }}</td>
+            <td class="strong">{{ p["nome"] }}</td>
+            <td class="ta-c">{{ p["quantidade"] }}</td>
+            <td class="ta-c muted">{{ p["estoque_minimo"] }}</td>
+            <td class="ta-c">
+              {% if p["quantidade"]|int <= 0 %}
+                <span class="tag t-bad">Sem estoque</span>
+              {% elif p["quantidade"]|int <= (p["estoque_minimo"]|int / 2) %}
+                <span class="tag t-bad">Crítico</span>
+              {% else %}
+                <span class="tag t-warn">Baixo</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="empty"><i class="bi bi-emoji-smile"></i> Nenhum produto com estoque baixo.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== ESTOQUE CRÍTICO ===== -->
+  <section class="card panel fade-up d-4">
+    <header class="panel-head">
+      <h2><i class="bi bi-exclamation-octagon ic-txt-red"></i> Estoque Crítico</h2>
+      <span class="badge-total badge-red">{{ total_criticos }} críticos</span>
+    </header>
+
+    <div class="table-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Produto</th>
+            <th class="ta-c">Quantidade</th>
+            <th class="ta-c">Mínimo</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in estoque_critico %}
+          <tr class="" style="animation-delay: {{ loop.index0 * 0.04 }}s">
+            <td class="muted">{{ loop.index }}</td>
+            <td class="strong">{{ c["nome"] if c["nome"] is defined else "—" }}</td>
+            <td class="ta-c">{{ c["quantidade"] if c["quantidade"] is defined else "—" }}</td>
+            <td class="ta-c muted">{{ c["estoque_minimo"] if c["estoque_minimo"] is defined else "—" }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" class="empty"><i class="bi bi-shield-check"></i> Nenhum item em estado crítico.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
   <!-- ===== FINANCEIRO ===== -->
   <section class="fin-grid">
 
@@ -196,81 +272,7 @@
     </div>
   </section>
 
-  <!-- ===== PRODUTOS COM ESTOQUE BAIXO ===== -->
-  <section class="card panel fade-up d-3">
-    <header class="panel-head">
-      <h2><i class="bi bi-list-check"></i> Produtos com Estoque Baixo</h2>
-      <span class="badge-total">{{ produtos_baixos|length }} itens</span>
-    </header>
-
-    <div class="table-wrap">
-      <table class="tbl">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Produto</th>
-            <th class="ta-c">Quantidade</th>
-            <th class="ta-c">Mínimo</th>
-            <th class="ta-c">Situação</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for p in produtos_baixos %}
-          <tr class="" style="animation-delay: {{ loop.index0 * 0.04 }}s">
-            <td class="muted">{{ loop.index }}</td>
-            <td class="strong">{{ p["nome"] }}</td>
-            <td class="ta-c">{{ p["quantidade"] }}</td>
-            <td class="ta-c muted">{{ p["estoque_minimo"] }}</td>
-            <td class="ta-c">
-              {% if p["quantidade"]|int <= 0 %}
-                <span class="tag t-bad">Sem estoque</span>
-              {% elif p["quantidade"]|int <= (p["estoque_minimo"]|int / 2) %}
-                <span class="tag t-bad">Crítico</span>
-              {% else %}
-                <span class="tag t-warn">Baixo</span>
-              {% endif %}
-            </td>
-          </tr>
-          {% else %}
-          <tr><td colspan="5" class="empty"><i class="bi bi-emoji-smile"></i> Nenhum produto com estoque baixo.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- ===== ESTOQUE CRÍTICO ===== -->
-  <section class="card panel fade-up d-4">
-    <header class="panel-head">
-      <h2><i class="bi bi-exclamation-octagon ic-txt-red"></i> Estoque Crítico</h2>
-      <span class="badge-total badge-red">{{ total_criticos }} críticos</span>
-    </header>
-
-    <div class="table-wrap">
-      <table class="tbl">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Produto</th>
-            <th class="ta-c">Quantidade</th>
-            <th class="ta-c">Mínimo</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for c in estoque_critico %}
-          <tr class="" style="animation-delay: {{ loop.index0 * 0.04 }}s">
-            <td class="muted">{{ loop.index }}</td>
-            <td class="strong">{{ c["nome"] if c["nome"] is defined else "—" }}</td>
-            <td class="ta-c">{{ c["quantidade"] if c["quantidade"] is defined else "—" }}</td>
-            <td class="ta-c muted">{{ c["estoque_minimo"] if c["estoque_minimo"] is defined else "—" }}</td>
-          </tr>
-          {% else %}
-          <tr><td colspan="4" class="empty"><i class="bi bi-shield-check"></i> Nenhum item em estado crítico.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </section>
+  
 
 </div>
 
