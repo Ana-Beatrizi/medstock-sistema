@@ -134,6 +134,35 @@ body.modal-aberto { overflow: hidden; }
 
 
 /* ============================================================
+   ALTERNÂNCIA DE VISUALIZAÇÃO (Grade / Lista / Tabela)
+============================================================ */
+
+.view-toggle {
+    display: flex; align-items: center; gap: 4px;
+    flex-shrink: 0;
+    height: 52px; padding: 4px;
+    background: #EEF1F5; border-radius: 26px;
+}
+
+.view-btn {
+    width: 44px; height: 44px;
+    border: none; border-radius: 20px;
+    background: transparent; color: #8A93A6; font-size: 17px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: .2s ease;
+}
+
+.view-btn:hover { color: #0B2D6B; }
+
+.view-btn.ativo {
+    background: #FFFFFF; color: #00819F;
+    box-shadow: 0 2px 6px rgba(16, 24, 64, .14);
+}
+
+.view-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(0, 196, 192, .35); }
+
+
+/* ============================================================
    BOTÃO CADASTRO
 ============================================================ */
 
@@ -159,6 +188,19 @@ body.modal-aberto { overflow: hidden; }
 }
 
 .btn-cadastro:active { transform: translateY(1px); }
+
+
+/* ============================================================
+   VISUALIZAÇÕES — wrapper comum
+============================================================ */
+
+.produtos-visualizacoes { display: flex; flex-direction: column; }
+
+/* IMPORTANTE: .produtos-grid e .produtos-lista definem "display"
+   próprio (grid/flex), o que sobrepõe o "display: none" implícito
+   do atributo [hidden]. Sem esta regra, as três visualizações
+   podem ficar visíveis ao mesmo tempo. */
+.produtos-visualizacoes [hidden] { display: none !important; }
 
 
 /* ============================================================
@@ -225,10 +267,23 @@ body.modal-aberto { overflow: hidden; }
 
 
 /* ============================================================
-   MENU (...)
+   MENU (...) — reaproveitado na grade, lista e tabela
 ============================================================ */
 
-.card-opcoes-wrap { position: relative; }
+.card-opcoes-wrap { position: relative; flex-shrink: 0; }
+
+/* Eleva o card/linha/tr que tem o menu "..." aberto, para o menu
+   nunca ficar coberto pelo item vizinho (grade, lista ou tabela) */
+.produto-card:has(.menu-opcoes.aberto),
+.produto-linha:has(.menu-opcoes.aberto) {
+    position: relative;
+    z-index: 50;
+}
+
+.produtos-tabela tbody tr:has(.menu-opcoes.aberto) {
+    position: relative;
+    z-index: 50;
+}
 
 .btn-opcoes {
     width: 34px; height: 34px;
@@ -286,7 +341,7 @@ body.modal-aberto { overflow: hidden; }
 
 
 /* ============================================================
-   ESTOQUE
+   ESTOQUE (grade)
 ============================================================ */
 
 .card-estoque-linha { margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
@@ -299,7 +354,7 @@ body.modal-aberto { overflow: hidden; }
 
 
 /* ============================================================
-   BOTÕES ENTRADA / SAÍDA
+   BOTÕES ENTRADA / SAÍDA — reaproveitados na grade e na lista
 ============================================================ */
 
 .card-acoes { display: flex; gap: 10px; }
@@ -311,6 +366,7 @@ body.modal-aberto { overflow: hidden; }
     font-size: 13.5px; font-weight: 600;
     display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     transition: .2s ease;
+    white-space: nowrap;
 }
 
 .btn-acao i { font-size: 14px; }
@@ -320,6 +376,166 @@ body.modal-aberto { overflow: hidden; }
 
 .btn-saida { background: #FFF4E5; color: #D97706; border: 1px solid #FCD9A5; }
 .btn-saida:hover { background: #FFE9C7; transform: translateY(-1px); }
+
+
+/* ============================================================
+   VISUALIZAÇÃO EM LISTA
+============================================================ */
+
+.produtos-lista { display: flex; flex-direction: column; gap: 12px; }
+
+.produto-linha {
+    position: relative;
+    display: flex; align-items: center; gap: 16px;
+    background: #fff;
+    border: 1px solid #E7EAF0;
+    border-left: 4px solid #00C4C0;
+    border-radius: 14px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: box-shadow .2s ease, transform .2s ease;
+}
+
+.produto-linha:hover {
+    box-shadow: 0 8px 18px rgba(16, 24, 64, 0.10);
+    transform: translateY(-1px);
+}
+
+.produto-linha.linha-estoque-baixo { border-left-color: #DC2626; }
+
+.linha-imagem {
+    position: relative; overflow: hidden; flex-shrink: 0;
+    width: 52px; height: 52px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #E6FBFA 0%, #E4EEFF 100%);
+    display: flex; align-items: center; justify-content: center;
+}
+
+.linha-imagem img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
+
+.linha-imagem i { display: none; font-size: 18px; color: #00819F; }
+
+.linha-imagem.sem-imagem i { display: block; }
+
+.linha-imagem.sem-imagem img { display: none; }
+
+.produto-linha.linha-estoque-baixo .linha-imagem { background: linear-gradient(135deg, #FFEDEE 0%, #FFF4E5 100%); }
+
+.produto-linha.linha-estoque-baixo .linha-imagem i { color: #DC2626; }
+
+.linha-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+
+.linha-nome {
+    font-size: 15.5px; font-weight: 700; color: #17223B;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.linha-meta { font-size: 12.5px; color: #8A93A6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.linha-preco {
+    min-width: 96px; flex-shrink: 0; text-align: right;
+    color: #002D81; font-weight: 700; font-size: 16px;
+}
+
+.linha-preco .moeda { font-size: 11px; font-weight: 700; }
+
+.linha-estoque {
+    min-width: 90px; flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
+}
+
+.linha-estoque .qtd { font-size: 14px; font-weight: 700; color: #17223B; display: flex; align-items: center; gap: 4px; }
+
+.linha-estoque.baixo .qtd { color: #DC2626; }
+
+.linha-estoque .min { font-size: 11.5px; color: #8A93A6; }
+
+.linha-acoes { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+.linha-acoes .btn-acao { flex: none; padding: 8px 12px; }
+
+
+/* ============================================================
+   VISUALIZAÇÃO EM TABELA
+============================================================ */
+
+.produtos-tabela-wrap {
+    background: #fff;
+    border: 1px solid #E7EAF0;
+    border-radius: 16px;
+    overflow-x: auto;
+}
+
+.produtos-tabela { width: 100%; border-collapse: collapse; min-width: 780px; }
+
+.produtos-tabela thead th {
+    text-align: left;
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px;
+    color: #7C879B; background: #F7F9FC;
+    padding: 14px 16px;
+    border-bottom: 1px solid #E7EAF0;
+    white-space: nowrap;
+}
+
+.produtos-tabela tbody tr {
+    cursor: pointer;
+    border-bottom: 1px solid #EEF1F6;
+    transition: background .15s ease;
+}
+
+.produtos-tabela tbody tr:last-child { border-bottom: none; }
+
+.produtos-tabela tbody tr:hover { background: #F7F9FC; }
+
+.produtos-tabela tbody tr.tr-estoque-baixo td:first-child { box-shadow: inset 4px 0 0 #DC2626; }
+
+.produtos-tabela td { padding: 12px 16px; font-size: 14px; color: #26334D; vertical-align: middle; }
+
+.td-produto { display: flex; align-items: center; gap: 12px; }
+
+.td-imagem {
+    position: relative; overflow: hidden; flex-shrink: 0;
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #E6FBFA 0%, #E4EEFF 100%);
+    display: flex; align-items: center; justify-content: center;
+}
+
+.td-imagem img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+
+.td-imagem i { display: none; font-size: 14px; color: #00819F; }
+
+.td-imagem.sem-imagem i { display: block; }
+
+.td-imagem.sem-imagem img { display: none; }
+
+.tr-estoque-baixo .td-imagem { background: linear-gradient(135deg, #FFEDEE 0%, #FFF4E5 100%); }
+
+.tr-estoque-baixo .td-imagem i { color: #DC2626; }
+
+.td-nome-produto { font-weight: 700; color: #17223B; white-space: nowrap; }
+
+.td-preco { font-weight: 700; color: #002D81; white-space: nowrap; }
+
+.td-estoque { white-space: nowrap; font-weight: 600; }
+
+.td-estoque.baixo { color: #DC2626; }
+
+.td-acoes { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+
+.btn-icone-acao {
+    width: 32px; height: 32px; flex-shrink: 0;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none; font-size: 14px;
+    transition: .2s ease;
+}
+
+.btn-icone-entrada { background: #E7FFF5; color: #059669; }
+.btn-icone-entrada:hover { background: #D8FCEC; }
+
+.btn-icone-saida { background: #FFF4E5; color: #D97706; }
+.btn-icone-saida:hover { background: #FFE9C7; }
 
 
 /* ============================================================
@@ -617,7 +833,15 @@ body.modal-aberto { overflow: hidden; }
 
     .filtros-painel { left: 0; right: 0; width: 100%; }
 
+    .view-toggle { width: 100%; justify-content: center; }
+
     .produtos-grid { grid-template-columns: 1fr; }
+
+    .produto-linha { flex-wrap: wrap; }
+
+    .linha-info { min-width: 140px; }
+
+    .linha-acoes { width: 100%; justify-content: flex-end; order: 5; }
 
 }
 
@@ -649,5 +873,13 @@ body.modal-aberto { overflow: hidden; }
     .preco-margem { grid-column: span 2; }
 
     .modal-acoes { grid-template-columns: 1fr 1fr; padding: 16px 20px 22px; }
+
+    .produto-linha { padding: 12px; gap: 10px; }
+
+    .linha-preco { min-width: 70px; font-size: 14px; }
+
+    .linha-estoque { min-width: 70px; }
+
+    .linha-meta { display: none; }
 
 }

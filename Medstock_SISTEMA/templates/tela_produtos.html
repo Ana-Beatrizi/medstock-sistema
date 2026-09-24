@@ -107,6 +107,26 @@
                     <input type="text" id="inputBusca" placeholder="Pesquisar">
                 </div>
 
+                <!-- ALTERNÂNCIA DE VISUALIZAÇÃO -->
+                <div class="view-toggle" role="tablist" aria-label="Alternar visualização dos produtos">
+
+                    <button type="button" class="view-btn ativo" data-view="grid"
+                            role="tab" aria-pressed="true" aria-label="Visualização em grade" title="Grade">
+                        <i class="bi bi-grid-3x3-gap-fill"></i>
+                    </button>
+
+                    <button type="button" class="view-btn" data-view="lista"
+                            role="tab" aria-pressed="false" aria-label="Visualização em lista" title="Lista">
+                        <i class="bi bi-list-ul"></i>
+                    </button>
+
+                    <button type="button" class="view-btn" data-view="tabela"
+                            role="tab" aria-pressed="false" aria-label="Visualização em tabela" title="Tabela">
+                        <i class="bi bi-table"></i>
+                    </button>
+
+                </div>
+
                 <!-- CADASTRAR -->
                 <a href="{{ url_for('tela_cadastro_produto') }}" class="btn-cadastro">
                     <i class="bi bi-plus-lg"></i>
@@ -140,118 +160,147 @@
         {% endwith %}
 
 
-        <!-- ================= GRID ================= -->
+        <!-- ================= VISUALIZAÇÕES ================= -->
 
-        <div class="produtos-grid" id="produtosGrid">
+        <div class="produtos-visualizacoes">
 
-            {% for produto in produtos %}
+            <!-- ----- GRADE (padrão, renderizada pelo Jinja) ----- -->
 
-            {% set icone = categoria_icones.get(produto.categoria, 'bi-box-seam') %}
-            {% set estoque_baixo = produto.quantidade_estoque <= produto.estoque_minimo %}
+            <div class="produtos-grid" id="produtosGrid">
 
-            <div class="produto-card {% if estoque_baixo %}card-estoque-baixo{% endif %}"
-                data-id="{{ produto.id }}"
-                data-nome="{{ produto.nome }}"
-                data-fornecedor="{{ produto.fornecedor.nome_fornecedor if produto.fornecedor else '' }}"
-                data-categoria="{{ produto.categoria }}"
-                data-icone="{{ icone }}"
-                data-estoque="{{ produto.quantidade_estoque }}"
-                data-minimo="{{ produto.estoque_minimo }}"
-                data-preco="{{ '%.2f'|format(produto.preco_venda) }}"
-                data-custo="{{ '%.2f'|format(produto.preco_custo) if produto.preco_custo is not none else '0.00' }}"
-                data-entrada="{{ url_for('novo_pedido', tipo='entrada', id=produto.id) }}"
-                data-saida="{{ url_for('novo_pedido_saida', tipo='saida', id=produto.id) }}"
-                data-editar="{{ url_for('editar_produto', id=produto.id) }}"
-                data-excluir="{{ url_for('excluir_produto', id=produto.id) }}"
-                data-imagem="{% if produto.imagem %}{% if produto.imagem.startswith('http://') or produto.imagem.startswith('https://') %}{{ produto.imagem }}{% else %}{{ url_for('static', filename='uploads/produtos/' + produto.imagem) }}{% endif %}{% endif %}">
+                {% for produto in produtos %}
 
-                <!-- TOPO -->
-                <div class="card-topo">
+                {% set icone = categoria_icones.get(produto.categoria, 'bi-box-seam') %}
+                {% set estoque_baixo = produto.quantidade_estoque <= produto.estoque_minimo %}
 
-                    <div class="card-imagem {% if not produto.imagem %}sem-imagem{% endif %}">
+                <div class="produto-item produto-card {% if estoque_baixo %}card-estoque-baixo{% endif %}"
+                    data-id="{{ produto.id }}"
+                    data-nome="{{ produto.nome }}"
+                    data-fornecedor="{{ produto.fornecedor.nome_fornecedor if produto.fornecedor else '' }}"
+                    data-categoria="{{ produto.categoria }}"
+                    data-icone="{{ icone }}"
+                    data-estoque="{{ produto.quantidade_estoque }}"
+                    data-minimo="{{ produto.estoque_minimo }}"
+                    data-preco="{{ '%.2f'|format(produto.preco_venda) }}"
+                    data-custo="{{ '%.2f'|format(produto.preco_custo) if produto.preco_custo is not none else '0.00' }}"
+                    data-entrada="{{ url_for('novo_pedido', tipo='entrada', id=produto.id) }}"
+                    data-saida="{{ url_for('novo_pedido_saida', tipo='saida', id=produto.id) }}"
+                    data-editar="{{ url_for('editar_produto', id=produto.id) }}"
+                    data-excluir="{{ url_for('excluir_produto', id=produto.id) }}"
+                    data-imagem="{% if produto.imagem %}{% if produto.imagem.startswith('http://') or produto.imagem.startswith('https://') %}{{ produto.imagem }}{% else %}{{ url_for('static', filename='uploads/produtos/' + produto.imagem) }}{% endif %}{% endif %}">
 
-                        {% if produto.imagem %}
-                            {% if produto.imagem.startswith('http://') or produto.imagem.startswith('https://') %}
-                                <img src="{{ produto.imagem }}" alt="{{ produto.nome }}" loading="lazy"
-                                     onerror="this.parentElement.classList.add('sem-imagem');">
-                            {% else %}
-                                <img src="{{ url_for('static', filename='uploads/produtos/' + produto.imagem) }}"
-                                     alt="{{ produto.nome }}" loading="lazy"
-                                     onerror="this.parentElement.classList.add('sem-imagem');">
+                    <!-- TOPO -->
+                    <div class="card-topo">
+
+                        <div class="card-imagem {% if not produto.imagem %}sem-imagem{% endif %}">
+
+                            {% if produto.imagem %}
+                                {% if produto.imagem.startswith('http://') or produto.imagem.startswith('https://') %}
+                                    <img src="{{ produto.imagem }}" alt="{{ produto.nome }}" loading="lazy"
+                                         onerror="this.parentElement.classList.add('sem-imagem');">
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='uploads/produtos/' + produto.imagem) }}"
+                                         alt="{{ produto.nome }}" loading="lazy"
+                                         onerror="this.parentElement.classList.add('sem-imagem');">
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
 
-                        <i class="bi {{ icone }}"></i>
+                            <i class="bi {{ icone }}"></i>
+
+                        </div>
+
+                        <!-- MENU (...) -->
+                        <div class="card-opcoes-wrap">
+
+                            <button type="button" class="btn-opcoes" aria-label="Mais opções">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+
+                            <div class="menu-opcoes">
+                                <a href="{{ url_for('editar_produto', id=produto.id) }}">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </a>
+                                <a href="{{ url_for('excluir_produto', id=produto.id) }}" class="opcao-excluir">
+                                    <i class="bi bi-trash3-fill"></i> Excluir
+                                </a>
+                            </div>
+
+                        </div>
 
                     </div>
 
-                    <!-- MENU (...) -->
-                    <div class="card-opcoes-wrap">
+                    <!-- CORPO -->
+                    <div class="card-corpo">
 
-                        <button type="button" class="btn-opcoes" aria-label="Mais opções">
-                            <i class="bi bi-three-dots-vertical"></i>
-                        </button>
+                        <span class="card-categoria">{{ produto.categoria }}</span>
 
-                        <div class="menu-opcoes">
-                            <a href="{{ url_for('editar_produto', id=produto.id) }}">
-                                <i class="bi bi-pencil-square"></i> Editar
-                            </a>
-                            <a href="{{ url_for('excluir_produto', id=produto.id) }}" class="opcao-excluir">
-                                <i class="bi bi-trash3-fill"></i> Excluir
-                            </a>
+                        <h3 class="card-nome">{{ produto.nome }}</h3>
+
+                        <div class="card-preco">
+                            <span class="moeda">R$</span>
+                            <span>{{ '%.2f'|format(produto.preco_venda) }}</span>
                         </div>
+
+                        <div class="card-estoque-linha">
+
+                            <div class="estoque-info {% if estoque_baixo %}estoque-baixo{% endif %}">
+                                {% if estoque_baixo %}
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                {% endif %}
+                                <span>{{ produto.quantidade_estoque }} un.</span>
+                            </div>
+
+                            <div class="estoque-minimo-info">
+                                <span>mín. {{ produto.estoque_minimo }}</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- BOTÕES -->
+                    <div class="card-acoes">
+
+                        <a class="btn-acao btn-entrada"
+                           href="{{ url_for('novo_pedido', tipo='entrada', id=produto.id) }}">
+                            <i class="bi bi-box-arrow-in-down"></i> Entrada
+                        </a>
+
+                        <a class="btn-acao btn-saida"
+                           href="{{ url_for('novo_pedido_saida', tipo='saida', id=produto.id) }}">
+                            <i class="bi bi-box-arrow-up"></i> Saída
+                        </a>
 
                     </div>
 
                 </div>
 
-                <!-- CORPO -->
-                <div class="card-corpo">
-
-                    <span class="card-categoria">{{ produto.categoria }}</span>
-
-                    <h3 class="card-nome">{{ produto.nome }}</h3>
-
-                    <div class="card-preco">
-                        <span class="moeda">R$</span>
-                        <span>{{ '%.2f'|format(produto.preco_venda) }}</span>
-                    </div>
-
-                    <div class="card-estoque-linha">
-
-                        <div class="estoque-info {% if estoque_baixo %}estoque-baixo{% endif %}">
-                            {% if estoque_baixo %}
-                                <i class="bi bi-exclamation-triangle-fill"></i>
-                            {% endif %}
-                            <span>{{ produto.quantidade_estoque }} un.</span>
-                        </div>
-
-                        <div class="estoque-minimo-info">
-                            <span>mín. {{ produto.estoque_minimo }}</span>
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- BOTÕES -->
-                <div class="card-acoes">
-
-                    <a class="btn-acao btn-entrada"
-                       href="{{ url_for('novo_pedido', tipo='entrada', id=produto.id) }}">
-                        <i class="bi bi-box-arrow-in-down"></i> Entrada
-                    </a>
-
-                    <a class="btn-acao btn-saida"
-                       href="{{ url_for('novo_pedido_saida', tipo='saida', id=produto.id) }}">
-                        <i class="bi bi-box-arrow-up"></i> Saída
-                    </a>
-
-                </div>
+                {% endfor %}
 
             </div>
 
-            {% endfor %}
+            <!-- ----- LISTA (compacta, montada via JS a partir da grade) ----- -->
+
+            <div class="produtos-lista" id="produtosLista" hidden></div>
+
+            <!-- ----- TABELA (montada via JS a partir da grade) ----- -->
+
+            <div class="produtos-tabela-wrap" id="produtosTabelaWrap" hidden>
+                <table class="produtos-tabela" id="produtosTabela">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Categoria</th>
+                            <th>Fornecedor</th>
+                            <th>Preço</th>
+                            <th>Estoque</th>
+                            <th>Mínimo</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="produtosTabelaBody"></tbody>
+                </table>
+            </div>
 
         </div>
 
@@ -271,7 +320,7 @@
         </div>
         {% endif %}
 
-        <!-- Aparece quando a busca esconde todos os cards -->
+        <!-- Aparece quando a busca esconde todos os cards da visualização atual -->
         <div class="estado-vazio" id="semResultadosBusca" hidden>
             <i class="bi bi-search"></i>
             <p>Nenhum produto corresponde à sua pesquisa.</p>
@@ -421,6 +470,12 @@ document.addEventListener("DOMContentLoaded", function () {
         document.body.appendChild(overlay);
     }
 
+    /* Declarados aqui em cima (e não lá embaixo, na seção de busca)
+       porque definirView() já precisa deles logo na inicialização */
+    const inputBusca = document.getElementById("inputBusca");
+    const semResultadosBusca = document.getElementById("semResultadosBusca");
+    const CHAVE_BUSCA = "medstock_busca_produtos";
+
 
     /* ========================================================
        PAINEL DE FILTROS (abrir / fechar)
@@ -453,38 +508,341 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* ========================================================
-       BUSCA (mantém o texto ao trocar de filtro)
+       ALTERNÂNCIA DE VISUALIZAÇÃO (Grade / Lista / Tabela)
     ======================================================== */
 
-    const inputBusca = document.getElementById("inputBusca");
-    const semResultadosBusca = document.getElementById("semResultadosBusca");
-    const CHAVE_BUSCA = "medstock_busca_produtos";
+    const CHAVE_VIEW = "medstock_view_produtos";
+
+    const containers = {
+        grid: document.getElementById("produtosGrid"),
+        lista: document.getElementById("produtosLista"),
+        tabela: document.getElementById("produtosTabelaWrap")
+    };
+
+    const botoesView = document.querySelectorAll(".view-btn");
+
+    let viewAtual = "grid";
+
+    function definirView(view) {
+
+        if (!containers[view]) view = "grid";
+
+        viewAtual = view;
+
+        Object.keys(containers).forEach(function (chave) {
+            containers[chave].hidden = chave !== view;
+        });
+
+        botoesView.forEach(function (btn) {
+            const ativo = btn.dataset.view === view;
+            btn.classList.toggle("ativo", ativo);
+            btn.setAttribute("aria-pressed", ativo ? "true" : "false");
+        });
+
+        try { localStorage.setItem(CHAVE_VIEW, view); } catch (err) { /* indisponível */ }
+
+        atualizarEstadoVazioBusca();
+
+    }
+
+    botoesView.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            definirView(btn.dataset.view);
+        });
+    });
+
+
+    /* ========================================================
+       MONTAGEM DAS VISUALIZAÇÕES DE LISTA E TABELA
+       (a partir dos mesmos dados dos cards da grade)
+    ======================================================== */
+
+    function formatarPrecoBR(valor) {
+        return parseFloat(valor || 0).toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    function criarImagemOuIcone(container, imagem, icone, nome) {
+
+        container.classList.toggle("sem-imagem", !imagem);
+
+        if (imagem) {
+            const img = document.createElement("img");
+            img.src = imagem;
+            img.alt = nome;
+            img.loading = "lazy";
+            img.onerror = function () {
+                container.classList.add("sem-imagem");
+                img.remove();
+            };
+            container.appendChild(img);
+        }
+
+        const iconeEl = document.createElement("i");
+        iconeEl.className = "bi " + icone;
+        container.appendChild(iconeEl);
+
+    }
+
+    function criarMenuOpcoes(d) {
+
+        const wrap = document.createElement("div");
+        wrap.className = "card-opcoes-wrap";
+
+        const botao = document.createElement("button");
+        botao.type = "button";
+        botao.className = "btn-opcoes";
+        botao.setAttribute("aria-label", "Mais opções");
+        botao.innerHTML = '<i class="bi bi-three-dots-vertical"></i>';
+
+        const menu = document.createElement("div");
+        menu.className = "menu-opcoes";
+
+        const linkEditar = document.createElement("a");
+        linkEditar.href = d.editar || "#";
+        linkEditar.innerHTML = '<i class="bi bi-pencil-square"></i> Editar';
+
+        const linkExcluir = document.createElement("a");
+        linkExcluir.href = d.excluir || "#";
+        linkExcluir.className = "opcao-excluir";
+        linkExcluir.innerHTML = '<i class="bi bi-trash3-fill"></i> Excluir';
+
+        menu.append(linkEditar, linkExcluir);
+        wrap.append(botao, menu);
+
+        return wrap;
+
+    }
+
+    function criarLinha(card) {
+
+        const d = card.dataset;
+        const estoque = parseInt(d.estoque || "0", 10);
+        const minimo = parseInt(d.minimo || "0", 10);
+        const estoqueBaixo = estoque <= minimo;
+
+        const linha = document.createElement("div");
+        linha.className = "produto-item produto-linha" + (estoqueBaixo ? " linha-estoque-baixo" : "");
+        Object.assign(linha.dataset, d);
+
+        const imagemDiv = document.createElement("div");
+        imagemDiv.className = "linha-imagem";
+        criarImagemOuIcone(imagemDiv, d.imagem, d.icone, d.nome);
+
+        const infoDiv = document.createElement("div");
+        infoDiv.className = "linha-info";
+
+        const nomeEl = document.createElement("strong");
+        nomeEl.className = "linha-nome";
+        nomeEl.textContent = d.nome;
+
+        const metaEl = document.createElement("span");
+        metaEl.className = "linha-meta";
+        metaEl.textContent = d.categoria + (d.fornecedor ? " • " + d.fornecedor : "");
+
+        infoDiv.append(nomeEl, metaEl);
+
+        const precoDiv = document.createElement("div");
+        precoDiv.className = "linha-preco";
+        const moedaEl = document.createElement("span");
+        moedaEl.className = "moeda";
+        moedaEl.textContent = "R$ ";
+        precoDiv.append(moedaEl, document.createTextNode(formatarPrecoBR(d.preco)));
+
+        const estoqueDiv = document.createElement("div");
+        estoqueDiv.className = "linha-estoque" + (estoqueBaixo ? " baixo" : "");
+
+        const qtdEl = document.createElement("span");
+        qtdEl.className = "qtd";
+        if (estoqueBaixo) {
+            qtdEl.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> ';
+        }
+        qtdEl.append(document.createTextNode(estoque + " un."));
+
+        const minEl = document.createElement("span");
+        minEl.className = "min";
+        minEl.textContent = "mín. " + minimo;
+
+        estoqueDiv.append(qtdEl, minEl);
+
+        const acoesDiv = document.createElement("div");
+        acoesDiv.className = "linha-acoes";
+
+        const btnEntrada = document.createElement("a");
+        btnEntrada.href = d.entrada || "#";
+        btnEntrada.className = "btn-acao btn-entrada";
+        btnEntrada.innerHTML = '<i class="bi bi-box-arrow-in-down"></i> Entrada';
+
+        const btnSaida = document.createElement("a");
+        btnSaida.href = d.saida || "#";
+        btnSaida.className = "btn-acao btn-saida";
+        btnSaida.innerHTML = '<i class="bi bi-box-arrow-up"></i> Saída';
+
+        acoesDiv.append(btnEntrada, btnSaida, criarMenuOpcoes(d));
+
+        linha.append(imagemDiv, infoDiv, precoDiv, estoqueDiv, acoesDiv);
+
+        return linha;
+
+    }
+
+    function criarLinhaTabela(card) {
+
+        const d = card.dataset;
+        const estoque = parseInt(d.estoque || "0", 10);
+        const minimo = parseInt(d.minimo || "0", 10);
+        const estoqueBaixo = estoque <= minimo;
+
+        const tr = document.createElement("tr");
+        tr.className = "produto-item" + (estoqueBaixo ? " tr-estoque-baixo" : "");
+        Object.assign(tr.dataset, d);
+
+        /* Produto (imagem/ícone + nome) */
+        const tdProduto = document.createElement("td");
+        const wrapProduto = document.createElement("div");
+        wrapProduto.className = "td-produto";
+
+        const imagemDiv = document.createElement("div");
+        imagemDiv.className = "td-imagem";
+        criarImagemOuIcone(imagemDiv, d.imagem, d.icone, d.nome);
+
+        const nomeEl = document.createElement("span");
+        nomeEl.className = "td-nome-produto";
+        nomeEl.textContent = d.nome;
+
+        wrapProduto.append(imagemDiv, nomeEl);
+        tdProduto.appendChild(wrapProduto);
+
+        /* Categoria */
+        const tdCategoria = document.createElement("td");
+        tdCategoria.textContent = d.categoria || "-";
+
+        /* Fornecedor */
+        const tdFornecedor = document.createElement("td");
+        tdFornecedor.textContent = d.fornecedor || "-";
+
+        /* Preço */
+        const tdPreco = document.createElement("td");
+        tdPreco.className = "td-preco";
+        tdPreco.textContent = "R$ " + formatarPrecoBR(d.preco);
+
+        /* Estoque */
+        const tdEstoque = document.createElement("td");
+        tdEstoque.className = "td-estoque" + (estoqueBaixo ? " baixo" : "");
+        if (estoqueBaixo) {
+            tdEstoque.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> ';
+        }
+        tdEstoque.append(document.createTextNode(estoque + " un."));
+
+        /* Mínimo */
+        const tdMinimo = document.createElement("td");
+        tdMinimo.textContent = minimo + " un.";
+
+        /* Ações */
+        const tdAcoes = document.createElement("td");
+        const wrapAcoes = document.createElement("div");
+        wrapAcoes.className = "td-acoes";
+
+        const btnEntrada = document.createElement("a");
+        btnEntrada.href = d.entrada || "#";
+        btnEntrada.className = "btn-icone-acao btn-icone-entrada";
+        btnEntrada.title = "Entrada";
+        btnEntrada.innerHTML = '<i class="bi bi-box-arrow-in-down"></i>';
+
+        const btnSaida = document.createElement("a");
+        btnSaida.href = d.saida || "#";
+        btnSaida.className = "btn-icone-acao btn-icone-saida";
+        btnSaida.title = "Saída";
+        btnSaida.innerHTML = '<i class="bi bi-box-arrow-up"></i>';
+
+        wrapAcoes.append(btnEntrada, btnSaida, criarMenuOpcoes(d));
+        tdAcoes.appendChild(wrapAcoes);
+
+        tr.append(tdProduto, tdCategoria, tdFornecedor, tdPreco, tdEstoque, tdMinimo, tdAcoes);
+
+        return tr;
+
+    }
+
+    function montarListaETabela() {
+
+        const listaContainer = containers.lista;
+        const tabelaBody = document.getElementById("produtosTabelaBody");
+
+        if (!listaContainer || !tabelaBody) return;
+
+        listaContainer.innerHTML = "";
+        tabelaBody.innerHTML = "";
+
+        document.querySelectorAll("#produtosGrid > .produto-card").forEach(function (card) {
+
+            const linha = criarLinha(card);
+            const tr = criarLinhaTabela(card);
+
+            listaContainer.appendChild(linha);
+            tabelaBody.appendChild(tr);
+
+            configurarItem(linha);
+            configurarItem(tr);
+
+        });
+
+    }
+
+    montarListaETabela();
+
+    let viewSalva = "grid";
+    try { viewSalva = localStorage.getItem(CHAVE_VIEW) || "grid"; } catch (err) { /* indisponível */ }
+    definirView(viewSalva);
+
+
+    /* ========================================================
+       BUSCA (funciona nas três visualizações; mantém o texto
+       ao trocar de filtro ou de visualização)
+    ======================================================== */
+
+    function itensDaViewAtiva() {
+        if (viewAtual === "lista") return containers.lista.querySelectorAll(".produto-item");
+        if (viewAtual === "tabela") return document.getElementById("produtosTabelaBody").querySelectorAll(".produto-item");
+        return containers.grid.querySelectorAll(".produto-item");
+    }
+
+    function atualizarEstadoVazioBusca() {
+
+        if (!semResultadosBusca) return;
+
+        const itens = itensDaViewAtiva();
+        const total = itens.length;
+        let visiveis = 0;
+
+        itens.forEach(function (item) {
+            if (item.style.display !== "none") visiveis++;
+        });
+
+        semResultadosBusca.hidden = !(total > 0 && visiveis === 0);
+
+    }
 
     function aplicarBusca() {
 
         const filtro = (inputBusca.value || "").toLowerCase().trim();
-        const cards = document.querySelectorAll(".produto-card");
-        let visiveis = 0;
+        const todosItens = document.querySelectorAll(".produto-item");
 
-        cards.forEach(function (card) {
+        todosItens.forEach(function (item) {
 
             const texto = [
-                card.dataset.nome,
-                card.dataset.fornecedor,
-                card.dataset.categoria
+                item.dataset.nome,
+                item.dataset.fornecedor,
+                item.dataset.categoria
             ].join(" ").toLowerCase();
 
-            const mostrar = texto.includes(filtro);
-
-            card.style.display = mostrar ? "" : "none";
-
-            if (mostrar) visiveis++;
+            item.style.display = texto.includes(filtro) ? "" : "none";
 
         });
 
-        if (semResultadosBusca) {
-            semResultadosBusca.hidden = !(cards.length > 0 && visiveis === 0);
-        }
+        atualizarEstadoVazioBusca();
 
     }
 
@@ -542,31 +900,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* ========================================================
-       FORMATAR PREÇO
+       PREENCHER MODAL (funciona com dados de card, linha ou tr,
+       pois todos compartilham os mesmos atributos data-*)
     ======================================================== */
 
-    function formatarPreco(valor) {
-        return parseFloat(valor || 0).toLocaleString("pt-BR", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        });
-    }
+    function preencherModal(item) {
 
-
-    /* ========================================================
-       PREENCHER MODAL
-    ======================================================== */
-
-    function preencherModal(card) {
-
-        const nome = card.dataset.nome || "Produto";
-        const categoria = card.dataset.categoria || "-";
-        const icone = card.dataset.icone || "bi-box-seam";
-        const estoque = parseInt(card.dataset.estoque || "0", 10);
-        const minimo = parseInt(card.dataset.minimo || "0", 10);
-        const preco = parseFloat(card.dataset.preco || "0");
-        const custo = parseFloat(card.dataset.custo || "0");
-        const imagem = card.dataset.imagem || "";
+        const nome = item.dataset.nome || "Produto";
+        const categoria = item.dataset.categoria || "-";
+        const icone = item.dataset.icone || "bi-box-seam";
+        const estoque = parseInt(item.dataset.estoque || "0", 10);
+        const minimo = parseInt(item.dataset.minimo || "0", 10);
+        const preco = parseFloat(item.dataset.preco || "0");
+        const custo = parseFloat(item.dataset.custo || "0");
+        const imagem = item.dataset.imagem || "";
 
 
         /* ----- Cabeçalho (imagem ou ícone) ----- */
@@ -604,14 +951,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         /* ----- ID / Fornecedor ----- */
 
-        modalId.textContent = "#" + (card.dataset.id || "0");
-        modalFornecedor.textContent = card.dataset.fornecedor || "-";
+        modalId.textContent = "#" + (item.dataset.id || "0");
+        modalFornecedor.textContent = item.dataset.fornecedor || "-";
 
 
         /* ----- Preço, custo e margem ----- */
 
-        modalPreco.textContent = formatarPreco(preco);
-        modalCusto.textContent = formatarPreco(custo);
+        modalPreco.textContent = formatarPrecoBR(preco);
+        modalCusto.textContent = formatarPrecoBR(custo);
 
         if (custo > 0 && preco > 0) {
 
@@ -668,10 +1015,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         /* ----- Links de ação ----- */
 
-        modalEntrada.href = card.dataset.entrada || "#";
-        modalSaida.href = card.dataset.saida || "#";
-        modalEditar.href = card.dataset.editar || "#";
-        modalExcluir.href = card.dataset.excluir || "#";
+        modalEntrada.href = item.dataset.entrada || "#";
+        modalSaida.href = item.dataset.saida || "#";
+        modalEditar.href = item.dataset.editar || "#";
+        modalExcluir.href = item.dataset.excluir || "#";
 
     }
 
@@ -680,12 +1027,12 @@ document.addEventListener("DOMContentLoaded", function () {
        ABRIR / FECHAR MODAL
     ======================================================== */
 
-    function abrirModal(card) {
+    function abrirModal(item) {
 
-        produtoAtual = card;
+        produtoAtual = item;
         ultimoElementoFocado = document.activeElement;
 
-        preencherModal(card);
+        preencherModal(item);
 
         overlay.classList.add("visivel");
         overlay.setAttribute("aria-hidden", "false");
@@ -713,7 +1060,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* ========================================================
-       CONFIRMAÇÃO DE EXCLUSÃO
+       CONFIRMAÇÃO DE EXCLUSÃO (botão do modal)
     ======================================================== */
 
     modalExcluir.addEventListener("click", function (e) {
@@ -728,23 +1075,79 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* ========================================================
-       CLIQUE NOS CARDS
+       CONFIGURAÇÃO DE CADA ITEM (grade, lista ou tabela)
+       — clique abre o modal, "..." abre o menu, exclusão confirma —
+       Cada item recebe seus próprios listeners (igual ao
+       comportamento original), então o stopPropagation() do botão
+       "..." já evita que o clique feche o próprio menu que acabou
+       de abrir, sem precisar de nenhum truque de delegação.
     ======================================================== */
 
-    document.querySelectorAll(".produto-card").forEach(function (card) {
+    function configurarItem(item) {
 
-        card.addEventListener("click", function (e) {
+        /* Clique no item abre o modal, exceto em links e no menu (...) */
+        item.addEventListener("click", function (e) {
 
-            /* Não abre pelos links nem pelo menu (...) */
             if (e.target.closest("a") || e.target.closest(".card-opcoes-wrap")) {
                 return;
             }
 
-            abrirModal(card);
+            abrirModal(item);
 
         });
 
-    });
+        /* Botão "..." abre/fecha o menu deste item */
+        const botaoOpcoes = item.querySelector(".btn-opcoes");
+
+        if (botaoOpcoes) {
+
+            botaoOpcoes.addEventListener("click", function (e) {
+
+                e.stopPropagation();
+
+                const menu = this.nextElementSibling;
+                const jaAberto = menu.classList.contains("aberto");
+
+                document.querySelectorAll(".menu-opcoes").forEach(function (m) {
+                    m.classList.remove("aberto");
+                });
+
+                fecharFiltros();
+
+                if (!jaAberto) {
+                    menu.classList.add("aberto");
+                }
+
+            });
+
+        }
+
+        /* Confirmação antes de excluir, direto no link "Excluir" do item */
+        const linkExcluir = item.querySelector(".opcao-excluir");
+
+        if (linkExcluir) {
+
+            linkExcluir.addEventListener("click", function (e) {
+
+                const nome = item.dataset.nome || "este produto";
+
+                if (!window.confirm('Tem certeza que deseja excluir "' + nome + '"? Esta ação não pode ser desfeita.')) {
+                    e.preventDefault();
+                }
+
+            });
+
+        }
+
+    }
+
+    /* Aplica a configuração a todos os cards já renderizados pelo Jinja */
+    document.querySelectorAll("#produtosGrid > .produto-card").forEach(configurarItem);
+
+
+    /* ========================================================
+       FECHAR MODAL
+    ======================================================== */
 
     if (fecharModal) {
 
@@ -763,35 +1166,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* ========================================================
-       MENU (...) DOS CARDS
-    ======================================================== */
-
-    document.querySelectorAll(".btn-opcoes").forEach(function (botao) {
-
-        botao.addEventListener("click", function (e) {
-
-            e.stopPropagation();
-
-            const menu = this.nextElementSibling;
-            const jaAberto = menu.classList.contains("aberto");
-
-            document.querySelectorAll(".menu-opcoes").forEach(function (m) {
-                m.classList.remove("aberto");
-            });
-
-            fecharFiltros();
-
-            if (!jaAberto) {
-                menu.classList.add("aberto");
-            }
-
-        });
-
-    });
-
-
-    /* ========================================================
-       CLIQUE FORA: fecha menus e painel de filtros
+       CLIQUE FORA: fecha menus abertos e o painel de filtros
     ======================================================== */
 
     document.addEventListener("click", function () {
