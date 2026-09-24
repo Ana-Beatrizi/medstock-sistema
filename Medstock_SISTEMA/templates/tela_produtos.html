@@ -23,6 +23,31 @@
     'EPIs': 'bi-person-badge'
 } %}
 
+{# ------------------------------------------------------------
+   TARJAS / RESTRIÇÃO DE VENDA
+   Valores aceitos em produto.tarja: 'preta' ou 'vermelha'.
+   Qualquer outro valor (ou vazio) = isento, sem badge.
+   Se o produto ainda não tem o campo "tarja", usa um padrão
+   pela categoria (tarja_por_categoria).
+------------------------------------------------------------ #}
+{% set tarjas = {
+    'preta': {
+        'texto': 'Tarja Preta',
+        'icone': 'bi-file-earmark-lock2-fill',
+        'aviso': 'Medicamento controlado: exige receita com retenção. Confira a receita antes de dar saída.'
+    },
+    'vermelha': {
+        'texto': 'Retenção de Receita',
+        'icone': 'bi-file-earmark-medical-fill',
+        'aviso': 'Venda somente com prescrição médica e retenção da receita. Confira a receita antes de dar saída.'
+    }
+} %}
+
+{% set tarja_por_categoria = {
+    'Medicamentos Controlados': 'preta',
+    'Antibióticos': 'vermelha'
+} %}
+
 {# Quantidade de filtros ativos (usada no selo do botão) #}
 {% set filtros_ativos = (1 if fornecedor_selecionado else 0) + (1 if estoque_selecionado else 0) %}
 
@@ -173,11 +198,16 @@
                 {% set icone = categoria_icones.get(produto.categoria, 'bi-box-seam') %}
                 {% set estoque_baixo = produto.quantidade_estoque <= produto.estoque_minimo %}
 
+                {# Tarja: campo do produto ou padrão da categoria #}
+                {% set tarja_tipo = (produto.tarja or tarja_por_categoria.get(produto.categoria, ''))|lower|trim %}
+                {% set tarja = tarjas.get(tarja_tipo) %}
+
                 <div class="produto-item produto-card {% if estoque_baixo %}card-estoque-baixo{% endif %}"
                     data-id="{{ produto.id }}"
                     data-nome="{{ produto.nome }}"
                     data-fornecedor="{{ produto.fornecedor.nome_fornecedor if produto.fornecedor else '' }}"
                     data-categoria="{{ produto.categoria }}"
+                    data-tarja="{{ tarja_tipo if tarja else '' }}"
                     data-icone="{{ icone }}"
                     data-estoque="{{ produto.quantidade_estoque }}"
                     data-minimo="{{ produto.estoque_minimo }}"
@@ -191,6 +221,8 @@
 
                     <!-- TOPO -->
                     <div class="card-topo">
+
+                      <div class="card-topo-esq">
 
                         <div class="card-imagem {% if not produto.imagem %}sem-imagem{% endif %}">
 
@@ -208,6 +240,16 @@
                             <i class="bi {{ icone }}"></i>
 
                         </div>
+
+                        <!-- BADGE DE TARJA (ao lado da foto) -->
+                        {% if tarja %}
+                        <span class="tarja-badge tarja-{{ tarja_tipo }} ao-lado" title="{{ tarja.aviso }}">
+                            <i class="bi {{ tarja.icone }}"></i>
+                            <span class="tarja-texto">{{ tarja.texto }}</span>
+                        </span>
+                        {% endif %}
+
+                      </div>
 
                         <!-- MENU (...) -->
                         <div class="card-opcoes-wrap">
@@ -352,6 +394,7 @@
                 </div>
 
                 <div class="modal-header-texto">
+                    <div class="modal-tarja-slot" id="modalTarjaSlot"></div>
                     <span class="modal-categoria-tag" id="modalCategoria">Categoria</span>
                     <h2 id="modalNome">Produto</h2>
                 </div>
@@ -366,6 +409,11 @@
 
         <!-- CONTEÚDO -->
         <div class="modal-conteudo">
+
+            <div class="modal-alerta-tarja" id="modalAlertaTarja" hidden>
+                <i id="modalAlertaTarjaIcone" class="bi bi-file-earmark-medical-fill"></i>
+                <span id="modalAlertaTarjaTexto"></span>
+            </div>
 
             <div class="modal-alerta-estoque" id="modalAlertaEstoque" hidden>
                 <i class="bi bi-exclamation-triangle-fill"></i>
@@ -475,6 +523,33 @@ document.addEventListener("DOMContentLoaded", function () {
     const inputBusca = document.getElementById("inputBusca");
     const semResultadosBusca = document.getElementById("semResultadosBusca");
     const CHAVE_BUSCA = "medstock_busca_produtos";
+
+    /* Configuração das tarjas (vem do Jinja, fonte única) */
+    const TARJAS = {{ tarjas|tojson }};
+
+
+    /* ========================================================
+       BADGE DE TARJA (usado na lista, na tabela e no modal)
+    ======================================================== */
+
+    function criarBadgeTarja(tipo, compacto) {
+
+        const t = TARJAS[tipo];
+
+        if (!t) return null;
+
+        const el = document.createElement("span");
+        el.className = "tarja-badge tarja-" + tipo + (compacto ? " compacto" : "");
+        el.title = t.aviso;
+
+        const iconeEl = document.createElement("i");
+        iconeEl.className = "bi " + t.icone;
+
+        el.append(iconeEl, document.createTextNode(t.texto));
+
+        return el;
+
+    }
 
 
     /* ========================================================
@@ -634,15 +709,24 @@ document.addEventListener("DOMContentLoaded", function () {
         const infoDiv = document.createElement("div");
         infoDiv.className = "linha-info";
 
+        /* Título = nome + badge de tarja (quando houver) */
+        const tituloDiv = document.createElement("div");
+        tituloDiv.className = "linha-titulo";
+
         const nomeEl = document.createElement("strong");
         nomeEl.className = "linha-nome";
         nomeEl.textContent = d.nome;
+
+        tituloDiv.appendChild(nomeEl);
+
+        const badgeTarja = criarBadgeTarja(d.tarja, true);
+        if (badgeTarja) tituloDiv.appendChild(badgeTarja);
 
         const metaEl = document.createElement("span");
         metaEl.className = "linha-meta";
         metaEl.textContent = d.categoria + (d.fornecedor ? " • " + d.fornecedor : "");
 
-        infoDiv.append(nomeEl, metaEl);
+        infoDiv.append(tituloDiv, metaEl);
 
         const precoDiv = document.createElement("div");
         precoDiv.className = "linha-preco";
@@ -699,7 +783,7 @@ document.addEventListener("DOMContentLoaded", function () {
         tr.className = "produto-item" + (estoqueBaixo ? " tr-estoque-baixo" : "");
         Object.assign(tr.dataset, d);
 
-        /* Produto (imagem/ícone + nome) */
+        /* Produto (imagem/ícone + nome + badge de tarja) */
         const tdProduto = document.createElement("td");
         const wrapProduto = document.createElement("div");
         wrapProduto.className = "td-produto";
@@ -713,6 +797,10 @@ document.addEventListener("DOMContentLoaded", function () {
         nomeEl.textContent = d.nome;
 
         wrapProduto.append(imagemDiv, nomeEl);
+
+        const badgeTarja = criarBadgeTarja(d.tarja, true);
+        if (badgeTarja) wrapProduto.appendChild(badgeTarja);
+
         tdProduto.appendChild(wrapProduto);
 
         /* Categoria */
@@ -801,6 +889,7 @@ document.addEventListener("DOMContentLoaded", function () {
     /* ========================================================
        BUSCA (funciona nas três visualizações; mantém o texto
        ao trocar de filtro ou de visualização)
+       Também encontra pela tarja (ex.: "tarja preta", "receita")
     ======================================================== */
 
     function itensDaViewAtiva() {
@@ -832,10 +921,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
         todosItens.forEach(function (item) {
 
+            const tarja = TARJAS[item.dataset.tarja];
+
             const texto = [
                 item.dataset.nome,
                 item.dataset.fornecedor,
-                item.dataset.categoria
+                item.dataset.categoria,
+                tarja ? tarja.texto : ""
             ].join(" ").toLowerCase();
 
             item.style.display = texto.includes(filtro) ? "" : "none";
@@ -880,6 +972,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const modalId = document.getElementById("modalId");
     const modalFornecedor = document.getElementById("modalFornecedor");
     const modalCategoria = document.getElementById("modalCategoria");
+    const modalTarjaSlot = document.getElementById("modalTarjaSlot");
+    const modalAlertaTarja = document.getElementById("modalAlertaTarja");
+    const modalAlertaTarjaIcone = document.getElementById("modalAlertaTarjaIcone");
+    const modalAlertaTarjaTexto = document.getElementById("modalAlertaTarjaTexto");
     const modalAlertaEstoque = document.getElementById("modalAlertaEstoque");
     const modalEstoqueTexto = document.getElementById("modalEstoqueTexto");
     const modalMinimoLegenda = document.getElementById("modalMinimoLegenda");
@@ -914,6 +1010,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const preco = parseFloat(item.dataset.preco || "0");
         const custo = parseFloat(item.dataset.custo || "0");
         const imagem = item.dataset.imagem || "";
+        const tipoTarja = item.dataset.tarja || "";
 
 
         /* ----- Cabeçalho (imagem ou ícone) ----- */
@@ -947,6 +1044,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
         modalNome.textContent = nome;
         modalCategoria.textContent = categoria;
+
+
+        /* ----- Tarja (badge no cabeçalho + aviso no conteúdo) ----- */
+
+        modalTarjaSlot.innerHTML = "";
+
+        const tarja = TARJAS[tipoTarja];
+
+        if (tarja) {
+
+            modalTarjaSlot.appendChild(criarBadgeTarja(tipoTarja, false));
+
+            modalAlertaTarja.className = "modal-alerta-tarja alerta-tarja-" + tipoTarja;
+            modalAlertaTarjaIcone.className = "bi " + tarja.icone;
+            modalAlertaTarjaTexto.textContent = tarja.aviso;
+            modalAlertaTarja.hidden = false;
+
+        } else {
+
+            modalAlertaTarja.hidden = true;
+
+        }
 
 
         /* ----- ID / Fornecedor ----- */
