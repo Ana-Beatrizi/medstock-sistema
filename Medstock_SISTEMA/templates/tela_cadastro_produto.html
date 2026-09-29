@@ -55,19 +55,39 @@
                         <label class="form-label">Categoria</label>
                         <select name="categoria" id="categoria" class="form-select" required>
                             <option value="">Selecione uma categoria</option>
+                            
+                            <!-- Medicamentos Frequentes -->
                             <option value="Analgésicos" {% if produto and produto.categoria == 'Analgésicos' %}selected{% endif %}>Analgésicos</option>
                             <option value="Anti-inflamatórios" {% if produto and produto.categoria == 'Anti-inflamatórios' %}selected{% endif %}>Anti-inflamatórios</option>
                             <option value="Antibióticos" {% if produto and produto.categoria == 'Antibióticos' %}selected{% endif %}>Antibióticos</option>
                             <option value="Antialérgicos" {% if produto and produto.categoria == 'Antialérgicos' %}selected{% endif %}>Antialérgicos</option>
+                            <option value="Antifúngicos e Antivirais" {% if produto and produto.categoria == 'Antifúngicos e Antivirais' %}selected{% endif %}>Antifúngicos e Antivirais</option>
                             <option value="Gastrointestinais" {% if produto and produto.categoria == 'Gastrointestinais' %}selected{% endif %}>Gastrointestinais</option>
                             <option value="Cardiovasculares" {% if produto and produto.categoria == 'Cardiovasculares' %}selected{% endif %}>Cardiovasculares</option>
+                            <option value="Anti-hipertensivos" {% if produto and produto.categoria == 'Anti-hipertensivos' %}selected{% endif %}>Anti-hipertensivos</option>
                             <option value="Antidiabéticos" {% if produto and produto.categoria == 'Antidiabéticos' %}selected{% endif %}>Antidiabéticos</option>
                             <option value="Respiratórios" {% if produto and produto.categoria == 'Respiratórios' %}selected{% endif %}>Respiratórios</option>
                             <option value="Dermatológicos" {% if produto and produto.categoria == 'Dermatológicos' %}selected{% endif %}>Dermatológicos</option>
-                            <option value="Vitaminas e Suplementos" {% if produto and produto.categoria == 'Vitaminas e Suplementos' %}selected{% endif %}>Vitaminas e Suplementos</option>
+                            <option value="Corticoides" {% if produto and produto.categoria == 'Corticoides' %}selected{% endif %}>Corticoides</option>
+                            <option value="Psiquiatria e Neurologia" {% if produto and produto.categoria == 'Psiquiatria e Neurologia' %}selected{% endif %}>Psiquiatria e Neurologia</option>
                             <option value="Medicamentos Controlados" {% if produto and produto.categoria == 'Medicamentos Controlados' %}selected{% endif %}>Medicamentos Controlados</option>
+                    
+                            <!-- Especialidades e Saúde Específica -->
+                            <option value="Ginecologia e Saúde da Mulher" {% if produto and produto.categoria == 'Ginecologia e Saúde da Mulher' %}selected{% endif %}>Ginecologia e Saúde da Mulher</option>
+                            <option value="Oftalmológicos e Otológicos" {% if produto and produto.categoria == 'Oftalmológicos e Otológicos' %}selected{% endif %}>Oftalmológicos e Otológicos</option>
+                            <option value="Endocrinologia" {% if produto and produto.categoria == 'Endocrinologia' %}selected{% endif %}>Endocrinologia</option>
+                            <option value="Fitoterápicos" {% if produto and produto.categoria == 'Fitoterápicos' %}selected{% endif %}>Fitoterápicos</option>
                             <option value="Vacinas" {% if produto and produto.categoria == 'Vacinas' %}selected{% endif %}>Vacinas</option>
+                    
+                            <!-- Suplementos, Higiene e Utilidades -->
+                            <option value="Vitaminas e Suplementos" {% if produto and produto.categoria == 'Vitaminas e Suplementos' %}selected{% endif %}>Vitaminas e Suplementos</option>
+                            <option value="Higiene e Cuidados Pessoais" {% if produto and produto.categoria == 'Higiene e Cuidados Pessoais' %}selected{% endif %}>Higiene e Cuidados Pessoais</option>
+                            <option value="Dermocosméticos" {% if produto and produto.categoria == 'Dermocosméticos' %}selected{% endif %}>Dermocosméticos</option>
+                            <option value="Infantil e Bebês" {% if produto and produto.categoria == 'Infantil e Bebês' %}selected{% endif %}>Infantil e Bebês</option>
+                    
+                            <!-- Materiais de Apoio e Hospitalares -->
                             <option value="Materiais Hospitalares" {% if produto and produto.categoria == 'Materiais Hospitalares' %}selected{% endif %}>Materiais Hospitalares</option>
+                            <option value="First Aid e Curativos" {% if produto and produto.categoria == 'First Aid e Curativos' %}selected{% endif %}>First Aid e Curativos</option>
                             <option value="EPIs" {% if produto and produto.categoria == 'EPIs' %}selected{% endif %}>EPIs</option>
                             <option value="Outros" {% if produto and produto.categoria == 'Outros' %}selected{% endif %}>Outros</option>
                         </select>

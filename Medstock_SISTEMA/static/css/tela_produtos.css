@@ -64,18 +64,27 @@ body.modal-aberto { overflow: hidden; }
     display: inline-flex; align-items: center; justify-content: center;
 }
 
+.filtro-badge[hidden] { display: none; }
+
 .filtros-painel {
     position: absolute; top: 60px; left: 0;
     background: #FFFFFF;
     border: 1px solid #E7EAF0;
     border-radius: 14px;
     box-shadow: 0 10px 24px rgba(16, 24, 64, 0.14);
-    padding: 16px; min-width: 280px;
-    display: none; flex-direction: column; gap: 12px;
+    padding: 16px;
+    width: 380px; max-width: calc(100vw - 48px);
+    max-height: min(78vh, 680px);
+    overflow-y: auto;
+    display: none; flex-direction: column; gap: 14px;
     z-index: 100;
 }
 
 .filtros-painel.aberto { display: flex; }
+
+.filtros-painel::-webkit-scrollbar { width: 5px; }
+.filtros-painel::-webkit-scrollbar-track { background: transparent; }
+.filtros-painel::-webkit-scrollbar-thumb { background: #D5DCE8; border-radius: 10px; }
 
 .filtros-form { display: flex; flex-direction: column; gap: 12px; }
 
@@ -83,7 +92,8 @@ body.modal-aberto { overflow: hidden; }
 
 .filtro-campo > span { font-size: 12.5px; font-weight: 600; color: #536078; }
 
-.filtros-form select {
+.filtros-form select,
+.filtro-select {
     width: 100%; height: 46px; padding: 0 14px;
     border-radius: 10px;
     border: 1px solid #d1d5db;
@@ -92,9 +102,11 @@ body.modal-aberto { overflow: hidden; }
     cursor: pointer; transition: .3s;
 }
 
-.filtros-form select:hover { border-color: #00C4C0; }
+.filtros-form select:hover,
+.filtro-select:hover { border-color: #00C4C0; }
 
-.filtros-form select:focus {
+.filtros-form select:focus,
+.filtro-select:focus {
     outline: none; border-color: #00C4C0;
     box-shadow: 0 0 0 3px rgba(0, 196, 192, .15);
 }
@@ -109,6 +121,101 @@ body.modal-aberto { overflow: hidden; }
 }
 
 .btn-limpar-filtros:hover { background: #FFE0E2; }
+
+.btn-limpar-filtros[hidden] { display: none; }
+
+
+/* ----- Seção "Sanitários e Regulatórios" ----- */
+
+.filtro-secao-titulo {
+    display: flex; align-items: center; gap: 8px;
+    padding-top: 14px;
+    border-top: 1px solid #EEF1F6;
+    color: #00819F;
+    font-size: 12px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: .5px;
+}
+
+.filtro-secao-titulo i { font-size: 14px; }
+
+.filtro-grupo { display: flex; flex-direction: column; gap: 8px; }
+
+.filtro-rotulo { font-size: 12.5px; font-weight: 600; color: #536078; }
+
+
+/* ----- Chips (seleção única) ----- */
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.chips.desativado { opacity: .5; }
+
+.chip {
+    height: 32px; padding: 0 12px;
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #FAFAFA;
+    border: 1px solid #D7DCE6;
+    border-radius: 999px;
+    color: #536078; font-size: 12.5px; font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer; transition: .15s ease;
+}
+
+.chip i { font-size: 12px; }
+
+.chip:hover { border-color: #00C4C0; color: #0B2D6B; }
+
+.chip:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(0, 196, 192, .25); }
+
+.chip:disabled { cursor: not-allowed; }
+
+.chip:disabled:hover { border-color: #D7DCE6; color: #536078; }
+
+.chip.ativo { background: #E6FBFA; border-color: #00C4C0; color: #00819F; }
+
+/* Validade: cores por urgência */
+.chip.chip-perigo:hover { border-color: #DC2626; color: #DC2626; }
+.chip.chip-perigo.ativo { background: #FFEDEE; border-color: #DC2626; color: #DC2626; }
+
+.chip.chip-atencao:hover { border-color: #D97706; color: #D97706; }
+.chip.chip-atencao.ativo { background: #FFF4E5; border-color: #D97706; color: #D97706; }
+
+.chip.chip-aviso:hover { border-color: #CA8A04; color: #A16207; }
+.chip.chip-aviso.ativo { background: #FEFCE8; border-color: #EAB308; color: #A16207; }
+
+
+/* ----- Bolinha da cor da receita (Branca / Azul / Amarela) ----- */
+
+.dot-receita {
+    display: inline-block;
+    width: 11px; height: 11px;
+    margin-right: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(15, 23, 42, .18);
+    flex-shrink: 0;
+    vertical-align: -1px;
+}
+
+.receita-branca { background: #FFFFFF; border-color: #94A3B8; }
+.receita-azul { background: #2563EB; border-color: #1D4ED8; }
+.receita-amarela { background: #FACC15; border-color: #CA8A04; }
+
+/* Dentro do modal a bolinha precisa de espaço até o texto */
+.modal-info-texto .dot-receita { margin-right: 6px; }
+
+
+/* ============================================================
+   RESUMO DE RESULTADOS (busca / filtros)
+============================================================ */
+
+.resultados-info {
+    display: flex; align-items: center; gap: 8px;
+    margin: -12px 0 16px;
+    font-size: 13px; font-weight: 600; color: #536078;
+}
+
+.resultados-info[hidden] { display: none; }
+
+.resultados-info i { color: #00C4C0; }
 
 
 /* ============================================================
@@ -385,7 +492,7 @@ body.modal-aberto { overflow: hidden; }
 
 /* ============================================================
    BADGE DE TARJA (restrição de venda)
-   Aparece no card (acima da categoria), na lista, na tabela
+   Aparece no card (ao lado da foto), na lista, na tabela
    e no cabeçalho do modal. Produto isento = sem badge.
 ============================================================ */
 
@@ -906,6 +1013,8 @@ body.modal-aberto { overflow: hidden; }
     display: flex; align-items: center; gap: 12px;
 }
 
+.modal-info[hidden] { display: none; }
+
 .modal-info-icone {
     flex-shrink: 0;
     width: 38px; height: 38px;
@@ -995,7 +1104,7 @@ body.modal-aberto { overflow: hidden; }
 
     .btn-cadastro { justify-content: center; }
 
-    .filtros-painel { left: 0; right: 0; width: 100%; }
+    .filtros-painel { left: 0; right: 0; width: 100%; max-width: none; }
 
     .view-toggle { width: 100%; justify-content: center; }
 
