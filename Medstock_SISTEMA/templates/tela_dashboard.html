@@ -1,300 +1,756 @@
+```html
 {% extends 'tela_home.html' %}
 
 {% block conteudo %}
+
 <link rel="stylesheet" href="{{ url_for('static', filename='css/tela_dashboard.css') }}">
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+
+<!-- ACESSIBILIDADE PARA LEITOR DE TELA -->
+
+<style>
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /*
+  Elemento invisível que pode receber o TAB.
+  Ele não altera o visual da página.
+  */
+
+  .leitor-tab {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /*
+  Quando recebe foco, continua invisível.
+  */
+
+  .leitor-tab:focus {
+    outline: none;
+  }
+
+</style>
+
 
 <div class="dash">
 
-  <!-- ===== CABEÇALHO ===== -->
-  <header class="dash-header fade-up">
-    <div>
-      <h1 class="dash-title"><i class="bi bi-speedometer2"></i> Dashboard</h1>
-      <p class="dash-sub">Visão geral do estoque, movimentações e resultado financeiro</p>
-    </div>
-    <div class="dash-chip">
-      <span class="pulse-dot"></span> Dados atualizados
-    </div>
-  </header>
 
-  <!-- ===== KPIs PRINCIPAIS ===== -->
-  <section class="kpi-grid">
+  <!-- RESUMO COMPLETO PARA O LEITOR DE TELA -->
 
-<article class="card kpi fade-up d-1 kpi-hover">
-  <div class="kpi-icon ic-blue"><i class="bi bi-box-seam"></i></div>
+  <div
+    class="sr-only"
+    aria-label="Resumo do Dashboard do MedStock"
+  >
 
-  <div class="kpi-body">
-    <span class="kpi-label">Total de Produtos</span>
-    <strong class="kpi-value" data-count="{{ total_produtos }}">0</strong>
-    <span class="kpi-foot">Itens cadastrados</span>
+    <h2>Resumo do Dashboard</h2>
+
+    <p>
+      Dashboard do sistema MedStock.
+      Visão geral do estoque, movimentações e resultado financeiro.
+      Dados atualizados.
+    </p>
+
+    <p>
+      Total de produtos:
+      {{ total_produtos }}
+      produtos cadastrados.
+    </p>
+
+    <p>
+      Estoque normal:
+      {{ estoque_normal }}
+      produtos com níveis adequados.
+    </p>
+
+    <p>
+      Estoque baixo:
+      {{ estoque_baixo }}
+      produtos.
+      {{ percentual_baixo }} por cento do estoque total.
+    </p>
+
+    <p>
+      Estoque crítico:
+      {{ total_criticos }}
+      produtos.
+      Reposição urgente.
+    </p>
+
+    <p>
+      Produtos com estoque baixo:
+      {{ produtos_baixos|length }}
+      itens.
+    </p>
+
+    <p>
+      Existem
+      {{ total_criticos }}
+      itens em estoque crítico.
+    </p>
+
+    <p>
+      Valor de custo:
+      R$ {{ "%.2f"|format(valores_financeiros["valor_custo"]|float) }}.
+    </p>
+
+    <p>
+      Valor de venda:
+      R$ {{ "%.2f"|format(valores_financeiros["valor_venda"]|float) }}.
+    </p>
+
+    <p>
+      Lucro potencial:
+      R$ {{ "%.2f"|format(valores_financeiros["lucro_potencial"]|float) }}.
+    </p>
+
+    <p>
+      Pedidos de entrada:
+      {{ status_entrada["total_status"] }}
+      pedidos.
+      {{ status_entrada["processados"] }}
+      processados.
+      {{ status_entrada["pendentes"] }}
+      pendentes.
+      {{ status_entrada["cancelados"] }}
+      cancelados.
+    </p>
+
+    <p>
+      Pedidos de saída:
+      {{ status_saida["total_status"] }}
+      pedidos.
+      {{ status_saida["processados"] }}
+      processados.
+      {{ status_saida["pendentes"] }}
+      pendentes.
+      {{ status_saida["cancelados"] }}
+      cancelados.
+    </p>
+
+    <p>
+      Saúde do estoque:
+      {{ estoque_normal }}
+      produtos em situação normal,
+      {{ estoque_baixo }}
+      produtos com estoque baixo e
+      {{ total_criticos }}
+      produtos em situação crítica.
+      {{ percentual_baixo }}
+      por cento do estoque está em alerta.
+    </p>
+
   </div>
 
-  <a href="{{ url_for('tela_produtos') }}" class="kpi-action">
-    Ver todos os produtos <i class="bi bi-arrow-right"></i>
-  </a>
-</article>
+
+  <!-- ===== CABEÇALHO ===== -->
+
+  <header class="dash-header fade-up">
+
+    <div>
+
+      <h1 class="dash-title" id="titulo-dashboard">
+
+        <i
+          class="bi bi-speedometer2"
+          aria-hidden="true"
+        ></i>
+
+        Dashboard
+
+      </h1>
+
+      <p class="dash-sub">
+        Visão geral do estoque, movimentações e resultado financeiro
+      </p>
+
+    </div>
+
+    <div class="dash-chip">
+
+      <span
+        class="pulse-dot"
+        aria-hidden="true"
+      ></span>
+
+      Dados atualizados
+
+    </div>
+
+  </header>
 
 
+  <!-- ===== KPIs PRINCIPAIS ===== -->
+
+  <section
+    class="kpi-grid"
+    aria-labelledby="titulo-indicadores"
+  >
+
+    <h2
+      id="titulo-indicadores"
+      class="sr-only"
+    >
+      Indicadores principais do estoque
+    </h2>
+
+
+    <!-- TOTAL DE PRODUTOS -->
+
+    <article class="card kpi fade-up d-1 kpi-hover">
+
+      <span
+        class="leitor-tab"
+        tabindex="0"
+        aria-label="Total de Produtos. {{ total_produtos }} produtos cadastrados. Itens cadastrados."
+      ></span>
+
+      <div
+        class="kpi-icon ic-blue"
+        aria-hidden="true"
+      >
+
+        <i class="bi bi-box-seam"></i>
+
+      </div>
+
+      <div class="kpi-body">
+
+        <span class="kpi-label">
+          Total de Produtos
+        </span>
+
+        <strong
+          class="kpi-value"
+          data-count="{{ total_produtos }}"
+          aria-label="{{ total_produtos }} produtos cadastrados"
+        >
+          0
+        </strong>
+
+        <span class="kpi-foot">
+          Itens cadastrados
+        </span>
+
+      </div>
+
+      <a
+        href="{{ url_for('tela_produtos') }}"
+        class="kpi-action"
+        aria-label="Ver todos os produtos"
+      >
+
+        Ver todos os produtos
+
+        <i
+          class="bi bi-arrow-right"
+          aria-hidden="true"
+        ></i>
+
+      </a>
+
+    </article>
+
+
+    <!-- ESTOQUE NORMAL -->
 
     <article class="card kpi fade-up d-2">
-      <div class="kpi-icon ic-green"><i class="bi bi-check2-circle"></i></div>
-      <div class="kpi-body">
-        <span class="kpi-label">Estoque Normal</span>
-        <strong class="kpi-value" data-count="{{ estoque_normal }}">0</strong>
-        <span class="kpi-foot">Níveis adequados</span>
+
+      <span
+        class="leitor-tab"
+        tabindex="0"
+        aria-label="Estoque Normal. {{ estoque_normal }} produtos com níveis adequados."
+      ></span>
+
+      <div
+        class="kpi-icon ic-green"
+        aria-hidden="true"
+      >
+
+        <i class="bi bi-check2-circle"></i>
+
       </div>
+
+      <div class="kpi-body">
+
+        <span class="kpi-label">
+          Estoque Normal
+        </span>
+
+        <strong
+          class="kpi-value"
+          data-count="{{ estoque_normal }}"
+          aria-label="{{ estoque_normal }} produtos com estoque normal"
+        >
+          0
+        </strong>
+
+        <span class="kpi-foot">
+          Níveis adequados
+        </span>
+
+      </div>
+
     </article>
+
+
+    <!-- ESTOQUE BAIXO -->
 
     <article class="card kpi fade-up d-3">
-      <div class="kpi-icon ic-amber"><i class="bi bi-exclamation-triangle"></i></div>
-      <div class="kpi-body">
-        <span class="kpi-label">Estoque Baixo</span>
-        <strong class="kpi-value" data-count="{{ estoque_baixo }}">0</strong>
-        <span class="kpi-foot">{{ percentual_baixo }}% do estoque total</span>
+
+      <span
+        class="leitor-tab"
+        tabindex="0"
+        aria-label="Estoque Baixo. {{ estoque_baixo }} produtos. {{ percentual_baixo }} por cento do estoque total."
+      ></span>
+
+      <div
+        class="kpi-icon ic-amber"
+        aria-hidden="true"
+      >
+
+        <i class="bi bi-exclamation-triangle"></i>
+
       </div>
+
+      <div class="kpi-body">
+
+        <span class="kpi-label">
+          Estoque Baixo
+        </span>
+
+        <strong
+          class="kpi-value"
+          data-count="{{ estoque_baixo }}"
+          aria-label="{{ estoque_baixo }} produtos com estoque baixo"
+        >
+          0
+        </strong>
+
+        <span class="kpi-foot">
+          {{ percentual_baixo }}% do estoque total
+        </span>
+
+      </div>
+
     </article>
+
+
+    <!-- ESTOQUE CRÍTICO -->
 
     <article class="card kpi fade-up d-4">
-      <div class="kpi-icon ic-red"><i class="bi bi-activity"></i></div>
-      <div class="kpi-body">
-        <span class="kpi-label">Estoque Crítico</span>
-        <strong class="kpi-value" data-count="{{ total_criticos }}">0</strong>
-        <span class="kpi-foot">Reposição urgente</span>
+
+      <span
+        class="leitor-tab"
+        tabindex="0"
+        aria-label="Estoque Crítico. {{ total_criticos }} produtos. Reposição urgente."
+      ></span>
+
+      <div
+        class="kpi-icon ic-red"
+        aria-hidden="true"
+      >
+
+        <i class="bi bi-activity"></i>
+
       </div>
+
+      <div class="kpi-body">
+
+        <span class="kpi-label">
+          Estoque Crítico
+        </span>
+
+        <strong
+          class="kpi-value"
+          data-count="{{ total_criticos }}"
+          aria-label="{{ total_criticos }} produtos com estoque crítico"
+        >
+          0
+        </strong>
+
+        <span class="kpi-foot">
+          Reposição urgente
+        </span>
+
+      </div>
+
     </article>
 
   </section>
+
 
   <!-- ===== PRODUTOS COM ESTOQUE BAIXO ===== -->
-  <section class="card panel fade-up d-3">
+
+  <section
+    class="card panel fade-up d-3"
+    aria-labelledby="titulo-estoque-baixo"
+  >
+
+    <span
+      class="leitor-tab"
+      tabindex="0"
+      aria-label="Produtos com Estoque Baixo. {{ produtos_baixos|length }} itens."
+    ></span>
+
     <header class="panel-head">
-      <h2><i class="bi bi-list-check"></i> Produtos com Estoque Baixo</h2>
-      <span class="badge-total">{{ produtos_baixos|length }} itens</span>
+
+      <h2 id="titulo-estoque-baixo">
+
+        <i
+          class="bi bi-list-check"
+          aria-hidden="true"
+        ></i>
+
+        Produtos com Estoque Baixo
+
+      </h2>
+
+      <span class="badge-total">
+        {{ produtos_baixos|length }} itens
+      </span>
+
     </header>
 
     <div class="table-wrap">
-      <table class="tbl">
+
+      <table
+        class="tbl"
+        aria-label="Produtos com estoque baixo"
+      >
+
         <thead>
+
           <tr>
-            <th>#</th>
-            <th>Produto</th>
-            <th class="ta-c">Quantidade</th>
-            <th class="ta-c">Mínimo</th>
-            <th class="ta-c">Situação</th>
+
+            <th scope="col">#</th>
+
+            <th scope="col">
+              Produto
+            </th>
+
+            <th
+              class="ta-c"
+              scope="col"
+            >
+              Quantidade
+            </th>
+
+            <th
+              class="ta-c"
+              scope="col"
+            >
+              Mínimo
+            </th>
+
+            <th
+              class="ta-c"
+              scope="col"
+            >
+              Situação
+            </th>
+
           </tr>
+
         </thead>
+
         <tbody>
+
           {% for p in produtos_baixos %}
-          <tr class="" style="animation-delay: {{ loop.index0 * 0.04 }}s">
-            <td class="muted">{{ loop.index }}</td>
-            <td class="strong">{{ p["nome"] }}</td>
-            <td class="ta-c">{{ p["quantidade"] }}</td>
-            <td class="ta-c muted">{{ p["estoque_minimo"] }}</td>
-            <td class="ta-c">
-              {% if p["quantidade"]|int <= 0 %}
-                <span class="tag t-bad">Sem estoque</span>
-              {% elif p["quantidade"]|int <= (p["estoque_minimo"]|int / 2) %}
-                <span class="tag t-bad">Crítico</span>
-              {% else %}
-                <span class="tag t-warn">Baixo</span>
-              {% endif %}
+
+          <tr
+            style="animation-delay: {{ loop.index0 * 0.04 }}s"
+          >
+
+            <td class="muted">
+              {{ loop.index }}
             </td>
+
+            <td class="strong">
+              {{ p["nome"] }}
+            </td>
+
+            <td class="ta-c">
+              {{ p["quantidade"] }}
+            </td>
+
+            <td class="ta-c muted">
+              {{ p["estoque_minimo"] }}
+            </td>
+
+            <td class="ta-c">
+
+              {% if p["quantidade"]|int <= 0 %}
+
+              <span class="tag t-bad">
+                Sem estoque
+              </span>
+
+              {% elif p["quantidade"]|int <= (p["estoque_minimo"]|int / 2) %}
+
+              <span class="tag t-bad">
+                Crítico
+              </span>
+
+              {% else %}
+
+              <span class="tag t-warn">
+                Baixo
+              </span>
+
+              {% endif %}
+
+            </td>
+
           </tr>
+
           {% else %}
-          <tr><td colspan="5" class="empty"><i class="bi bi-emoji-smile"></i> Nenhum produto com estoque baixo.</td></tr>
+
+          <tr>
+
+            <td
+              colspan="5"
+              class="empty"
+            >
+
+              <i
+                class="bi bi-emoji-smile"
+                aria-hidden="true"
+              ></i>
+
+              Nenhum produto com estoque baixo.
+
+            </td>
+
+          </tr>
+
           {% endfor %}
+
         </tbody>
+
       </table>
+
     </div>
+
   </section>
+
 
   <!-- ===== ESTOQUE CRÍTICO ===== -->
-  <section class="card panel fade-up d-4">
+
+  <section
+    class="card panel fade-up d-4"
+    aria-labelledby="titulo-estoque-critico"
+  >
+
+    <span
+      class="leitor-tab"
+      tabindex="0"
+      aria-label="Estoque Crítico. {{ total_criticos }} itens críticos."
+    ></span>
+
     <header class="panel-head">
-      <h2><i class="bi bi-exclamation-octagon ic-txt-red"></i> Estoque Crítico</h2>
-      <span class="badge-total badge-red">{{ total_criticos }} críticos</span>
+
+      <h2 id="titulo-estoque-critico">
+
+        <i
+          class="bi bi-exclamation-octagon ic-txt-red"
+          aria-hidden="true"
+        ></i>
+
+        Estoque Crítico
+
+      </h2>
+
+      <span class="badge-total badge-red">
+        {{ total_criticos }} críticos
+      </span>
+
     </header>
 
     <div class="table-wrap">
-      <table class="tbl">
+
+      <table
+        class="tbl"
+        aria-label="Produtos com estoque crítico"
+      >
+
         <thead>
+
           <tr>
-            <th>#</th>
-            <th>Produto</th>
-            <th class="ta-c">Quantidade</th>
-            <th class="ta-c">Mínimo</th>
+
+            <th scope="col">#</th>
+
+            <th scope="col">
+              Produto
+            </th>
+
+            <th
+              class="ta-c"
+              scope="col"
+            >
+              Quantidade
+            </th>
+
+            <th
+              class="ta-c"
+              scope="col"
+            >
+              Mínimo
+            </th>
+
           </tr>
+
         </thead>
+
         <tbody>
+
           {% for c in estoque_critico %}
-          <tr class="" style="animation-delay: {{ loop.index0 * 0.04 }}s">
-            <td class="muted">{{ loop.index }}</td>
-            <td class="strong">{{ c["nome"] if c["nome"] is defined else "—" }}</td>
-            <td class="ta-c">{{ c["quantidade"] if c["quantidade"] is defined else "—" }}</td>
-            <td class="ta-c muted">{{ c["estoque_minimo"] if c["estoque_minimo"] is defined else "—" }}</td>
+
+          <tr
+            style="animation-delay: {{ loop.index0 * 0.04 }}s"
+          >
+
+            <td class="muted">
+              {{ loop.index }}
+            </td>
+
+            <td class="strong">
+              {{ c["nome"] if c["nome"] is defined else "—" }}
+            </td>
+
+            <td class="ta-c">
+              {{ c["quantidade"] if c["quantidade"] is defined else "—" }}
+            </td>
+
+            <td class="ta-c muted">
+              {{ c["estoque_minimo"] if c["estoque_minimo"] is defined else "—" }}
+            </td>
+
           </tr>
+
           {% else %}
-          <tr><td colspan="4" class="empty"><i class="bi bi-shield-check"></i> Nenhum item em estado crítico.</td></tr>
+
+          <tr>
+
+            <td
+              colspan="4"
+              class="empty"
+            >
+
+              <i
+                class="bi bi-shield-check"
+                aria-hidden="true"
+              ></i>
+
+              Nenhum item em estado crítico.
+
+            </td>
+
+          </tr>
+
           {% endfor %}
+
         </tbody>
+
       </table>
+
     </div>
+
   </section>
+
 
   <!-- ===== FINANCEIRO ===== -->
-  <section class="fin-grid">
+
+  <section
+    class="fin-grid"
+    aria-labelledby="titulo-financeiro"
+  >
+
+    <h2
+      id="titulo-financeiro"
+      class="sr-only"
+    >
+      Informações financeiras
+    </h2>
+
+
+    <!-- VALOR DE CUSTO -->
 
     <article class="card fin fade-up d-1">
-      <span class="fin-label"><i class="bi bi-cash-stack"></i> Valor de Custo</span>
-      <strong class="fin-value">
+
+      <span
+        class="leitor-tab"
+        tabindex="0"
+        aria-label="Valor de Custo. O valor de custo é R$ {{ '%.2f'|format(valores_financeiros['valor_custo']|float) }}."
+      ></span>
+
+      <span class="fin-label">
+
+        <i
+          class="bi bi-cash-stack"
+          aria-hidden="true"
+        ></i>
+
+        Valor de Custo
+
+      </span>
+
+      <strong
+        class="fin-value"
+        aria-hidden="true"
+      >
+
         R$ {{ "%.2f"|format(valores_financeiros["valor_custo"]|float) }}
+
       </strong>
-      <div class="fin-bar"><span class="fin-fill f-blue" style="width:100%"></span></div>
+
+      <div
+        class="fin-bar"
+        aria-hidden="true"
+      >
+
+        <span
+          class="fin-fill f-blue"
+          style="width:100%"
+        ></span>
+
+      </div>
+
     </article>
+
+
+    <!-- VALOR DE VENDA -->
 
     <article class="card fin fade-up d-2">
-      <span class="fin-label"><i class="bi bi-tags"></i> Valor de Venda</span>
-      <strong class="fin-value">
-        R$ {{ "%.2f"|format(valores_financeiros["valor_venda"]|float) }}
-      </strong>
-      <div class="fin-bar"><span class="fin-fill f-cyan" style="width:100%"></span></div>
-    </article>
 
-    <article class="card fin fade-up d-3">
-      <span class="fin-label"><i class="bi bi-graph-up-arrow"></i> Lucro Potencial</span>
-      <strong class="fin-value pos">
-        R$ {{ "%.2f"|format(valores_financeiros["lucro_potencial"]|float) }}
-      </strong>
-      <div class="fin-bar"><span class="fin-fill f-green" style="width:100%"></span></div>
-    </article>
+      <span
+        class="leitor-tab"
+        tabindex="0"
+        aria-label="Valor de Venda. O valor de venda é R$ {{ '%.2f'|format(valores_financeiros['valor_venda']|float) }}."
+      ></span>
 
-  </section>
+      <span class="fin-label">
 
-  <!-- ===== PEDIDOS: ENTRADA x SAÍDA ===== -->
-  <section class="pedidos-grid">
-
-    <!-- ENTRADAS -->
-  <article class="card panel fade-up d-2 kpi-hover">
-    <header class="panel-head">
-      <h2><i class="bi bi-box-arrow-in-down ic-txt-green"></i> Pedidos de Entrada</h2>
-      <span class="badge-total">{{ status_entrada["total_status"] }} pedidos</span>
-    </header>
-
-      <div class="panel-body">
-        <div class="donut" style="--p:{{ status_entrada['percentual_processado'] }};--c:var(--ok)">
-          <div class="donut-hole">
-            <strong>{{ status_entrada["percentual_processado"] }}%</strong>
-            <small>processados</small>
-          </div>
-        </div>
-
-        <ul class="stat-list">
-          <li>
-            <span class="dot d-ok"></span> Processados
-            <b>{{ status_entrada["processados"] }}</b>
-            <div class="mini-bar"><i style="width:{{ status_entrada['percentual_processado'] }}%;background:var(--ok)"></i></div>
-          </li>
-          <li>
-            <span class="dot d-warn"></span> Pendentes
-            <b>{{ status_entrada["pendentes"] }}</b>
-            <div class="mini-bar"><i style="width:{{ status_entrada['percentual_pendente'] }}%;background:var(--warn)"></i></div>
-          </li>
-          <li>
-            <span class="dot d-bad"></span> Cancelados
-            <b>{{ status_entrada["cancelados"] }}</b>
-            <div class="mini-bar"><i style="width:{{ status_entrada['percentual_cancelado'] }}%;background:var(--bad)"></i></div>
-          </li>
-        </ul>
-      </div>
-
-          <a href="{{ url_for('tela_entrada') }}" class="kpi-action act-green">
-      Ver pedidos de entrada <i class="bi bi-arrow-right"></i>
-    </a>
-    </article>
-
-    <!-- SAÍDAS -->
-  <article class="card panel fade-up d-3 kpi-hover">
-    <header class="panel-head">
-      <h2><i class="bi bi-box-arrow-up ic-txt-blue"></i> Pedidos de Saída</h2>
-      <span class="badge-total">{{ status_saida["total_status"] }} pedidos</span>
-    </header>
-
-      <div class="panel-body">
-        <div class="donut" style="--p:{{ status_saida['percentual_processado'] }};--c:var(--brand)">
-          <div class="donut-hole">
-            <strong>{{ status_saida["percentual_processado"] }}%</strong>
-            <small>processados</small>
-          </div>
-        </div>
-
-        <ul class="stat-list">
-          <li>
-            <span class="dot d-ok"></span> Processados
-            <b>{{ status_saida["processados"] }}</b>
-            <div class="mini-bar"><i style="width:{{ status_saida['percentual_processado'] }}%;background:var(--ok)"></i></div>
-          </li>
-          <li>
-            <span class="dot d-warn"></span> Pendentes
-            <b>{{ status_saida["pendentes"] }}</b>
-            <div class="mini-bar"><i style="width:{{ status_saida['percentual_pendente'] }}%;background:var(--warn)"></i></div>
-          </li>
-          <li>
-            <span class="dot d-bad"></span> Cancelados
-            <b>{{ status_saida["cancelados"] }}</b>
-            <div class="mini-bar"><i style="width:{{ status_saida['percentual_cancelado'] }}%;background:var(--bad)"></i></div>
-          </li>
-        </ul>
-      </div>
-
-          <a href="{{ url_for('tela_saida') }}" class="kpi-action act-blue">
-      Ver pedidos de saída <i class="bi bi-arrow-right"></i>
-    </a>
-    </article>
-
-  </section>
-
-  <!-- ===== SAÚDE DO ESTOQUE ===== -->
-  <section class="card panel fade-up d-2">
-    <header class="panel-head">
-      <h2><i class="bi bi-heart-pulse"></i> Saúde do Estoque</h2>
-      <span class="badge-total">{{ percentual_baixo }}% em alerta</span>
-    </header>
-    <div class="health">
-      <div class="health-bar">
-        <span class="h-ok"   style="width:{{ 100 - percentual_baixo }}%"></span>
-        <span class="h-warn" style="width:{{ percentual_baixo }}%"></span>
-      </div>
-      <div class="health-legend">
-        <span><i class="dot d-ok"></i> Normal: <b>{{ estoque_normal }}</b></span>
-        <span><i class="dot d-warn"></i> Baixo: <b>{{ estoque_baixo }}</b></span>
-        <span><i class="dot d-bad"></i> Crítico: <b>{{ total_criticos }}</b></span>
-      </div>
-    </div>
-  </section>
-
-  
-
-</div>
-
-<script>
-  // Contadores animados
-  document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll("[data-count]").forEach(el => {
-      const alvo = parseInt(el.dataset.count || "0", 10);
-      const dur = 900; const ini = performance.now();
-      const step = t => {
-        const p = Math.min((t - ini) / dur, 1);
-        el.textContent = Math.round(alvo * (1 - Math.pow(1 - p, 3)));
-        if (p < 1) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-    });
-
-    // Revelar ao rolar
-    const io = new IntersectionObserver(es => {
-      es.forEach(e => e.isIntersecting && e.target.classList.add("show"));
-    }, { threshold: .12 });
-    document.querySelectorAll(".fade-up").forEach(el => io.observe(el));
-  });
-</script>
-{% endblock %}
+        <i
+          class="bi bi-tags"
+          aria-
+```

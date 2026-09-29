@@ -197,3 +197,115 @@ body{
 /* variantes de cor do botão */
 .kpi-action.act-green { background: linear-gradient(135deg, #22c55e, #16a34a); }
 .kpi-action.act-blue  { background: linear-gradient(135deg, #f6953b, #eb7125); }
+
+
+/* =========================================================
+   ACESSIBILIDADE - NAVEGAÇÃO PELO TECLADO
+   ========================================================= */
+
+/* Mostra onde o usuário está quando utiliza a tecla TAB */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 3px;
+}
+
+
+/* Foco dos links do Dashboard */
+.kpi-action:focus-visible {
+    outline: 3px solid #0f172a;
+    outline-offset: 3px;
+}
+
+
+/* Foco dos elementos que podem receber TAB */
+.dash a:focus-visible,
+.dash button:focus-visible,
+.dash input:focus-visible,
+.dash select:focus-visible,
+.dash textarea:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 3px;
+}
+
+
+/* Mantém o foco visível mesmo nos cards */
+.card:focus-within {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+
+/* Foco do link que aparece dentro dos cards */
+.kpi-hover:focus-within .kpi-action {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+
+/* Permite que o link seja encontrado pelo teclado */
+.kpi-action:focus-visible {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+
+/* Foco das tabelas quando algum elemento receber foco */
+.tbl th:focus-visible,
+.tbl td:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: -3px;
+}
+
+
+/* Melhora a identificação visual dos links */
+.dash a:focus-visible {
+    border-radius: 4px;
+}
+
+
+/* =========================================================
+   ACESSIBILIDADE - SKIP LINK
+   ========================================================= */
+
+/* O link fica invisível normalmente */
+.skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 10px;
+    z-index: 9999;
+    padding: 12px 18px;
+    background: #0f172a;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 8px;
+}
+
+
+/* Quando o usuário apertar TAB, o link aparece */
+.skip-link:focus {
+    left: 10px;
+    top: 10px;
+    outline: 3px solid #2563eb;
+    outline-offset: 3px;
+}
+
+
+/* =========================================================
+   ACESSIBILIDADE - FOCO DO TECLADO
+   ========================================================= */
+
+/* Garante que o foco continue visível durante a navegação */
+:focus-visible {
+    outline-style: solid;
+}
+
+
+/* Remove o outline apenas quando o elemento
+   não estiver sendo acessado pelo teclado */
+:focus:not(:focus-visible) {
+    outline: none;
+}
