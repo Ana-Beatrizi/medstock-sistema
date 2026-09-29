@@ -64,18 +64,27 @@ body.modal-aberto { overflow: hidden; }
     display: inline-flex; align-items: center; justify-content: center;
 }
 
+.filtro-badge[hidden] { display: none; }
+
 .filtros-painel {
     position: absolute; top: 60px; left: 0;
     background: #FFFFFF;
     border: 1px solid #E7EAF0;
     border-radius: 14px;
     box-shadow: 0 10px 24px rgba(16, 24, 64, 0.14);
-    padding: 16px; min-width: 280px;
-    display: none; flex-direction: column; gap: 12px;
+    padding: 16px;
+    width: 380px; max-width: calc(100vw - 48px);
+    max-height: min(78vh, 680px);
+    overflow-y: auto;
+    display: none; flex-direction: column; gap: 14px;
     z-index: 100;
 }
 
 .filtros-painel.aberto { display: flex; }
+
+.filtros-painel::-webkit-scrollbar { width: 5px; }
+.filtros-painel::-webkit-scrollbar-track { background: transparent; }
+.filtros-painel::-webkit-scrollbar-thumb { background: #D5DCE8; border-radius: 10px; }
 
 .filtros-form { display: flex; flex-direction: column; gap: 12px; }
 
@@ -83,7 +92,8 @@ body.modal-aberto { overflow: hidden; }
 
 .filtro-campo > span { font-size: 12.5px; font-weight: 600; color: #536078; }
 
-.filtros-form select {
+.filtros-form select,
+.filtro-select {
     width: 100%; height: 46px; padding: 0 14px;
     border-radius: 10px;
     border: 1px solid #d1d5db;
@@ -92,9 +102,11 @@ body.modal-aberto { overflow: hidden; }
     cursor: pointer; transition: .3s;
 }
 
-.filtros-form select:hover { border-color: #00C4C0; }
+.filtros-form select:hover,
+.filtro-select:hover { border-color: #00C4C0; }
 
-.filtros-form select:focus {
+.filtros-form select:focus,
+.filtro-select:focus {
     outline: none; border-color: #00C4C0;
     box-shadow: 0 0 0 3px rgba(0, 196, 192, .15);
 }
@@ -109,6 +121,101 @@ body.modal-aberto { overflow: hidden; }
 }
 
 .btn-limpar-filtros:hover { background: #FFE0E2; }
+
+.btn-limpar-filtros[hidden] { display: none; }
+
+
+/* ----- Seção "Sanitários e Regulatórios" ----- */
+
+.filtro-secao-titulo {
+    display: flex; align-items: center; gap: 8px;
+    padding-top: 14px;
+    border-top: 1px solid #EEF1F6;
+    color: #00819F;
+    font-size: 12px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: .5px;
+}
+
+.filtro-secao-titulo i { font-size: 14px; }
+
+.filtro-grupo { display: flex; flex-direction: column; gap: 8px; }
+
+.filtro-rotulo { font-size: 12.5px; font-weight: 600; color: #536078; }
+
+
+/* ----- Chips (seleção única) ----- */
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.chips.desativado { opacity: .5; }
+
+.chip {
+    height: 32px; padding: 0 12px;
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #FAFAFA;
+    border: 1px solid #D7DCE6;
+    border-radius: 999px;
+    color: #536078; font-size: 12.5px; font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer; transition: .15s ease;
+}
+
+.chip i { font-size: 12px; }
+
+.chip:hover { border-color: #00C4C0; color: #0B2D6B; }
+
+.chip:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(0, 196, 192, .25); }
+
+.chip:disabled { cursor: not-allowed; }
+
+.chip:disabled:hover { border-color: #D7DCE6; color: #536078; }
+
+.chip.ativo { background: #E6FBFA; border-color: #00C4C0; color: #00819F; }
+
+/* Validade: cores por urgência */
+.chip.chip-perigo:hover { border-color: #DC2626; color: #DC2626; }
+.chip.chip-perigo.ativo { background: #FFEDEE; border-color: #DC2626; color: #DC2626; }
+
+.chip.chip-atencao:hover { border-color: #D97706; color: #D97706; }
+.chip.chip-atencao.ativo { background: #FFF4E5; border-color: #D97706; color: #D97706; }
+
+.chip.chip-aviso:hover { border-color: #CA8A04; color: #A16207; }
+.chip.chip-aviso.ativo { background: #FEFCE8; border-color: #EAB308; color: #A16207; }
+
+
+/* ----- Bolinha da cor da receita (Branca / Azul / Amarela) ----- */
+
+.dot-receita {
+    display: inline-block;
+    width: 11px; height: 11px;
+    margin-right: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(15, 23, 42, .18);
+    flex-shrink: 0;
+    vertical-align: -1px;
+}
+
+.receita-branca { background: #FFFFFF; border-color: #94A3B8; }
+.receita-azul { background: #2563EB; border-color: #1D4ED8; }
+.receita-amarela { background: #FACC15; border-color: #CA8A04; }
+
+/* Dentro do modal a bolinha precisa de espaço até o texto */
+.modal-info-texto .dot-receita { margin-right: 6px; }
+
+
+/* ============================================================
+   RESUMO DE RESULTADOS (busca / filtros)
+============================================================ */
+
+.resultados-info {
+    display: flex; align-items: center; gap: 8px;
+    margin: -12px 0 16px;
+    font-size: 13px; font-weight: 600; color: #536078;
+}
+
+.resultados-info[hidden] { display: none; }
+
+.resultados-info i { color: #00C4C0; }
 
 
 /* ============================================================
@@ -333,7 +440,13 @@ body.modal-aberto { overflow: hidden; }
 
 .card-nome { font-size: 18px; font-weight: 700; color: #17223B; line-height: 1.25; }
 
-.card-preco { margin-top: 6px; display: flex; align-items: baseline; gap: 4px; color: #002D81; }
+/* Linha do preço: preço à esquerda, selo de genérico à direita */
+.card-preco-linha {
+    margin-top: 6px;
+    display: flex; align-items: flex-end; justify-content: space-between; gap: 10px;
+}
+
+.card-preco { display: flex; align-items: baseline; gap: 4px; color: #002D81; }
 
 .card-preco .moeda { font-size: 13px; font-weight: 600; }
 
@@ -341,8 +454,45 @@ body.modal-aberto { overflow: hidden; }
 
 
 /* ============================================================
+   SELO DE MEDICAMENTO GENÉRICO
+   Quadrado amarelo com "G" azul (padrão do genérico).
+   - padrão: card da grade (canto direito da linha do preço)
+   - .compacto: lista e tabela, ao lado do nome
+   - .pill: cabeçalho do modal
+============================================================ */
+
+.selo-generico {
+    flex-shrink: 0;
+    width: 46px; height: 46px;
+    border-radius: 10px;
+    background: #FFC800;
+    color: #1E2A8A;
+    font-size: 32px; font-weight: 900; line-height: 1;
+    display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 3px rgba(16, 24, 64, 0.18);
+    cursor: help;
+    user-select: none;
+}
+
+.selo-generico.compacto {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    font-size: 15px;
+    box-shadow: none;
+}
+
+.selo-generico.pill {
+    width: auto; height: auto;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 11.5px; font-weight: 800; letter-spacing: .2px;
+    box-shadow: none;
+}
+
+
+/* ============================================================
    BADGE DE TARJA (restrição de venda)
-   Aparece no card (acima da categoria), na lista, na tabela
+   Aparece no card (ao lado da foto), na lista, na tabela
    e no cabeçalho do modal. Produto isento = sem badge.
 ============================================================ */
 
@@ -488,7 +638,7 @@ body.modal-aberto { overflow: hidden; }
 
 .linha-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 
-/* Nome + badge de tarja na mesma linha */
+/* Nome + selo de genérico + badge de tarja na mesma linha */
 .linha-titulo { display: flex; align-items: center; gap: 8px; min-width: 0; }
 
 .linha-nome {
@@ -688,8 +838,8 @@ body.modal-aberto { overflow: hidden; }
 
 .modal-header-texto { min-width: 0; }
 
-/* Espaço da badge de tarja no cabeçalho (some quando vazio) */
-.modal-tarja-slot { display: flex; margin-bottom: 8px; }
+/* Espaço dos selos (genérico + tarja) no cabeçalho (some quando vazio) */
+.modal-tarja-slot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 8px; }
 
 .modal-tarja-slot:empty { display: none; }
 
@@ -863,6 +1013,8 @@ body.modal-aberto { overflow: hidden; }
     display: flex; align-items: center; gap: 12px;
 }
 
+.modal-info[hidden] { display: none; }
+
 .modal-info-icone {
     flex-shrink: 0;
     width: 38px; height: 38px;
@@ -876,6 +1028,31 @@ body.modal-aberto { overflow: hidden; }
 .modal-info-texto span { color: #8993A7; font-size: 12px; font-weight: 600; }
 
 .modal-info-texto strong { color: #26334D; font-size: 14px; font-weight: 700; line-height: 1.3; word-break: break-word; }
+
+
+/* DATA DE VALIDADE (situação: no prazo / perto de vencer / vencido) */
+
+.validade-status {
+    margin-left: auto; flex-shrink: 0;
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 700; line-height: 1.2;
+    white-space: nowrap;
+}
+
+.validade-status[hidden] { display: none; }
+
+.validade-status.validade-ok { background: #E6FBFA; color: #00819F; }
+.validade-status.validade-atencao { background: #FFF4E5; color: #D97706; }
+.validade-status.validade-vencida { background: #FFEDEE; color: #DC2626; }
+
+.modal-info.validade-ok .modal-info-icone { background: #E6FBFA; color: #00A6B5; }
+
+.modal-info.validade-atencao { background: #FFFBF3; border-color: #FCE3B8; }
+.modal-info.validade-atencao .modal-info-icone { background: #FFF4E5; color: #D97706; }
+
+.modal-info.validade-vencida { background: #FFF7F7; border-color: #FFD3D3; }
+.modal-info.validade-vencida .modal-info-icone { background: #FFEDEE; color: #DC2626; }
+.modal-info.validade-vencida .modal-info-texto strong { color: #B91C1C; }
 
 
 /* AÇÕES DO MODAL */
@@ -927,7 +1104,7 @@ body.modal-aberto { overflow: hidden; }
 
     .btn-cadastro { justify-content: center; }
 
-    .filtros-painel { left: 0; right: 0; width: 100%; }
+    .filtros-painel { left: 0; right: 0; width: 100%; max-width: none; }
 
     .view-toggle { width: 100%; justify-content: center; }
 
@@ -977,5 +1154,7 @@ body.modal-aberto { overflow: hidden; }
     .linha-estoque { min-width: 70px; }
 
     .linha-meta { display: none; }
+
+    .validade-status { font-size: 10.5px; padding: 4px 8px; }
 
 }

@@ -29,7 +29,7 @@ import smtplib #Simple Mail Transfer Protocol - protocolo para enviar e-mail pel
 # OUTRAS Importações ========
 import uuid
 import random
-from datetime import datetime
+from datetime import datetime, date
 import re
 #re.sub() → substitui partes de um texto.
 #r'\D' - "qualquer caractere que NÃO seja número".
@@ -1602,7 +1602,9 @@ def get_produto_form_cadastro():
         "categoria": request.form.get("categoria", "").strip(),
         "estoque_minimo": to_int(request.form.get("estoque_minimo")),
         "preco_custo": to_float(request.form.get("preco_custo").replace(",", ".")),
-        "preco_venda": to_float(request.form.get("preco_venda").replace(",", ".")),   
+        "preco_venda": to_float(request.form.get("preco_venda").replace(",", ".")),  
+        "data_validade": request.form.get("data_validade") or None,  # Retorna None se estiver vazio
+        "tipo_medicamento": request.form.get("tipo_medicamento", "outros").strip(), 
     }
 # ===============================
 

@@ -78,7 +78,10 @@ VALUES
 	  preco_custo DECIMAL(10,2) NOT NULL DEFAULT 0,
 	  preco_venda DECIMAL(10,2) NOT NULL DEFAULT 0,
       imagem VARCHAR(255) NULL,
+      data_validade DATE,
+      tipo_medicamento ENUM('referencia', 'generico', 'similar', 'biologico', 'fitoterapico', 'outros') DEFAULT 'outros',
       ativo BOOLEAN DEFAULT TRUE,
+
 	  PRIMARY KEY (id),
 	  CONSTRAINT fk_produto_fornecedor FOREIGN KEY (fornecedor_id) REFERENCES fornecedor (id)
 	) ENGINE = InnoDB;
