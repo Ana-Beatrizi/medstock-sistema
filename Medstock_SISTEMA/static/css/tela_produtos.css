@@ -333,11 +333,54 @@ body.modal-aberto { overflow: hidden; }
 
 .card-nome { font-size: 18px; font-weight: 700; color: #17223B; line-height: 1.25; }
 
-.card-preco { margin-top: 6px; display: flex; align-items: baseline; gap: 4px; color: #002D81; }
+/* Linha do preço: preço à esquerda, selo de genérico à direita */
+.card-preco-linha {
+    margin-top: 6px;
+    display: flex; align-items: flex-end; justify-content: space-between; gap: 10px;
+}
+
+.card-preco { display: flex; align-items: baseline; gap: 4px; color: #002D81; }
 
 .card-preco .moeda { font-size: 13px; font-weight: 600; }
 
 .card-preco span:last-child { font-size: 24px; font-weight: 700; }
+
+
+/* ============================================================
+   SELO DE MEDICAMENTO GENÉRICO
+   Quadrado amarelo com "G" azul (padrão do genérico).
+   - padrão: card da grade (canto direito da linha do preço)
+   - .compacto: lista e tabela, ao lado do nome
+   - .pill: cabeçalho do modal
+============================================================ */
+
+.selo-generico {
+    flex-shrink: 0;
+    width: 46px; height: 46px;
+    border-radius: 10px;
+    background: #FFC800;
+    color: #1E2A8A;
+    font-size: 32px; font-weight: 900; line-height: 1;
+    display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 3px rgba(16, 24, 64, 0.18);
+    cursor: help;
+    user-select: none;
+}
+
+.selo-generico.compacto {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    font-size: 15px;
+    box-shadow: none;
+}
+
+.selo-generico.pill {
+    width: auto; height: auto;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 11.5px; font-weight: 800; letter-spacing: .2px;
+    box-shadow: none;
+}
 
 
 /* ============================================================
@@ -488,7 +531,7 @@ body.modal-aberto { overflow: hidden; }
 
 .linha-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 
-/* Nome + badge de tarja na mesma linha */
+/* Nome + selo de genérico + badge de tarja na mesma linha */
 .linha-titulo { display: flex; align-items: center; gap: 8px; min-width: 0; }
 
 .linha-nome {
@@ -688,8 +731,8 @@ body.modal-aberto { overflow: hidden; }
 
 .modal-header-texto { min-width: 0; }
 
-/* Espaço da badge de tarja no cabeçalho (some quando vazio) */
-.modal-tarja-slot { display: flex; margin-bottom: 8px; }
+/* Espaço dos selos (genérico + tarja) no cabeçalho (some quando vazio) */
+.modal-tarja-slot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 8px; }
 
 .modal-tarja-slot:empty { display: none; }
 
@@ -878,6 +921,31 @@ body.modal-aberto { overflow: hidden; }
 .modal-info-texto strong { color: #26334D; font-size: 14px; font-weight: 700; line-height: 1.3; word-break: break-word; }
 
 
+/* DATA DE VALIDADE (situação: no prazo / perto de vencer / vencido) */
+
+.validade-status {
+    margin-left: auto; flex-shrink: 0;
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 700; line-height: 1.2;
+    white-space: nowrap;
+}
+
+.validade-status[hidden] { display: none; }
+
+.validade-status.validade-ok { background: #E6FBFA; color: #00819F; }
+.validade-status.validade-atencao { background: #FFF4E5; color: #D97706; }
+.validade-status.validade-vencida { background: #FFEDEE; color: #DC2626; }
+
+.modal-info.validade-ok .modal-info-icone { background: #E6FBFA; color: #00A6B5; }
+
+.modal-info.validade-atencao { background: #FFFBF3; border-color: #FCE3B8; }
+.modal-info.validade-atencao .modal-info-icone { background: #FFF4E5; color: #D97706; }
+
+.modal-info.validade-vencida { background: #FFF7F7; border-color: #FFD3D3; }
+.modal-info.validade-vencida .modal-info-icone { background: #FFEDEE; color: #DC2626; }
+.modal-info.validade-vencida .modal-info-texto strong { color: #B91C1C; }
+
+
 /* AÇÕES DO MODAL */
 
 .modal-acoes {
@@ -977,5 +1045,7 @@ body.modal-aberto { overflow: hidden; }
     .linha-estoque { min-width: 70px; }
 
     .linha-meta { display: none; }
+
+    .validade-status { font-size: 10.5px; padding: 4px 8px; }
 
 }

@@ -17,11 +17,14 @@ class Produto(Crudmedstock):
         "preco_custo",
         "preco_venda",
         "imagem",
+        "data_validade",
+        "tipo_medicamento",
         "ativo"
+
     ]
 
     def __init__(self, fornecedor_id, nome, quantidade_estoque, categoria, estoque_minimo, preco_custo,
-                 preco_venda, imagem=None, ativo=True):
+                 preco_venda, imagem=None, data_validade=None, tipo_medicamento="outros", ativo=True):
         self.fornecedor_id = fornecedor_id
         self.nome = nome
         self.quantidade_estoque = quantidade_estoque
@@ -30,6 +33,8 @@ class Produto(Crudmedstock):
         self.preco_custo = preco_custo
         self.preco_venda = preco_venda
         self.imagem = imagem
+        self.data_validade = data_validade
+        self.tipo_medicamento = tipo_medicamento
         self.ativo = ativo
 
 

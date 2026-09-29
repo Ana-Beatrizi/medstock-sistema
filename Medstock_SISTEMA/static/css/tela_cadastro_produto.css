@@ -15,7 +15,7 @@ body {
     margin-top: 20px;
     align-items: center;
     grid-template-columns: 1fr 1fr;
-  
+
 }
 
 .logo {
@@ -54,7 +54,7 @@ body {
 .link-offset-1{
     display: flex;
     justify-content: flex-end;
-    
+
 }
 
 .form-check{
@@ -70,14 +70,132 @@ body {
 #cadastro-form{
     align-items: center;
     grid-template-columns: 1fr 1fr;
-    
-   
+
+
 }
 
 #linha{
     display: flex;
     flex-direction: row;
 }
+
+/* =========================================================
+   PREÇO DE CUSTO / PREÇO DE VENDA (MARGEM AUTOMÁTICA)
+========================================================= */
+
+/* Linha do rótulo: título à esquerda, badge à direita */
+.label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 26px;
+    margin-bottom: 0.5rem;
+}
+
+.label-row .form-label {
+    margin-bottom: 0;
+}
+
+/* Badge com a porcentagem de margem */
+.margem-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    padding: 3px 10px;
+
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    white-space: nowrap;
+
+    background: #e6f7f9;
+    color: #00819f;
+
+    border: 1px solid #bfe6ec;
+    border-radius: 999px;
+
+    transition:
+        background-color 0.25s ease,
+        color 0.25s ease,
+        border-color 0.25s ease;
+}
+
+.margem-badge i {
+    font-size: 11px;
+}
+
+/* Sem custo informado ainda */
+.margem-badge.vazia {
+    background: #f1f5f9;
+    color: #64748b;
+    border-color: #e2e8f0;
+}
+
+/* Preço editado manualmente */
+.margem-badge.manual {
+    background: #fff7e6;
+    color: #b45309;
+    border-color: #fde3b0;
+}
+
+/* Venda abaixo do custo */
+.margem-badge.negativa {
+    background: #fee2e2;
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+
+/* Texto de ajuda abaixo do campo */
+.preco-hint {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+
+    margin-top: 6px;
+
+    font-size: 12px;
+    color: #64748b;
+}
+
+.preco-hint i {
+    color: #00819f;
+}
+
+/* Botão "Restaurar 60%" */
+.btn-restaurar {
+    display: none;
+
+    padding: 0;
+    margin-left: 2px;
+
+    background: none;
+    border: none;
+
+    font-size: 12px;
+    font-weight: 600;
+    color: #00819f;
+
+    text-decoration: underline;
+    cursor: pointer;
+
+    transition: color 0.25s ease;
+}
+
+.btn-restaurar i {
+    color: inherit;
+}
+
+.btn-restaurar.visivel {
+    display: inline;
+}
+
+.btn-restaurar:hover {
+    color: #002D81;
+}
+
 /* =========================================================
    FOTO DO PRODUTO
 ========================================================= */
@@ -346,4 +464,3 @@ body {
         font-size: 20px;
     }
 }
-
