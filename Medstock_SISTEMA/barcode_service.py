@@ -36,7 +36,6 @@ TAMANHO_MAX_IMAGEM = 3 * 1024 * 1024  # 3 MB
 
 HEADERS = {
     "User-Agent": "Cosmos-API-Request",
-    "X-Cosmos-Token": COSMOS_TOKEN
 }
 
 
@@ -196,9 +195,9 @@ def _fonte_cosmos(codigo):
     if not COSMOS_TOKEN:
         return None
     d = _get_json(
-        f"https://api.cosmos.bluesoft.com.br/gtins/{codigo}.json",
-        headers={"X-Cosmos-Token": COSMOS_TOKEN},
-    )
+    f"https://cosmos.bluesoft.com.br/api/gtins/{codigo}.json",
+    headers={"X-Cosmos-Token": COSMOS_TOKEN},
+)
     if not d:
         return None
 
