@@ -4,7 +4,7 @@
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password": "123456",
+    "password": "",
     "database": "Medstock_db",
     "auth_plugin": "mysql_native_password" 
 }

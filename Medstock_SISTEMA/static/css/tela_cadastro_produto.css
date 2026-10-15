@@ -1,6 +1,6 @@
 body {
     background: linear-gradient(90deg,#002D81 0%, #00819F 50%, #00C4C0 100%);
-    height: 100vh;
+    min-height: 100vh;
     font-family: 'Inter', sans-serif;
 }
 
@@ -10,12 +10,12 @@ body {
     border-radius: 16px;
     padding: 40px;
     width: 100%;
-    max-width: 600px;
+    max-width: 640px;
     border: 1px solid rgba(255,255,255,0.1);
     margin-top: 20px;
+    margin-bottom: 30px;
     align-items: center;
     grid-template-columns: 1fr 1fr;
-
 }
 
 .logo {
@@ -49,12 +49,9 @@ body {
     color: #94a3b8 !important;
 }
 
-
-
 .link-offset-1{
     display: flex;
     justify-content: flex-end;
-
 }
 
 .form-check{
@@ -70,8 +67,6 @@ body {
 #cadastro-form{
     align-items: center;
     grid-template-columns: 1fr 1fr;
-
-
 }
 
 #linha{
@@ -83,7 +78,6 @@ body {
    PREÇO DE CUSTO / PREÇO DE VENDA (MARGEM AUTOMÁTICA)
 ========================================================= */
 
-/* Linha do rótulo: título à esquerda, badge à direita */
 .label-row {
     display: flex;
     align-items: center;
@@ -97,7 +91,6 @@ body {
     margin-bottom: 0;
 }
 
-/* Badge com a porcentagem de margem */
 .margem-badge {
     display: inline-flex;
     align-items: center;
@@ -126,28 +119,24 @@ body {
     font-size: 11px;
 }
 
-/* Sem custo informado ainda */
 .margem-badge.vazia {
     background: #f1f5f9;
     color: #64748b;
     border-color: #e2e8f0;
 }
 
-/* Preço editado manualmente */
 .margem-badge.manual {
     background: #fff7e6;
     color: #b45309;
     border-color: #fde3b0;
 }
 
-/* Venda abaixo do custo */
 .margem-badge.negativa {
     background: #fee2e2;
     color: #b91c1c;
     border-color: #fecaca;
 }
 
-/* Texto de ajuda abaixo do campo */
 .preco-hint {
     display: flex;
     align-items: center;
@@ -164,7 +153,6 @@ body {
     color: #00819f;
 }
 
-/* Botão "Restaurar 60%" */
 .btn-restaurar {
     display: none;
 
@@ -205,9 +193,6 @@ body {
     margin-top: 4px;
 }
 
-
-/* TÍTULO */
-
 .foto-produto > label:first-child {
     display: block;
     font-size: 16px;
@@ -215,9 +200,6 @@ body {
     color: #27364a;
     margin-bottom: 8px;
 }
-
-
-/* ÁREA DE UPLOAD */
 
 .upload-area {
     width: 100%;
@@ -250,9 +232,6 @@ body {
     box-sizing: border-box;
 }
 
-
-/* ÍCONE */
-
 .upload-area i {
     font-size: 28px;
 
@@ -262,9 +241,6 @@ body {
         color 0.25s ease,
         transform 0.25s ease;
 }
-
-
-/* TEXTO PRINCIPAL */
 
 .upload-area span {
     font-size: 14px;
@@ -281,9 +257,6 @@ body {
     white-space: nowrap;
 }
 
-
-/* FORMATOS */
-
 .upload-area small {
     font-size: 11px;
 
@@ -293,9 +266,6 @@ body {
 
     letter-spacing: 0.5px;
 }
-
-
-/* HOVER */
 
 .upload-area:hover {
     background: #f7fcfd;
@@ -308,15 +278,11 @@ body {
     transform: translateY(-1px);
 }
 
-
 .upload-area:hover i {
     color: #00a6b8;
 
     transform: translateY(-3px);
 }
-
-
-/* QUANDO O INPUT ESTÁ FOCADO */
 
 #imagem:focus + .upload-area {
     border-color: #00819f;
@@ -324,11 +290,6 @@ body {
     box-shadow:
         0 0 0 4px rgba(0, 129, 159, 0.12);
 }
-
-
-/* =========================================================
-   ARQUIVO SELECIONADO
-========================================================= */
 
 .upload-area.arquivo-selecionado {
     border-color: #00a6b8;
@@ -338,17 +299,380 @@ body {
     background: #f0fbfc;
 }
 
-
 .upload-area.arquivo-selecionado i {
     color: #00a6b8;
 }
 
+/* Pré-visualização da foto (escolhida ou vinda da consulta automática) */
+.preview-foto {
+    width: 110px;
+    height: 110px;
+
+    object-fit: contain;
+
+    background: #ffffff;
+
+    border: 1px solid #dce8f2;
+    border-radius: 12px;
+
+    padding: 6px;
+
+    box-shadow: 0 4px 12px rgba(0, 45, 129, 0.08);
+}
+
+.preview-foto[hidden],
+.upload-area i[hidden] {
+    display: none;
+}
+
+/* =========================================================
+   CADASTRO INTELIGENTE (CÓDIGO DE BARRAS)
+========================================================= */
+
+.smart-box {
+    margin: 4px 0 24px;
+    padding: 18px;
+
+    background: linear-gradient(135deg, #eef6ff 0%, #e8fafa 100%);
+
+    border: 1px solid #cfe3f3;
+    border-radius: 14px;
+
+    box-shadow: 0 4px 16px rgba(0, 45, 129, 0.06);
+}
+
+.smart-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    margin-bottom: 14px;
+}
+
+.smart-header > i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    font-size: 22px;
+    color: #ffffff;
+
+    background: linear-gradient(90deg,#002D81 0%, #00819F 50%, #00C4C0 100%);
+    border-radius: 12px;
+}
+
+.smart-header strong {
+    display: block;
+
+    font-size: 15px;
+    font-weight: 600;
+    color: #002D81;
+
+    line-height: 1.2;
+}
+
+.smart-header small {
+    display: block;
+
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* Linha do campo + botões */
+.smart-input .input-group-text {
+    background: #ffffff;
+    color: #00819f;
+    border-color: #cfe3f3;
+}
+
+.smart-input .form-control {
+    background: #ffffff;
+    color: #0f172a;
+    border-color: #cfe3f3;
+
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    font-variant-numeric: tabular-nums;
+}
+
+.smart-input .form-control:focus {
+    background: #ffffff;
+    color: #0f172a;
+    border-color: #00a6b8;
+    box-shadow: 0 0 0 4px rgba(0, 166, 184, 0.15);
+}
+
+.smart-input .form-control::placeholder {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: #94a3b8;
+}
+
+.btn-smart {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    padding: 0 16px;
+
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+
+    background: linear-gradient(90deg,#002D81 0%, #00819F 100%);
+
+    border: none;
+
+    cursor: pointer;
+
+    transition:
+        opacity 0.25s ease,
+        filter 0.25s ease;
+}
+
+.btn-smart:hover {
+    filter: brightness(1.1);
+}
+
+.btn-smart:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.btn-smart.btn-smart-camera {
+    background: #ffffff;
+    color: #002D81;
+
+    border: 1px solid #cfe3f3;
+    border-left: none;
+}
+
+.btn-smart.btn-smart-camera:hover {
+    background: #f0fbfc;
+    filter: none;
+}
+
+/* Mensagem de status */
+.smart-status {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+
+    margin-top: 12px;
+    padding: 9px 12px;
+
+    font-size: 13px;
+    line-height: 1.4;
+    color: #475569;
+
+    background: rgba(255, 255, 255, 0.75);
+
+    border: 1px solid #dce8f2;
+    border-radius: 10px;
+
+    transition:
+        background-color 0.25s ease,
+        color 0.25s ease,
+        border-color 0.25s ease;
+}
+
+.smart-status i {
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.smart-status.carregando {
+    color: #00819f;
+    background: #f0fbfc;
+    border-color: #bfe6ec;
+}
+
+.smart-status.carregando i {
+    animation: smart-girar 0.9s linear infinite;
+}
+
+.smart-status.ok {
+    color: #166534;
+    background: #ecfdf3;
+    border-color: #bbf7d0;
+}
+
+.smart-status.aviso {
+    color: #b45309;
+    background: #fff7e6;
+    border-color: #fde3b0;
+}
+
+.smart-status.erro {
+    color: #b91c1c;
+    background: #fee2e2;
+    border-color: #fecaca;
+}
+
+@keyframes smart-girar {
+    to { transform: rotate(360deg); }
+}
+
+/* Produto já cadastrado */
+.dup-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    margin-top: 10px;
+    padding: 12px 14px;
+
+    background: #fff7e6;
+
+    border: 1px solid #fde3b0;
+    border-radius: 12px;
+}
+
+.dup-banner[hidden],
+.preco-ref[hidden],
+.leitor-wrap[hidden] {
+    display: none;
+}
+
+.dup-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dup-info > i {
+    font-size: 20px;
+    color: #b45309;
+}
+
+.dup-info strong {
+    display: block;
+
+    font-size: 14px;
+    color: #78350f;
+}
+
+.dup-info small {
+    display: block;
+
+    font-size: 12px;
+    color: #b45309;
+}
+
+.dup-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 7px 13px;
+
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+
+    background: #d97706;
+
+    border-radius: 9px;
+
+    text-decoration: none;
+
+    transition: background-color 0.25s ease;
+}
+
+.dup-link:hover {
+    background: #b45309;
+    color: #ffffff;
+}
+
+/* Preço de referência */
+.preco-ref {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-top: 10px;
+    padding: 8px 12px;
+
+    font-size: 12px;
+    color: #00819f;
+
+    background: #e6f7f9;
+
+    border: 1px solid #bfe6ec;
+    border-radius: 10px;
+}
+
+/* Leitor por câmera */
+.leitor-wrap {
+    margin-top: 12px;
+    padding: 10px;
+
+    background: #0f172a;
+
+    border-radius: 12px;
+
+    text-align: center;
+}
+
+#leitor {
+    width: 100%;
+    overflow: hidden;
+
+    border-radius: 8px;
+}
+
+#leitor video {
+    width: 100% !important;
+    border-radius: 8px;
+}
+
+.btn-fechar-camera {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    margin-top: 10px;
+    padding: 7px 16px;
+
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+
+    background: rgba(255, 255, 255, 0.12);
+
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 9px;
+
+    cursor: pointer;
+
+    transition: background-color 0.25s ease;
+}
+
+.btn-fechar-camera:hover {
+    background: rgba(255, 255, 255, 0.22);
+}
 
 /* =========================================================
    RESPONSIVO
 ========================================================= */
 
 @media (max-width: 768px) {
+
+    .cadastro-card {
+        padding: 24px 18px;
+    }
 
     .upload-area {
         min-height: 100px;
@@ -363,6 +687,18 @@ body {
         font-size: 13px;
     }
 
+    /* No celular os botões do código de barras ficam só com o ícone */
+    .btn-smart span {
+        display: none;
+    }
+
+    .btn-smart {
+        padding: 0 14px;
+    }
+
+    .smart-box {
+        padding: 14px;
+    }
 }
 
 /* =========================================
@@ -409,7 +745,6 @@ body {
         box-shadow 0.25s ease;
 }
 
-/* Ícone */
 #btn-voltar a i {
     font-size: 18px;
     line-height: 1;
@@ -417,30 +752,21 @@ body {
     transition: transform 0.25s ease;
 }
 
-/* Hover */
 #btn-voltar a:hover {
-
-
     transform: translateY(-2px);
 
     box-shadow:
         0 8px 20px rgba(0, 45, 129, 0.18);
 }
 
-/* Movimento da seta */
 #btn-voltar a:hover i {
     transform: translateX(-4px);
 }
 
-/* Clique */
 #btn-voltar a:active {
     transform: translateY(0);
     box-shadow: 0 3px 8px rgba(0, 45, 129, 0.12);
 }
-
-/* =========================================
-   RESPONSIVO
-   ========================================= */
 
 @media (max-width: 768px) {
     #btn-voltar {
