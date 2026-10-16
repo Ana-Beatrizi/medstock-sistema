@@ -11,6 +11,11 @@ Bases consultadas (em ordem de prioridade):
   3. UPCitemdb (plano trial, sem chave, limite diário baixo)
 
 Dependência:  pip install requests
+
+# $env:COSMOS_TOKEN="th8i6PVxyNMv8khJ8mvwoA"
+
+# $env:COSMOS_TOKEN="th8i6PVxyNMv8khJ8mvwoA" 
+>> python app.py
 """
 
 import ipaddress

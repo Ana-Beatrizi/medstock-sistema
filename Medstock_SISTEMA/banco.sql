@@ -87,6 +87,13 @@ VALUES
 	) ENGINE = InnoDB;
     
 
+ALTER TABLE produto
+    ADD COLUMN codigo_barras VARCHAR(14) NULL AFTER nome,
+    ADD COLUMN marca VARCHAR(100) NULL AFTER codigo_barras;
+    
+    CREATE UNIQUE INDEX uq_produto_codigo_barras ON produto (codigo_barras);
+    
+    
 
 INSERT INTO produto
 (fornecedor_id, nome, quantidade_estoque, categoria, estoque_minimo, preco_custo, preco_venda, ativo)
