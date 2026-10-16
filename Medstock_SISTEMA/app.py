@@ -17,6 +17,8 @@ from models.saida import PedidoSaida
 from models.fornecedor import Fornecedor
 from models.cliente_cadastro import ClientesCadastro
 from models.movimentacao import Movimentacao
+from models.relatorios import relatorios_bp
+
 #============================
 
 # Importações E-MAIL ========
@@ -46,6 +48,8 @@ CORS(app)
 app.secret_key = "Medstock_programa_de_estoque_123456"
 
 #! = Feito pela -- Ana Beatriz // linha 1 a 1880 𖹭.ᐟ
+
+app.register_blueprint(relatorios_bp)
 
 UPLOAD_FOLDER = "static/uploads/produtos"
 

@@ -1,0 +1,200 @@
+{% extends "tela_home.html" %}
+
+{% block conteudo %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tela_relatorios.css') }}">
+
+{% macro celula(valor, fmt) -%}
+  {%- if valor is none or valor == '' -%}—
+  {%- elif fmt == 'moeda' -%}{{ valor | brl }}
+  {%- elif fmt == 'int' -%}{{ valor | inteiro }}
+  {%- elif fmt == 'pct' -%}{{ valor }}%
+  {%- elif fmt == 'data' -%}{{ valor.strftime('%d/%m/%Y') }}
+  {%- elif fmt == 'datahora' -%}{{ valor.strftime('%d/%m/%Y %H:%M') }}
+  {%- elif fmt == 'badge' -%}
+    <span class="rel-badge badge-{{ valor | lower | replace(' ', '-') }}">{{ valor }}</span>
+  {%- else -%}{{ valor }}
+  {%- endif -%}
+{%- endmacro %}
+
+<main class="rel-page">
+
+  <!-- Cabeçalho -->
+  <header class="rel-hero">
+    <div class="rel-hero-icon"><i class="bi bi-bar-chart-line"></i></div>
+    <div>
+      <span class="rel-pill"><span class="dot"></span>Relatórios</span>
+      <h1>Relatórios — <span>MEDSTOCK</span></h1>
+      <p>Consulta e exportação de dados do estoque</p>
+    </div>
+  </header>
+
+  <form method="get" action="{{ url_for('relatorios.tela_relatorios') }}" id="formRelatorio">
+
+    <!-- Tipo de relatório -->
+    <h2 class="rel-section-title">Tipo de relatório</h2>
+    <div class="rel-tipos">
+      {% set icones = {
+        'estoque': 'bi-box-seam',
+        'movimentacao': 'bi-arrow-left-right',
+        'baixo': 'bi-exclamation-triangle',
+        'validade': 'bi-calendar2-x',
+        'financeiro': 'bi-cash-coin'
+      } %}
+      {% set descricoes = {
+        'estoque': 'Produtos, categorias, fornecedores, quantidades, mínimo e valores.',
+        'movimentacao': 'Movimentações por período e tipo, com quantidades e valores.',
+        'baixo': 'Produtos que precisam de reposição conforme o estoque mínimo.',
+        'validade': 'Medicamentos vencidos ou próximos do vencimento.',
+        'financeiro': 'Valor do estoque, potencial de venda e margem estimada.'
+      } %}
+      {% for chave, nome in tipos.items() %}
+      <label class="rel-tipo {{ 'ativo' if f.tipo == chave }}">
+        <input type="radio" name="tipo" value="{{ chave }}" {{ 'checked' if f.tipo == chave }}>
+        <span class="rel-tipo-icone"><i class="bi {{ icones[chave] }}"></i></span>
+        <span class="rel-tipo-texto">
+          <strong>{{ nome }}</strong>
+          <small>{{ descricoes[chave] }}</small>
+        </span>
+      </label>
+      {% endfor %}
+    </div>
+
+    <!-- Filtros -->
+    <h2 class="rel-section-title">Filtros</h2>
+    <section class="rel-card rel-filtros">
+
+      <div class="rel-campo" data-tipos="movimentacao financeiro">
+        <label for="data_inicial">Data inicial</label>
+        <input type="date" id="data_inicial" name="data_inicial" value="{{ f.data_inicial }}">
+      </div>
+
+      <div class="rel-campo" data-tipos="movimentacao financeiro">
+        <label for="data_final">Data final</label>
+        <input type="date" id="data_final" name="data_final" value="{{ f.data_final }}">
+      </div>
+
+      <div class="rel-campo" data-tipos="movimentacao">
+        <label for="tipo_mov">Tipo de movimentação</label>
+        <select id="tipo_mov" name="tipo_mov">
+          <option value="">Entradas e saídas</option>
+          <option value="ENTRADA" {{ 'selected' if f.tipo_mov == 'ENTRADA' }}>Somente entradas</option>
+          <option value="SAIDA"   {{ 'selected' if f.tipo_mov == 'SAIDA' }}>Somente saídas</option>
+        </select>
+      </div>
+
+      <div class="rel-campo" data-tipos="estoque movimentacao baixo validade">
+        <label for="fornecedor_id">Fornecedor</label>
+        <select id="fornecedor_id" name="fornecedor_id">
+          <option value="">Todos</option>
+          {% for fo in fornecedores %}
+          <option value="{{ fo.id }}" {{ 'selected' if f.fornecedor_id|string == fo.id|string }}>{{ fo.nome_fornecedor }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="rel-campo" data-tipos="estoque baixo validade">
+        <label for="categoria">Categoria</label>
+        <select id="categoria" name="categoria">
+          <option value="">Todas</option>
+          {% for c in categorias %}
+          <option value="{{ c }}" {{ 'selected' if f.categoria == c }}>{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="rel-campo" data-tipos="validade">
+        <label for="prazo">Prazo de validade</label>
+        <select id="prazo" name="prazo">
+          <option value="vencidos" {{ 'selected' if f.prazo == 'vencidos' }}>Somente vencidos</option>
+          <option value="30" {{ 'selected' if f.prazo == '30' }}>Vencidos + até 30 dias</option>
+          <option value="60" {{ 'selected' if f.prazo == '60' }}>Vencidos + até 60 dias</option>
+          <option value="90" {{ 'selected' if f.prazo == '90' }}>Vencidos + até 90 dias</option>
+        </select>
+      </div>
+
+      <div class="rel-acoes">
+        <button type="submit" class="btn-rel btn-primario">
+          <i class="bi bi-search"></i> Gerar relatório
+        </button>
+        <button type="submit" class="btn-rel btn-secundario"
+                formaction="{{ url_for('relatorios.exportar_excel') }}">
+          <i class="bi bi-file-earmark-excel"></i> Excel
+        </button>
+        <button type="button" class="btn-rel btn-secundario" onclick="window.print()">
+          <i class="bi bi-file-earmark-pdf"></i> PDF
+        </button>
+      </div>
+    </section>
+  </form>
+
+  <!-- Resumo -->
+  <section class="rel-resumo">
+    {% for rotulo, valor, fmt, icone in resumo %}
+    <article class="rel-stat">
+      <span class="rel-stat-icone"><i class="bi {{ icone }}"></i></span>
+      <div>
+        <small>{{ rotulo }}</small>
+        <strong>{{ celula(valor, fmt) }}</strong>
+      </div>
+    </article>
+    {% endfor %}
+  </section>
+
+  <!-- Resultado -->
+  <section class="rel-card rel-resultado">
+    <div class="rel-resultado-topo">
+      <div>
+        <h3>{{ titulo_relatorio }}</h3>
+        <small>Gerado em {{ gerado_em }} · {{ linhas|length }} registro(s)</small>
+      </div>
+    </div>
+
+    {% if linhas %}
+    <div class="rel-tabela-wrap">
+      <table class="rel-tabela">
+        <thead>
+          <tr>{% for chave, rotulo, fmt in colunas %}
+            <th class="{{ 'num' if fmt in ('int','moeda','pct') }}">{{ rotulo }}</th>
+          {% endfor %}</tr>
+        </thead>
+        <tbody>
+          {% for l in linhas %}
+          <tr>
+            {% for chave, rotulo, fmt in colunas %}
+            <td class="{{ 'num' if fmt in ('int','moeda','pct') }}" data-label="{{ rotulo }}">{{ celula(l[chave], fmt) }}</td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="rel-vazio">
+      <i class="bi bi-inbox"></i>
+      <p>Nenhum registro encontrado para os filtros selecionados.</p>
+    </div>
+    {% endif %}
+  </section>
+</main>
+
+<script>
+  const form = document.getElementById('formRelatorio');
+
+  function atualizarCampos() {
+    const tipo = form.querySelector('input[name="tipo"]:checked').value;
+    form.querySelectorAll('.rel-tipo').forEach(el =>
+      el.classList.toggle('ativo', el.querySelector('input').checked));
+    form.querySelectorAll('.rel-campo').forEach(el => {
+      const visivel = el.dataset.tipos.split(' ').includes(tipo);
+      el.style.display = visivel ? '' : 'none';
+      el.querySelectorAll('input, select').forEach(i => i.disabled = !visivel);
+    });
+  }
+
+  form.querySelectorAll('input[name="tipo"]').forEach(r =>
+    r.addEventListener('change', () => { atualizarCampos(); form.submit(); }));
+
+  atualizarCampos();
+</script>
+{% endblock %}
