@@ -63,6 +63,10 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 UPLOAD_PRODUTOS = os.path.join(app.root_path, "static", "uploads", "produtos")
 EXTENSOES_IMAGEM = {".png", ".jpg", ".jpeg", ".webp"}
 
+from services.api_produtos_mobile import mobile_produtos
+
+app.register_blueprint(mobile_produtos)
+
 # CODIGO BARRAS ======================
 # =========================================================
 # MEDSTOCK - CADASTRO DE PRODUTO + CADASTRO INTELIGENTE
