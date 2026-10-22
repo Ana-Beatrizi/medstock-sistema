@@ -18,6 +18,28 @@
 
     <!-- Fonte -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <title>Home | MEDSTOCK</title>
+
+    <!-- Acessibilidade: aplica em todas as telas o que foi escolhido no perfil -->
+    <script>
+        (function () {
+            try {
+                var saved = JSON.parse(localStorage.getItem('medstock_a11y'));
+                if (!saved) return;
+                var steps = [100, 110, 125, 150, 175];
+                var root = document.documentElement;
+                var nivel = saved.text || 0;
+
+                root.style.setProperty('--a11y-zoom', steps[nivel] / 100);
+                root.classList.toggle('a11y-zoomed', nivel > 0);
+
+                Object.keys(saved.flags || {}).forEach(function (cls) {
+                    root.classList.toggle(cls, !!saved.flags[cls]);
+                });
+            } catch (e) {}
+        })();
+    </script>
 </head>
 
 <body>

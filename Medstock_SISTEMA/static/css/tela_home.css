@@ -845,3 +845,128 @@ body {
         animation: none !important;
     }
 }
+
+/* ================= ACESSIBILIDADE (aplicada em todas as telas) ================= */
+
+/* Tamanho do texto: amplia o conteúdo (sem mexer na navbar e na sidebar) */
+html.a11y-zoomed .conteudo > * {
+    zoom: var(--a11y-zoom, 1);
+}
+
+/* Modo escuro (inverte tudo, preservando imagens) */
+html.a11y-dark {
+    filter: invert(1) hue-rotate(180deg);
+}
+html.a11y-dark img {
+    filter: invert(1) hue-rotate(180deg);
+}
+
+/* Escala de cinza */
+html.a11y-gray {
+    filter: grayscale(1);
+}
+html.a11y-dark.a11y-gray {
+    filter: invert(1) hue-rotate(180deg) grayscale(1);
+}
+
+/* Destacar links e botões */
+html.a11y-links a,
+html.a11y-links button {
+    text-decoration: underline !important;
+    outline: 2px solid #00C4C0;
+    outline-offset: 2px;
+}
+
+/* Fonte legível */
+html.a11y-font body,
+html.a11y-font body *:not(.bi):not([class^="bi-"]) {
+    font-family: Verdana, Tahoma, Arial, sans-serif !important;
+}
+
+/* Espaçamento maior */
+html.a11y-spacing .conteudo,
+html.a11y-spacing .sidebar,
+html.a11y-spacing .navbar {
+    letter-spacing: 0.06em;
+    word-spacing: 0.16em;
+    line-height: 1.8;
+}
+
+/* Cursor grande */
+html.a11y-cursor,
+html.a11y-cursor * {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24'><path d='M3 2l7 19 3-8 8-3z' fill='%23002D81' stroke='%2300C4C0' stroke-width='1.5' stroke-linejoin='round'/></svg>") 4 2, auto !important;
+}
+
+/* Parar animações */
+html.a11y-motion *,
+html.a11y-motion *::before,
+html.a11y-motion *::after {
+    animation: none !important;
+    transition: none !important;
+}
+
+/* ---------- Alto contraste: navbar, sidebar e conteúdo ---------- */
+html.a11y-contrast body {
+    background: #000000;
+}
+
+html.a11y-contrast .navbar {
+    background: #000000;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-bottom: 2px solid #ffff00;
+}
+
+html.a11y-contrast .sidebar {
+    background: #000000;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-right: 2px solid #ffff00;
+    box-shadow: none;
+}
+
+html.a11y-contrast .menu li a,
+html.a11y-contrast .btn-menu,
+html.a11y-contrast .btn-icon-nav,
+html.a11y-contrast .user-nav,
+html.a11y-contrast .user-nav-name,
+html.a11y-contrast .user-nav-hello,
+html.a11y-contrast .sb-brand-text,
+html.a11y-contrast .sb-menu li a,
+html.a11y-contrast .sb-menu li a i,
+html.a11y-contrast .sb-logout,
+html.a11y-contrast .sb-version {
+    color: #ffffff;
+}
+
+html.a11y-contrast .sb-section {
+    color: #ffff00;
+}
+
+html.a11y-contrast .sb-menu li a.active,
+html.a11y-contrast .sb-menu li a.active i {
+    color: #ffff00;
+}
+
+/* hover: fundo amarelo e texto preto (inclusive com a sidebar recolhida) */
+html.a11y-contrast .sb-menu li a:hover,
+html.a11y-contrast .sb-logout:hover,
+html.a11y-contrast .sidebar.close .sb-menu li a:hover,
+html.a11y-contrast .sidebar.close .sb-logout:hover,
+html.a11y-contrast .menu li a:hover {
+    background: #ffff00;
+    color: #000000 !important;
+}
+
+html.a11y-contrast .sb-menu li a:hover i,
+html.a11y-contrast .sb-logout:hover i {
+    color: #000000;
+}
+
+/* conteúdo das telas (sem !important: o contraste específico do perfil continua valendo) */
+html.a11y-contrast .conteudo :where(*) {
+    background-color: #000000;
+    color: #ffffff;
+    border-color: #ffffff;
+}

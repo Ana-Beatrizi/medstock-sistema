@@ -385,7 +385,7 @@
     border-color: #00829F;
 }
 
-/* ================= ACESSIBILIDADE: EFEITOS (aplicados no <html>) ================= */
+/* ================= ACESSIBILIDADE: EFEITOS ================= */
 
 /* Tamanho do texto: amplia o conteúdo do perfil */
 html.a11y-zoomed .profile-wrapper {
