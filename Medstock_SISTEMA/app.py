@@ -2086,7 +2086,139 @@ def cancelar_saida(id):
         flash(f"Erro ao cancelar pedido: {e}", "erro")
     return redirect(url_for("tela_saida"))
 
+# ==========================================================
+# API - FORNECEDORES
+# ==========================================================
 
+@app.route("/api/fornecedores", methods=["GET"])
+def api_fornecedores():
+
+    try:
+
+        conn = conectar_banco.connect()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT
+                id,
+                nome_fornecedor,
+                cnpj,
+                email
+            FROM fornecedor
+            ORDER BY nome_fornecedor ASC
+        """)
+
+        fornecedores = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "sucesso": True,
+            "fornecedores": fornecedores
+        })
+
+    except Exception as e:
+
+        print("ERRO API FORNECEDORES:", e)
+
+        return jsonify({
+            "sucesso": False,
+            "erro": str(e)
+        }), 500
+
+
+# ==========================================================
+# API - PRODUTOS
+# ==========================================================
+
+@app.route("/api/produtos", methods=["GET"])
+def api_produtos():
+
+    try:
+
+        conn = conectar_banco.connect()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT
+                id,
+                nome,
+                categoria,
+                quantidade_estoque,
+                estoque_minimo,
+                preco_custo,
+                preco_venda,
+                fornecedor_id
+            FROM produto
+            WHERE ativo = TRUE
+            ORDER BY nome ASC
+        """)
+
+        produtos = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "sucesso": True,
+            "produtos": produtos
+        })
+
+    except Exception as e:
+
+        print("ERRO API PRODUTOS:", e)
+
+        return jsonify({
+            "sucesso": False,
+            "erro": str(e)
+        }), 500
+
+
+# ==========================================================
+# API - CLIENTES CADASTRADOS
+# ==========================================================
+
+@app.route("/api/clientes", methods=["GET"])
+def api_clientes():
+
+    try:
+
+        conn = conectar_banco.connect()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT
+                id,
+                nome,
+                cpf,
+                telefone,
+                cidade,
+                estado,
+                cep
+            FROM clientes_cadastro
+            ORDER BY nome ASC
+        """)
+
+        clientes = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "sucesso": True,
+            "clientes": clientes
+        })
+
+    except Exception as e:
+
+        print("ERRO API CLIENTES:", e)
+
+        return jsonify({
+            "sucesso": False,
+            "erro": str(e)
+        }), 500
+        
 #! = Feito pela -- Ana Beatriz // linha 1 a 1880 𖹭.ᐟ
 
 if __name__ == "__main__":
