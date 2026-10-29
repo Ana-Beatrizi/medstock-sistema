@@ -42,6 +42,7 @@ import re
 
 
 from flask_cors import CORS
+from iot_mqtt import sinalizar
 
 app = Flask(__name__)
 CORS(app)
@@ -582,7 +583,11 @@ def api_movimentacoes():
 
 
 # ======================= ROTAS =====================
-
+@app.route('/api/iot/sinal', methods=['POST'])
+def api_iot_sinal():
+    dados = request.get_json(silent=True) or {}
+    ok = sinalizar(dados.get('evento'))
+    return jsonify({'ok': ok})
 # TELA DE ERRO 404 ===============
 @app.errorhandler(404)
 def pagina_nao_encontrada(error):
@@ -1796,6 +1801,7 @@ def salvar_produto():
     try:
         produto.insert()
         flash("Produto cadastrado com sucesso.", "success")
+        sinalizar('cadastro')
         return redirect(url_for("tela_produtos"))
     except Exception as e:
         _apagar_imagem(dados.get("imagem"))     # não deixa arquivo órfão
@@ -1806,8 +1812,37 @@ def salvar_produto():
         dados["imagem"] = None
         dados.pop("imagem", None)
         return _renderizar_form(dados, imagem_url)
- 
- 
+
+# =====================================================
+# CONFIGURACAO (pode ser trocada por variaveis de ambiente)
+# =====================================================
+
+MQTT_BROKER = os.getenv(
+    "MQTT_BROKER",
+    "b1600c60a35c4520b32b9507d0b47b02.s1.eu.hivemq.cloud"
+)
+
+MQTT_PORT = int(os.getenv("MQTT_PORT", "8883"))
+
+MQTT_USER = os.getenv("MQTT_USER", "IOT-SENAI")
+MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", "12345678")
+
+# Mesmo topico que o ESP32 escuta
+MQTT_TOPIC_COMANDOS = os.getenv("MQTT_TOPIC_COMANDOS", "medstock/comandos")
+
+DEVICE_ID = "medstock"
+
+# Client ID DIFERENTE do ESP32 (se fosse igual, um derrubaria o outro).
+# O PID evita conflito quando o Flask roda com reloader (2 processos).
+MQTT_CLIENT_ID = "medstock-web-" + str(os.getpid())
+
+
+# Duracao de cada evento (milissegundos)
+EVENTOS = {
+    "busca": 200,       # bip curto ao buscar codigo de barras
+    "cadastro": 800,    # bip longo ao cadastrar produto
+}
+    
 # =========================================================
 # POST - ATUALIZAR PRODUTO
 # =========================================================
@@ -1963,6 +1998,7 @@ def salvar_pedido(produto_id):
     
     try:
         entrada.insert()
+        sinalizar('saida')
         flash("Pedido criado com sucesso.", "success")
         return redirect(url_for("tela_entrada"))
     except Exception as e:
@@ -2062,6 +2098,7 @@ def salvar_pedido_saida(produto_id):
     
     try:
         saida.insert()
+        sinalizar('saida')
         flash("Pedido de saida criado com sucesso.", "success")
         return redirect(url_for("tela_saida"))
     except Exception as e:

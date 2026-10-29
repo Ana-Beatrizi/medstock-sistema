@@ -402,7 +402,17 @@
 (function () {
     const URL_API   = "{{ url_for('api_consulta_codigo_barras', codigo='0') }}".slice(0, -1); // ".../codigo-barras/"
     const ID_ATUAL  = {{ produto.id if produto and produto.id else 'null' }};
+    const URL_IOT = "{{ url_for('api_iot_sinal') }}";
 
+function sinalIoT(evento) {
+    try {
+        fetch(URL_IOT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ evento: evento })
+        }).catch(function () {});
+    } catch (e) { /* sem IoT: o site continua normal */ }
+}
     const campoCodigo = document.getElementById('codigo_barras');
     const btnBuscar   = document.getElementById('btn-buscar');
     const btnCamera   = document.getElementById('btn-camera');
@@ -523,6 +533,7 @@
         }
 
         ultimoBuscado = codigo;
+        sinalIoT('busca');
         const minhaBusca = ++buscaAtual;
         btnBuscar.disabled = true;
         status('carregando', 'Consultando bases de dados...');
