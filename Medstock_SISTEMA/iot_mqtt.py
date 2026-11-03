@@ -43,9 +43,9 @@ MQTT_CLIENT_ID = "medstock-web-" + str(os.getpid())
 
 # Duracao de cada evento (milissegundos)
 EVENTOS = {
-    "busca": 100,       # bip curto ao buscar codigo de barras
-    "cadastro": 200,    # bip longo ao cadastrar produto
-    "saida": 200,
+    "busca": 50,       # bip curto ao buscar codigo de barras
+    "cadastro": 100,    # bip longo ao cadastrar produto
+    "saida": 50,
 }
 
 
