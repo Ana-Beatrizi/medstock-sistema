@@ -237,7 +237,7 @@
                 <!-- BUSCA -->
                 <div class="busca-wrap">
                     <i class="bi bi-search"></i>
-                    <input type="text" id="inputBusca" placeholder="Pesquisar">
+                    <input type="text" id="inputBusca" placeholder="Pesquise codigo de barras, nome, fornecedor, categoria, tipo ">
                 </div>
 
                 <!-- ALTERNÂNCIA DE VISUALIZAÇÃO -->
@@ -341,6 +341,7 @@
                 <div class="produto-item produto-card {% if estoque_baixo %}card-estoque-baixo{% endif %}"
                     data-id="{{ produto.id }}"
                     data-nome="{{ produto.nome }}"
+                    data-codigo-barras="{{ produto.codigo_barras or '' }}"
                     data-fornecedor="{{ produto.fornecedor.nome_fornecedor if produto.fornecedor else '' }}"
                     data-categoria="{{ produto.categoria }}"
                     data-tarja="{{ tarja_tipo if tarja else '' }}"
@@ -650,12 +651,22 @@
                 </div>
 
                 <div class="modal-info">
+                    <div class="modal-info-icone"><i class="bi bi-upc-scan"></i></div>
+                    <div class="modal-info-texto">
+                        <span>Código de barras</span>
+                        <strong id="modalCodigo_Barras">#0</strong>
+                    </div>
+                </div>
+
+                <div class="modal-info">
                     <div class="modal-info-icone"><i class="bi bi-hash"></i></div>
                     <div class="modal-info-texto">
-                        <span>Código do produto</span>
+                        <span>ID do produto</span>
                         <strong id="modalId">#0</strong>
                     </div>
                 </div>
+
+                
 
             </div>
 
@@ -1344,6 +1355,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const texto = [
                 d.nome,
+                d.codigoBarras,
                 d.fornecedor,
                 d.categoria,
                 tarja ? tarja.texto : "",
@@ -1394,6 +1406,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const fecharModal = document.getElementById("fecharModal");
     const modalIcone = document.getElementById("modalIcone");
     const modalNome = document.getElementById("modalNome");
+    const modalCodigo_Barras = document.getElementById("modalCodigo_Barras");
     const modalId = document.getElementById("modalId");
     const modalFornecedor = document.getElementById("modalFornecedor");
     const modalCategoria = document.getElementById("modalCategoria");
@@ -1511,6 +1524,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         modalId.textContent = "#" + (item.dataset.id || "0");
         modalFornecedor.textContent = item.dataset.fornecedor || "-";
+
+        /* ----- Código de barras ----- */
+        const codigoBarras = (item.dataset.codigoBarras || "").trim();
+        modalCodigo_Barras.textContent = codigoBarras || "Não informado";
 
 
         /* ----- Tipo do medicamento e receita exigida ----- */
