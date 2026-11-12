@@ -1087,6 +1087,91 @@ body.modal-aberto { overflow: hidden; }
 
 
 /* ============================================================
+   MODAL DE CONFIRMAÇÃO DE EXCLUSÃO
+   Fica acima do modal de detalhes (z-index maior)
+============================================================ */
+
+.confirm-overlay {
+    position: fixed; inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    z-index: 1000000;
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity .2s ease, visibility .2s ease;
+}
+
+.confirm-overlay.visivel { opacity: 1; visibility: visible; pointer-events: auto; }
+
+.confirm-modal {
+    width: 400px; max-width: 100%;
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 28px 26px 24px;
+    text-align: center;
+    box-shadow: 0 30px 70px rgba(16, 24, 64, 0.30), 0 8px 20px rgba(16, 24, 64, 0.12);
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    outline: none;
+    transform: scale(.92) translateY(10px);
+    opacity: 0;
+    transition: transform .22s cubic-bezier(.2, .9, .3, 1), opacity .2s ease;
+}
+
+.confirm-overlay.visivel .confirm-modal { transform: scale(1) translateY(0); opacity: 1; }
+
+.confirm-icone {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: #FFEDEE; color: #DC2626; font-size: 26px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 4px;
+    box-shadow: 0 0 0 8px #FFF5F5;
+}
+
+.confirm-modal h3 { color: #17223B; font-size: 20px; font-weight: 700; }
+
+.confirm-modal p {
+    color: #536078; font-size: 14px; line-height: 1.5;
+    word-break: break-word;
+}
+
+.confirm-modal p strong { color: #17223B; }
+
+.confirm-acoes {
+    width: 100%;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin-top: 12px;
+}
+
+.confirm-btn {
+    height: 48px; border-radius: 12px;
+    font-size: 14.5px; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    text-decoration: none; cursor: pointer;
+    transition: .2s ease;
+}
+
+.confirm-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(0, 196, 192, .35); }
+
+.confirm-btn-cancelar {
+    background: #EEF1F5; color: #536078; border: 1px solid transparent;
+}
+
+.confirm-btn-cancelar:hover { background: #E3E7EE; color: #0B2D6B; }
+
+.confirm-btn-excluir {
+    background: #DC2626; color: #FFFFFF !important; border: 1px solid #DC2626;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, .30);
+}
+
+.confirm-btn-excluir:hover { background: #B91C1C; border-color: #B91C1C; transform: translateY(-1px); }
+
+.confirm-btn-excluir:focus-visible { box-shadow: 0 0 0 3px rgba(220, 38, 38, .35); }
+
+
+/* ============================================================
    RESPONSIVO — TABLET
 ============================================================ */
 
@@ -1156,5 +1241,17 @@ body.modal-aberto { overflow: hidden; }
     .linha-meta { display: none; }
 
     .validade-status { font-size: 10.5px; padding: 4px 8px; }
+
+    /* Confirmação de exclusão: sobe da base, como o modal de detalhes */
+    .confirm-overlay { padding: 0; align-items: flex-end; }
+
+    .confirm-modal {
+        width: 100%;
+        border-radius: 22px 22px 0 0;
+        padding: 26px 20px 22px;
+        transform: translateY(24px);
+    }
+
+    .confirm-overlay.visivel .confirm-modal { transform: translateY(0); }
 
 }

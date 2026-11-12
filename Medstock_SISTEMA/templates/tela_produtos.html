@@ -209,8 +209,6 @@
                             </div>
                         </div>
 
-                        
-
                         <!-- Tipo de medicamento -->
                         <div class="filtro-grupo">
                             <span class="filtro-rotulo">Tipo de medicamento</span>
@@ -666,8 +664,6 @@
                     </div>
                 </div>
 
-                
-
             </div>
 
         </div>
@@ -698,15 +694,58 @@
 </div>
 
 
+<!-- =============================================================
+     MODAL DE CONFIRMAÇÃO DE EXCLUSÃO
+     Abre por cima do modal de detalhes (z-index maior).
+============================================================= -->
+
+<div id="confirmOverlay" class="confirm-overlay" aria-hidden="true">
+
+    <div id="confirmModal" class="confirm-modal" role="alertdialog" aria-modal="true"
+         aria-labelledby="confirmTitulo" aria-describedby="confirmTexto" tabindex="-1">
+
+        <div class="confirm-icone">
+            <i class="bi bi-trash3-fill"></i>
+        </div>
+
+        <h3 id="confirmTitulo">Excluir produto?</h3>
+
+        <p id="confirmTexto">
+            Você está prestes a excluir <strong id="confirmNomeProduto">este produto</strong>.
+            Esta ação não pode ser desfeita.
+        </p>
+
+        <div class="confirm-acoes">
+
+            <button type="button" id="confirmCancelar" class="confirm-btn confirm-btn-cancelar">
+                Cancelar
+            </button>
+
+            <a id="confirmExcluir" href="#" class="confirm-btn confirm-btn-excluir">
+                <i class="bi bi-trash3-fill"></i> Excluir
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 <script>
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    /* Move o overlay para o BODY (evita prender o modal em containers) */
+    /* Move os overlays para o BODY (evita prender os modais em containers) */
     const overlay = document.getElementById("modalOverlay");
+    const confirmOverlay = document.getElementById("confirmOverlay");
 
     if (overlay && overlay.parentElement !== document.body) {
         document.body.appendChild(overlay);
+    }
+
+    if (confirmOverlay && confirmOverlay.parentElement !== document.body) {
+        document.body.appendChild(confirmOverlay);
     }
 
     /* Declarados aqui em cima porque definirView() já precisa deles
@@ -1295,11 +1334,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
-    montarListaETabela();
-
-    let viewSalva = "grid";
-    try { viewSalva = localStorage.getItem(CHAVE_VIEW) || "grid"; } catch (err) { /* indisponível */ }
-    definirView(viewSalva);
+    /* Obs.: montarListaETabela() e definirView() são chamadas mais abaixo,
+       depois que o modal e o configurarItem() já estão definidos. */
 
 
     /* ========================================================
@@ -1392,14 +1428,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
-    /* Estado inicial: restaura filtros salvos e aplica tudo de uma vez */
-    carregarFiltros();
-    sincronizarControles();
-    aplicarBusca();
-
 
     /* ========================================================
-       ELEMENTOS DO MODAL
+       ELEMENTOS DO MODAL DE DETALHES
     ======================================================== */
 
     const modal = document.getElementById("modalProduto");
@@ -1667,7 +1698,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* ========================================================
-       ABRIR / FECHAR MODAL
+       ABRIR / FECHAR MODAL DE DETALHES
     ======================================================== */
 
     function abrirModal(item) {
@@ -1703,23 +1734,78 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* ========================================================
-       CONFIRMAÇÃO DE EXCLUSÃO (botão do modal)
+       MODAL DE CONFIRMAÇÃO DE EXCLUSÃO
+       Usado pelo "Excluir" do menu (...) (grade, lista e tabela)
+       e pelo botão "Excluir" do modal de detalhes.
     ======================================================== */
 
+    const confirmNomeProduto = document.getElementById("confirmNomeProduto");
+    const confirmCancelar = document.getElementById("confirmCancelar");
+    const confirmExcluir = document.getElementById("confirmExcluir");
+    const confirmModal = document.getElementById("confirmModal");
+
+    let focoAntesConfirm = null;
+
+    function confirmAberto() {
+        return confirmOverlay.classList.contains("visivel");
+    }
+
+    function abrirConfirmExclusao(nome, url) {
+
+        focoAntesConfirm = document.activeElement;
+
+        confirmNomeProduto.textContent = nome ? '"' + nome + '"' : "este produto";
+        confirmExcluir.href = url || "#";
+
+        confirmOverlay.classList.add("visivel");
+        confirmOverlay.setAttribute("aria-hidden", "false");
+        document.body.classList.add("modal-aberto");
+
+        /* Foco no "Cancelar": evita excluir sem querer ao apertar Enter */
+        requestAnimationFrame(function () {
+            confirmCancelar.focus();
+        });
+
+    }
+
+    function fecharConfirmExclusao() {
+
+        confirmOverlay.classList.remove("visivel");
+        confirmOverlay.setAttribute("aria-hidden", "true");
+
+        /* Só libera a rolagem se o modal de detalhes também estiver fechado */
+        if (!produtoAtual) {
+            document.body.classList.remove("modal-aberto");
+        }
+
+        if (focoAntesConfirm && document.contains(focoAntesConfirm)) {
+            focoAntesConfirm.focus();
+        }
+
+    }
+
+    confirmCancelar.addEventListener("click", fecharConfirmExclusao);
+
+    confirmOverlay.addEventListener("click", function (e) {
+        if (e.target === confirmOverlay) {
+            fecharConfirmExclusao();
+        }
+    });
+
+    /* Botão "Excluir" do modal de detalhes */
     modalExcluir.addEventListener("click", function (e) {
 
-        const nome = modalNome.textContent || "este produto";
+        e.preventDefault();
 
-        if (!window.confirm('Tem certeza que deseja excluir "' + nome + '"? Esta ação não pode ser desfeita.')) {
-            e.preventDefault();
-        }
+        abrirConfirmExclusao(modalNome.textContent, this.getAttribute("href"));
 
     });
 
 
     /* ========================================================
        CONFIGURAÇÃO DE CADA ITEM (grade, lista ou tabela)
-       — clique abre o modal, "..." abre o menu, exclusão confirma —
+       — clique abre o modal, "..." abre o menu, "Excluir" abre
+         a confirmação —
        Cada item recebe seus próprios listeners, então o
        stopPropagation() do botão "..." já evita que o clique feche
        o próprio menu que acabou de abrir.
@@ -1764,18 +1850,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }
 
-        /* Confirmação antes de excluir, direto no link "Excluir" do item */
+        /* "Excluir" do menu: abre o modal de confirmação em vez de navegar */
         const linkExcluir = item.querySelector(".opcao-excluir");
 
         if (linkExcluir) {
 
             linkExcluir.addEventListener("click", function (e) {
 
-                const nome = item.dataset.nome || "este produto";
+                e.preventDefault();
+                e.stopPropagation();
 
-                if (!window.confirm('Tem certeza que deseja excluir "' + nome + '"? Esta ação não pode ser desfeita.')) {
-                    e.preventDefault();
-                }
+                document.querySelectorAll(".menu-opcoes").forEach(function (m) {
+                    m.classList.remove("aberto");
+                });
+
+                abrirConfirmExclusao(item.dataset.nome, this.getAttribute("href"));
 
             });
 
@@ -1788,7 +1877,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* ========================================================
-       FECHAR MODAL
+       INICIALIZAÇÃO (lista/tabela, visualização salva, filtros)
+    ======================================================== */
+
+    montarListaETabela();
+
+    let viewSalva = "grid";
+    try { viewSalva = localStorage.getItem(CHAVE_VIEW) || "grid"; } catch (err) { /* indisponível */ }
+    definirView(viewSalva);
+
+    /* Restaura filtros salvos e aplica tudo de uma vez */
+    carregarFiltros();
+    sincronizarControles();
+    aplicarBusca();
+
+
+    /* ========================================================
+       FECHAR MODAL DE DETALHES
     ======================================================== */
 
     if (fecharModal) {
@@ -1823,14 +1928,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* ========================================================
-       ESC: fecha modal e painel de filtros
+       ESC: fecha primeiro a confirmação, depois o modal de
+       detalhes e, por fim, o painel de filtros
     ======================================================== */
 
     document.addEventListener("keydown", function (e) {
 
         if (e.key !== "Escape") return;
 
-        if (produtoAtual) {
+        if (confirmAberto()) {
+            fecharConfirmExclusao();
+        } else if (produtoAtual) {
             fecharDetalhes();
         } else {
             fecharFiltros();
